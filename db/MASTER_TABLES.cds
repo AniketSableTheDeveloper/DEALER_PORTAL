@@ -133,5 +133,103 @@ context DEALER_PORTAL {
             SECTION     : String(50);
 
     }
+
+    entity MATRIX_REQUEST_APPR {
+
+        key APPROVER_LEVEL : Integer;
+        key USER_ROLE      : String(10);
+        key USER_ID        : String(100);
+        key ENTITY_CODE    : String(50);
+            // key ENTITY_DESC : String(100);
+            TO_USER_ROLE   : Association to one MASTER_USER_ROLE
+                                 on TO_USER_ROLE.CODE = USER_ROLE;
+            TO_ENTITY_CODE : Association to one MASTER_ENTITY_CODE
+                                 on TO_ENTITY_CODE.BUKRS = ENTITY_CODE;
+    }
+
+    entity MATRIX_REGISTRATION_APPR {
+
+        key APPROVER_LEVEL : Integer;
+        key USER_ROLE      : String(10);
+        key USER_ID        : String(100);
+        key ENTITY_CODE    : String(10);
+            TO_USER_ROLE   : Association to one MASTER_USER_ROLE
+                                 on TO_USER_ROLE.CODE = USER_ROLE;
+            TO_ENTITY_CODE : Association to one MASTER_ENTITY_CODE
+                                 on TO_ENTITY_CODE.BUKRS = ENTITY_CODE;
+    }
+
+    entity MASTER_IDEAL_USERS {
+        key SR_NO            : Integer;
+            USER_ID          : String(50);
+            USER_ROLE        : String(50);
+            USER_NAME        : String(500);
+        key EMAIL            : String(150);
+            COMPANY_CODE     : String(500);
+            EMP_NO           : String(100);
+            CREATED_ON       : Timestamp;
+            UPDATED_ON       : Timestamp;
+            ACTIVE           : String(1);
+            TO_USER_ROLE     : Association to one MASTER_USER_ROLE
+                                   on TO_USER_ROLE.CODE = USER_ROLE;
+            TO_ENTITY_CODE   : Association to one MASTER_ENTITY_CODE
+                                   on TO_ENTITY_CODE.BUKRS = COMPANY_CODE;
+            TO_USER_ENTITIES : Association to many MASTER_USER_ENTITY_CODES
+                                   on TO_USER_ENTITIES.USER_ID = USER_ID;
+    }
+
+    entity MASTER_USER_ENTITY_CODES {
+        key USER_ID     : String(50);
+        key USER_ROLE   : String(50);
+        key ENTITY_CODE : String(50);
+            EMAIL       : String(150);
+            ENTITY_DESC : String(100);
+    }
+
+    entity MASTER_CREDENTIAL {
+        key SR_NO      : Integer;
+            USERNAME   : String(100);
+            PASSWORD   : String(100);
+            TYPE       : String(100);
+            ADD_INFO1  : String(100);
+            ADD_INFO2  : String(100);
+            ADD_INFO3  : String(100);
+            CREATED_ON : Timestamp;
+    }
+
+    entity MASTER_EMAIL_CONTACT_ID {
+
+        key SR_NO             : Integer;
+            EMAIL_NOTIF_1     : String(100);
+            EMAIL_NOTIF_2     : String(100);
+            EMAIL_NOTIF_3     : String(100);
+            CONTACT_ID_1      : String(100);
+            CONTACT_ID_2      : String(100);
+            CONTACT_ID_3      : String(100);
+            CLIENT_FULL_NAME  : String(100);
+            CLIENT_SHORT_NAME : String(100);
+            CLIENT_COUNTRY    : String(100);
+
+    }
+
+    entity MASTER_IDEAL_SAP_VENDOR_NO {
+            // REG_NO : Integer64;
+            SAP_VENDOR_CODE  : String(10);
+        key IVEN_VENDOR_CODE : Integer64;
+            ACCOUNT_GROUP    : String(50)
+    }
+
+    entity MASTER_SAP_CLIENT {
+        key SR_NO       : Integer;
+            CLIENT      : Integer not null;
+            DESTINTAION : String(25) not null;
+    }
+
+    entity MASTER_SUBACCOUNT {
+        key SR_NO       : Integer;
+            SUBACCOUNT  : String(50) not null;
+            PORTAL_LINK : String(100);
+            // DM_LIMIT : Integer;
+    }
     
 }
