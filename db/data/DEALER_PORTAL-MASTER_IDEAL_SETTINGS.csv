@@ -1,0 +1,13 @@
+CODE;DESCRIPTION;SETTING;TYPE
+DM_EMAIL_NOTIFICATION;Enable Emails - Data Migration Invites;null;REGFORM
+PORTAL_HELP;Enable Portal - Help (User Manual) Button;X;PORTAL
+PORTAL_NOTIFICATION;Enable Portal - Notification Button;X;PORTAL
+PORTAL_NOTIFICATION_APPRV;Enable Portal - Notification item Approve button;X;PORTAL
+PORTAL_NOTIFICATION_CLOSE;Enable Portal - Notification item Close button;null;PORTAL
+REGFORM_MESSENGER;Enable Messenger option for Vendor;X;REGFORM
+REGFORM_PROGRESSBAR;Enable Progress Bar;null;REGFORM
+REGFORM_SAMPLE_BTN;Enable Sample data button;X;REGFORM
+REGFORM_SAVEDRAFT_BTN;Enable Save Draft button;X;REGFORM
+VM_EMAIL_NOTIFICATION;Enable Emails - All iVen email notifications;X;REGFORM
+DM_UPLOAD_LIMIT;Upload limit for Data Migration records;50;VALUE
+JOB_ERRORLOG_LIMIT;Deletion limit for Error log in Days;30;VALUE

@@ -1,0 +1,31 @@
+CODE;DESCRIPTION;SHORT_DESCRIPTION;TYPE;GROUP1;GROUP2
+1;Company Profile;_CP;ONB;;G1
+3;Production/Quality Resources;_PRQA;ONB;;G2
+2;Catalogue of Products / services;_CAT;ONB;;G11
+4;Power of Attorney;_POA;ONB;;G12
+7;Bank Account letter issued by the Bank;_BANK;ONB;;G13
+12;TRN Certificate;_TRN;ONB;;G14
+18;Major Customers;_CUST;ONB;;G15
+19;Major Suppliers;_SUPPL;ONB;;G16
+20;List of references;_REF;ONB;;G17
+21;Signed and stamped NIMR PO terms and conditions;_POTAC;ONB;;G18
+22;Agency /distributorship Agreement endorse by OEM;_OEM;ONB;;G19
+16;Financial Statement;_FS;ONB;;G5
+23;ISO Certificate;_ISO;ONB;ISO;G3
+13;Chamber of Commerce certificate;_CCOM;ONB;;G7
+14;Certificate issued from the Manufacturer / service provider;_CMST;ONB;;G6
+11;Digital Certificate;_DC;ONB;;G6
+9;Certificate of Registration for Value Added Tax (VAT);_VAT;ONB;UAE;G7
+15;Non-disclosure Agreement (NDA);_NDA;ONB;;G10
+10;Certificate of Incorporation / Company Registration;_INCO;ONB;UAE;G7
+29;Other Attachments;_OA;ONB;;G24
+8;Valid Commercial / Trade License;_TL;ONB;UAE;G7
+5;Passport Copy;_PASS1;ONB;Passport;G8
+6;UID Copy;_UID1;ONB;Passport;G20
+24;Passport Copy;_PASS2;ONB;Passport;G9
+25;UID Copy;_UID2;ONB;Passport;G21
+26;Data Migration Template;_DM;DM;;
+27;VAT Evidence;_VATEVD;ONB;;G22
+28;ICV Certificate;_ICV;ONB;;G23
+17;Other Certificate;_OC;ONB;QC;G4
+30;User Manual;_UM;IVEN;;

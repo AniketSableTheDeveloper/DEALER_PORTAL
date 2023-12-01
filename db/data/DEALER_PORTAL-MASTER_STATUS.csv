@@ -1,0 +1,17 @@
+CODE;DESCRIPTION
+1;Not Invited
+2;Invited
+3;Invite Rejected
+5;In Approval - BUYER
+13;Rejected - MDG
+9;In Approval - SMDM Team (Resubmit)
+8;Form Rejected
+10;In Approval - MDG
+12;Invite Resent
+21;SES Created
+27;SES Deleted
+11;Registered
+7;Form Sent Back
+4;Form In Progress
+6;In Approval - SMDM
+14;Request Deleted
