@@ -134,6 +134,7 @@ context DEALER_PORTAL {
 
     }
 
+    //request approval matrix
     entity MATRIX_REQUEST_APPR {
 
         key APPROVER_LEVEL : Integer;
@@ -147,6 +148,7 @@ context DEALER_PORTAL {
                                  on TO_ENTITY_CODE.BUKRS = ENTITY_CODE;
     }
 
+    // registration approval matrix
     entity MATRIX_REGISTRATION_APPR {
 
         key APPROVER_LEVEL : Integer;
@@ -158,7 +160,7 @@ context DEALER_PORTAL {
             TO_ENTITY_CODE : Association to one MASTER_ENTITY_CODE
                                  on TO_ENTITY_CODE.BUKRS = ENTITY_CODE;
     }
-
+    //user master
     entity MASTER_IDEAL_USERS {
         key SR_NO            : Integer;
             USER_ID          : String(50);
