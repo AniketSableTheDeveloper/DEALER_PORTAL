@@ -29,7 +29,40 @@ service ideal_master_maintance {
     entity MasterSapClient as projection on DEALER_PORTAL.MASTER_SAP_CLIENT;
     entity MasterSubaccount as projection on DEALER_PORTAL.MASTER_SUBACCOUNT;
 
-    action UserMasterCrud(input : many MasterIdeaUsers,Action : String(100))returns String;
+    //CRUD Payload
+  type UserMasterPayload {
+    ACTION         : String;
+    // SR_NO          : Integer;
+    USER_DETAILS : User_Details;
+    VALUE          : array of {
+      USERMASTER     : array of {   
+      SR_NO        : Integer;
+      USER_ID      : String(50);
+      USER_ROLE    : String(50);
+      USER_NAME    : String(500);
+      EMAIL        : String(150);
+      COMPANY_CODE : String(500);
+      EMP_NO       : String(100);
+      CREATED_ON   : Timestamp;
+      UPDATED_ON   : Timestamp;
+      ACTIVE       : String(1);
+    };
+    ENTITYDATA     : array of {
+      USER_ID      : String(50);
+      USER_ROLE    : String(50);
+      ENTITY_CODE  : String(50);
+      EMAIL        : String(150);
+      ENTITY_DESC  : String(100);
+    }
+    };
+  };
+  type User_Details:{
+    USER_ROLE: String(50);
+    USER_ID: String(50);
+  };
+  
+    //CRUD operation action
+    action PostUserMaster(input : UserMasterPayload) returns String;
     
 
 }
