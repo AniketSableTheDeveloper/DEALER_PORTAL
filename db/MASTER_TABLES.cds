@@ -233,5 +233,16 @@ context DEALER_PORTAL {
             PORTAL_LINK : String(100);
             // DM_LIMIT : Integer;
     }
+
+    entity EMAIL_CONFIG {
+        key SR_NO      : Integer;
+            HOST   : String(100);
+            PORT   : Integer;
+            SECURE       : Boolean;
+            SENDER_EMAIL  : String(100);
+            USERNAME  : String(100);
+            PASSWORD  : String(100);
+            CREATED_ON : Timestamp;
+    }
     
 }

@@ -1,6 +1,6 @@
 using {DEALER_PORTAL} from '../db/MASTER_TABLES';
 
-service ideal_master_maintance {
+service ideal_master_maintenance {
 
     entity MasterCountry as projection on DEALER_PORTAL.MASTER_COUNTRY;
     entity MasterUserRole as projection on DEALER_PORTAL.MASTER_USER_ROLE;
@@ -21,7 +21,7 @@ service ideal_master_maintance {
     entity MasterRegformFieldsIdDesc as projection on DEALER_PORTAL.MASTER_REGFORM_FIELDS_ID_DESC;
     entity MatrixRequestAppr as projection on DEALER_PORTAL.MATRIX_REQUEST_APPR;
     entity MatrixRegistrationAppr as projection on DEALER_PORTAL.MATRIX_REGISTRATION_APPR;
-    entity MasterIdeaUsers as projection on DEALER_PORTAL.MASTER_IDEAL_USERS;
+    entity MasterIdealUsers as projection on DEALER_PORTAL.MASTER_IDEAL_USERS;
     entity MasterUserEntityUsers as projection on DEALER_PORTAL.MASTER_USER_ENTITY_CODES;
     entity MasterCredential as projection on DEALER_PORTAL.MASTER_CREDENTIAL;
     entity MasterEmailContactId as projection on DEALER_PORTAL.MASTER_EMAIL_CONTACT_ID;
@@ -29,7 +29,6 @@ service ideal_master_maintance {
     entity MasterSapClient as projection on DEALER_PORTAL.MASTER_SAP_CLIENT;
     entity MasterSubaccount as projection on DEALER_PORTAL.MASTER_SUBACCOUNT;
 
-    //CRUD Payload
   type UserMasterPayload {
     ACTION         : String;
     // SR_NO          : Integer;
@@ -60,9 +59,29 @@ service ideal_master_maintance {
     USER_ROLE: String(50);
     USER_ID: String(50);
   };
+
+  //CRUD Payload
+  type approvalMatrixPayload {
+      ACTION : String;
+      APP_TYPE : String(30);
+      USER_DETAILS : User_Details;
+      VALUE : array of {
+        APPROVER_LEVEL : Integer;
+        USER_ROLE      : String(10);
+        USER_ID        : String(100);
+        ENTITY_CODE    : String(50);
+      }
+    };
+
+      //  type User_Details:{
+      //         USER_ROLE: String(50);
+      //         USER_ID: String(50);
+      //  }
   
     //CRUD operation action
     action PostUserMaster(input : UserMasterPayload) returns String;
+    //CRUD operation action   
+    action PostApprovalMatrix(input : approvalMatrixPayload) returns String;
     
 
 }
