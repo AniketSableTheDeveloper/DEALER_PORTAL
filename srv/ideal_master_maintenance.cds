@@ -25,7 +25,7 @@ service ideal_master_maintenance {
     entity MasterUserEntityUsers as projection on DEALER_PORTAL.MASTER_USER_ENTITY_CODES;
     entity MasterCredential as projection on DEALER_PORTAL.MASTER_CREDENTIAL;
     entity MasterEmailContactId as projection on DEALER_PORTAL.MASTER_EMAIL_CONTACT_ID;
-    entity MasterIdealSapVendorNo as projection on DEALER_PORTAL.MASTER_IDEAL_SAP_VENDOR_NO;
+    entity MasterIdealSapVendorNo as projection on DEALER_PORTAL.MASTER_IDEAL_SAP_DEALER_NO;
     entity MasterSapClient as projection on DEALER_PORTAL.MASTER_SAP_CLIENT;
     entity MasterSubaccount as projection on DEALER_PORTAL.MASTER_SUBACCOUNT;
 

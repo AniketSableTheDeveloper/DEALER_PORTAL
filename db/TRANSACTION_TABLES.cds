@@ -1,5 +1,4 @@
-
-context  DEALER_PORTAL{
+namespace DEALER_PORTAL;
     
 entity IDEAL_ERROR_LOG {
  
@@ -26,5 +25,5 @@ entity REGFORM_FOLDER_IDS {
         OT_FOLDER3_ID    : String(25);
         OT_FOLDER4_ID    : String(25);
 }
-}
+
  

@@ -1,4 +1,3 @@
-
 context DEALER_PORTAL {
 
     entity MASTER_USER_ROLE {
@@ -83,7 +82,7 @@ context DEALER_PORTAL {
     entity MASTER_IDEAL_SETTINGS {
         key CODE        : String(25);
             DESCRIPTION : String(100);
-            SETTING     : String(10);
+            SETTING     : String(100);
             TYPE        : String(10)
     }
 
@@ -214,10 +213,10 @@ context DEALER_PORTAL {
 
     }
 
-    entity MASTER_IDEAL_SAP_VENDOR_NO {
+    entity MASTER_IDEAL_SAP_DEALER_NO {
             // REG_NO : Integer64;
-            SAP_VENDOR_CODE  : String(10);
-        key IVEN_VENDOR_CODE : Integer64;
+            SAP_DEALER_CODE  : String(10);
+        key IDEAL_DEALER_CODE : Integer64;
             ACCOUNT_GROUP    : String(50)
     }
 

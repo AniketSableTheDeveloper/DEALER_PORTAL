@@ -15,16 +15,12 @@ service ideal_admin_panel_srv {
     entity MasterRequestType as projection on DEALER_PORTAL.MASTER_REQUEST_TYPE;
     entity MasterIdealUsers as projection on DEALER_PORTAL.MASTER_IDEAL_USERS;
     entity MasterUserEntityUsers as projection on DEALER_PORTAL.MASTER_USER_ENTITY_CODES;
+    entity MasterUserRole as projection on DEALER_PORTAL.MASTER_USER_ROLE;
     entity IdealErrorLog as projection on DEALER_PORTAL.IDEAL_ERROR_LOG;
     entity RegformFolderIds as projection on DEALER_PORTAL.REGFORM_FOLDER_IDS;
     entity EmailConfig as projection on DEALER_PORTAL.EMAIL_CONFIG;
+    
 
-    //TEST
-  // entity region as projection on VENDOR_PORTAL.MASTER_REGION;
-  // entity address as projection on VENDOR_PORTAL.REGFORM_ADDRESS;
-
-  //Get data for Admin Panel
-  // function GetAdminPanelData(action : String, tableCode : MasterTableNames:TABLE_CODE, requestNo : Integer) returns array of String;
   function GetAdminPanelData(action : String, tableCode : String, requestNo : Integer) returns array of String;
   //Get Visible and Mandatory Fields
   function GetVisbleMandatoryFields(requestType : Integer, entityCode : String)returns array of String;
@@ -33,9 +29,5 @@ service ideal_admin_panel_srv {
   //Post Admin Panel Edits
   action   EditAdminPanelData(input : String)returns array of String;
   function TestOnPremiseConnection(sapClient : String, destFileName : String)returns array of String;
-
-//Dynamic Logic
-//  action   DynamicPostAdminPanelData(input : String)                                          returns array of String;
-//   action   DynamicEditAdminPanelData(input : String)                                          returns array of String;
 
 }

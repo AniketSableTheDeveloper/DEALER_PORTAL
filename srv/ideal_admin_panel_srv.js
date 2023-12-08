@@ -2,10 +2,10 @@
 const cds = require('@sap/cds')
 const dbClass = require("sap-hdbext-promisfied")
 const hdbext = require("@sap/hdbext")
-const lib_admin_panel = require('../srv/LIB/ideal_library_admin_panel')
-const lib_common = require('../srv/LIB/ideal_library')
-const lib_email = require('../srv/LIB/ideal_library_email')
-const lib_mdg = require('../srv/LIB/ideal_library_mdg')
+const lib_admin_panel = require('../srv/LIB/ideal_library_admin_panel');
+const lib_common = require('../srv/LIB/ideal_library');
+// const lib_email = require('../srv/LIB/ideal_library_email')
+// const lib_mdg = require('../srv/LIB/ideal_library_mdg')
 // const connect = require('passport/lib/framework/connect')
 
 // const { results } = require('@sap/cds/lib_admin_panel/utils/cds-utils')
@@ -43,9 +43,9 @@ module.exports = cds.service.impl(function () {
         try{
         //Refactor payload for Import CSV
           if(sAction === "IMPORT_CSV")
-            aInputData =await lib_admin_panel.removeMetadata(aInputData);
+            aInputData = await lib_admin_panel.removeMetadata(aInputData);
         
-          if(sTableName === 'MASTER_ENTITY_CODE' )
+          if(sTableName === 'MASTER_ENTITY_CODE')
           {
              //Refactor payload for Import CSV
             if(sAction === "IMPORT_CSV")
@@ -67,7 +67,7 @@ module.exports = cds.service.impl(function () {
               OUT_ERROR_CODE: iErrorCode,
               OUT_ERROR_MESSAGE:  error.message ? error.message : error
           }
-          lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
+        //   lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
           req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
 
@@ -86,7 +86,7 @@ module.exports = cds.service.impl(function () {
               OUT_ERROR_CODE: iErrorCode,
               OUT_ERROR_MESSAGE:  error.message ? error.message : error
           }
-          lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
+        //   lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
           req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
       }
@@ -100,8 +100,8 @@ module.exports = cds.service.impl(function () {
           var aEmailCC = aInputData[0].EMAIL_CC;
           var sEmailSender = aInputData[0].EMAIL_SENDER;
           // sResponse = await lib_email.sendEmail(connection, sEmailBody, sEmailSubject, aEmailTo, aEmailCC, sEmailSender)
-          var sCCEmail = await lib_email.setSampleCC( [aEmailCC]);
-          await  lib_email.sendivenEmail(aEmailTo,sCCEmail,'html', sEmailSubject,sEmailBody)
+        //   var sCCEmail = await lib_email.setSampleCC( [aEmailCC]);
+        //   await  lib_email.sendidealEmail(aEmailTo,sCCEmail,'html', sEmailSubject,sEmailBody)
       
           return sResponse
         }catch(error){     
@@ -111,7 +111,7 @@ module.exports = cds.service.impl(function () {
               OUT_ERROR_CODE: iErrorCode,
               OUT_ERROR_MESSAGE:  error.message ? error.message : error
           }
-          lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
+        //   lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
           req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
 
@@ -138,7 +138,7 @@ module.exports = cds.service.impl(function () {
       var sTableName = oReqData.VALUE[0].TABLE_NAME || null;
       var sTableDesc = oReqData.VALUE[0].TABLE_DESCRIPTION || null;
       var aMasterData = oReqData.VALUE[0].TABLE_DATA || [];
-      var oPrimaryKeydetails = oReqData.VALUE[0].PRMIARY_KEY_DETAILS || [];
+      var oPrimaryKeydetails = oReqData.VALUE[0].PRIMARY_KEY_DETAILS || [];
       var sResponse = null;
 
       var oUserDetails=oReqData.USER_DETAILS;   
@@ -171,7 +171,7 @@ module.exports = cds.service.impl(function () {
               OUT_ERROR_CODE: iErrorCode,
               OUT_ERROR_MESSAGE:  error.message ? error.message : error
           }
-          lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
+        //   lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
           req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
       }
@@ -189,9 +189,10 @@ module.exports = cds.service.impl(function () {
               masterName = oReqData.VALUE[i].TABLE_NAME;
               editType = oReqData.EDIT_TYPE;
               masterData = oReqData.VALUE[i].TABLE_DATA;
+              oPrimaryKeydetails =oReqData.VALUE[i].PRIMARY_KEY_DETAILS;
               tableDescription = oReqData.VALUE[i].TABLE_DESCRIPTION;
               aTableDesc.push(tableDescription)
-                sResponse = await lib_admin_panel.funcEditFormsAdminPanelData(connection,masterName,masterData,oPrimaryKeydetails);
+              sResponse = await lib_admin_panel.funcEditFormsAdminPanelData(connection,masterName,masterData,oPrimaryKeydetails);
             if (sResponse !== null) {
                 if (sResponse === 'Y') {
                   aSuccessArray.push(sResponse);
@@ -206,14 +207,14 @@ module.exports = cds.service.impl(function () {
           // Created Success Msg Dynamically Cause Needed Both Master Or One Master at a Time With The Help Change Flag
           successMsg = await lib_common.generateSuccessMessage(aTableDesc);
           return successMsg
-        }catch(oError){
+        }catch(error){
           var sType=error.code?"Procedure":"Node Js";    
           var iErrorCode=error.code??500;     
           let Result = {
               OUT_ERROR_CODE: iErrorCode,
               OUT_ERROR_MESSAGE:  error.message ? error.message : error
           }
-          lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
+        //   lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
           req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
       }
@@ -269,7 +270,7 @@ module.exports = cds.service.impl(function () {
               OUT_ERROR_CODE: iErrorCode,
               OUT_ERROR_MESSAGE:  error.message ? error.message : error
           }
-          lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
+        //   lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
           req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
         // responseInfo(JSON.stringify(results), "text/plain", 200);
@@ -289,7 +290,7 @@ module.exports = cds.service.impl(function () {
               OUT_ERROR_CODE: iErrorCode,
               OUT_ERROR_MESSAGE:  error.message ? error.message : error
           }
-          lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
+        //   lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
           req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
     }
@@ -301,7 +302,7 @@ module.exports = cds.service.impl(function () {
           OUT_ERROR_CODE: iErrorCode,
           OUT_ERROR_MESSAGE:  error.message ? error.message : error
       }
-      lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
+    //   lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
       req.error({ code:iErrorCode, message:  error.message ? error.message : error });
     }
   })
@@ -336,20 +337,20 @@ module.exports = cds.service.impl(function () {
           "Results": await lib_admin_panel.getMasterFormsData(connection),
           "ProgressBar": await lib_admin_panel.getPercentOfConfig(connection)
         };
-        // iVen_Content.responseInfo(JSON.stringify(responseObj), "application/json", 200);
+        // iDeal_Content.responseInfo(JSON.stringify(responseObj), "application/json", 200);
         return responseObj;
       }
       else if (action === "MDG_PAYLOAD") { 
 		    responseObj = {};
-    		responseObj.MDGPayload =await lib_mdg.getActiveDataPayload(connection, parseInt(requestNo, 10));
+    		// responseObj.MDGPayload =await lib_mdg.getActiveDataPayload(connection, parseInt(requestNo, 10));
 		    // responseInfo(JSON.stringify(responseObj), "application/json", 200);
 		    req.reply(responseObj)
 		}
       // else if(action === 'TEST_CONNECTION'){
       //   try{
-      //       //   set connection to ZIVN_VENDOR_REG_SRV Destination
-      //       var iVenVendorConnection = await cds.connect.to('ZIVN_VENDOR_REG_SRV');
-      //       var response = await iVenVendorConnection.send({
+      //       //   set connection to ZIVN_DEALER_REG_SRV Destination
+      //       var iDealDealerConnection = await cds.connect.to('ZIVN_DEALER_REG_SRV');
+      //       var response = await iDealDealerConnection.send({
       //         method: 'GET',
       //         path: '/GetCitySet',
       //         headers: { 'Content-Type': 'application/json' }
@@ -371,9 +372,9 @@ module.exports = cds.service.impl(function () {
   this.on('TestOnPremiseConnection',async(req) =>{
     try{
       var {sapClient,destFileName} = req.data;
-      //   set connection to ZIVN_VENDOR_REG_SRV Destination
-      var iVenVendorConnection = await cds.connect.to('ZIVN_VENDOR_REG_SRV');
-      var response = await iVenVendorConnection.send({
+      //   set connection to ZIVN_DEALER_REG_SRV Destination
+      var iDealDealerConnection = await cds.connect.to('ZIVN_DEALER_REG_SRV');
+      var response = await iDealDealerConnection.send({
         method: 'GET',
         path: '/GetCitySet',
         headers: { 'Content-Type': 'application/json',
