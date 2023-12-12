@@ -47,5 +47,21 @@ const cds = require("@sap/cds");
 		catch (error) {
 			throw error;
 		}
-	}
+	},
+	getApproverForEntity: async function (connection, sEntityCode, sUserRole, sTableName) {
+        try {
+            // let sApprover = null;
+            let sTableFullName = 'DEALER_PORTAL.' + sTableName;
+            let aResult = await connection.run(
+                SELECT
+                    .from`${connection.entities[sTableFullName]}`
+                    .where({ ENTITY_CODE: sEntityCode, USER_ROLE: sUserRole }));
+            if (aResult.length > 0) return aResult;
+            else return null;
+            // sApprover = aResult[0].USER_ID;            
+ 
+        }
+        catch (error) { throw error; }
+ 
+    }
 }

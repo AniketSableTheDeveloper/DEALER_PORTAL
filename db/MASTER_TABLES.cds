@@ -1,5 +1,20 @@
 context DEALER_PORTAL {
 
+    // entity MASTER_APPROVAL_HIERARCHY{
+    //     key HIERARCHY_ID : String(10);
+    //     ENTITY_CODE : String(10);
+    //     LEVEL : Integer;
+    //     ROLE_CODE : String(10);
+    //     key TYPE : String(10);
+
+    // }
+
+    // entity MASTER_APPROVAL_MATRIX{
+    //     key HIERARCHY_ID : String(10);
+    //     USER_IDS : String(100);
+    //     key TYPE : String(10);
+    // }
+
     entity MASTER_USER_ROLE {
         key CODE        : String(25);
             DESCRIPTION : String(100);
@@ -244,4 +259,18 @@ context DEALER_PORTAL {
             CREATED_ON : Timestamp;
     }
     
+}
+
+@cds.persistence.exists
+@cds.persistence.calcview
+entity USERMASTER_ENTITIES {
+    key USER_NAME    : String(500) @title: 'USER_NAME: USER_NAME';
+        EMAIL        : String(150) @title: 'EMAIL: EMAIL';
+        COMPANY_CODE : String(500) @title: 'COMPANY_CODE: COMPANY_CODE';
+        CREATED_ON   : Timestamp   @title: 'CREATED_ON: CREATED_ON';
+        ACTIVE       : String(1)   @title: 'ACTIVE: ACTIVE';
+        ENTITY_CODE  : String(50)  @title: 'ENTITY_CODE: ENTITY_CODE';
+        ENTITY_DESC  : String(100) @title: 'ENTITY_DESC: ENTITY_DESC';
+        USER_ID      : String(50)  @title: 'USER_ID: USER_ID';
+        USER_ROLE    : String(50)  @title: 'USER_ROLE: USER_ROLE';
 }
