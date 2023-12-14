@@ -509,6 +509,7 @@ module.exports = cds.service.impl(function () {
                 var sUserId = aInputData[0].USER_ID || null;
                 var sBuyerId = await getRequestCreator(connection, iRequestNo);
                 var sComment = aInputData[0].COMMENT;
+                // var responseObj;
 
                 var sReqType = aInputData[0].REQUEST_TYPE;
                 var iReqTypeChangeTo = aInputData[0].REQUEST_TYPE_TO_CODE;
@@ -534,20 +535,20 @@ module.exports = cds.service.impl(function () {
                 // var sEmailContentChange ='';
                 if(changedFields.length > 0)
                 {
-                    changedFields.map(function(field){
-                      field =  field.trim();
-                        if(field === "Creation Type" || field === "Request Type")
-                            // aEmailContentChange.push(field +" changed from " + sChangedFrom + " to <b>" + sChangedTo +" </b>")
-                            aEmailContentChange.push({"CHANGE_TYPE":field,"OLD_VALUE":sChangedFrom,"NEW_VALUE":sChangedTo})
-                            else if(field === "Dealer Type")
-                            aEmailContentChange.push({"CHANGE_TYPE":field,"OLD_VALUE":sSupplTypeFromDesc,"NEW_VALUE":sSupplTypeToDesc})
-                        // aEmailContentChange.push(field +" changed from " + sSupplTypeFromDesc + " to <b>" + sSupplTypeToDesc +" </b>")
-                        else if(field === "Dealer Sub Type")
-                        aEmailContentChange.push({"CHANGE_TYPE":field,"OLD_VALUE":sSubTypeFromDesc,"NEW_VALUE":sSubTypeToDesc})
+                    // changedFields.map(function(field){
+                    //   field =  field.trim();
+                    //     if(field === "Creation Type" || field === "Request Type")
+                    //         // aEmailContentChange.push(field +" changed from " + sChangedFrom + " to <b>" + sChangedTo +" </b>")
+                    //         aEmailContentChange.push({"CHANGE_TYPE":field,"OLD_VALUE":sChangedFrom,"NEW_VALUE":sChangedTo})
+                    //         else if(field === "Dealer Type")
+                    //         aEmailContentChange.push({"CHANGE_TYPE":field,"OLD_VALUE":sSupplTypeFromDesc,"NEW_VALUE":sSupplTypeToDesc})
+                    //     // aEmailContentChange.push(field +" changed from " + sSupplTypeFromDesc + " to <b>" + sSupplTypeToDesc +" </b>")
+                    //     else if(field === "Dealer Sub Type")
+                    //     aEmailContentChange.push({"CHANGE_TYPE":field,"OLD_VALUE":sSubTypeFromDesc,"NEW_VALUE":sSubTypeToDesc})
                         
-                        // aEmailContentChange.push(field +" changed from " + sSubTypeFromDesc + " to <b>" + sSubTypeToDesc +" </b>")
+                    //     // aEmailContentChange.push(field +" changed from " + sSubTypeFromDesc + " to <b>" + sSubTypeToDesc +" </b>")
                     
-                    })
+                    // })
                     // sEmailContentChange=  aEmailContentChange.toString()
                 }
 
@@ -757,9 +758,10 @@ module.exports = cds.service.impl(function () {
                   
                     }
                 }
+                
                 //-------------------------------------------------------------------------------------------------------------
                 // responseInfo(JSON.stringify(responseObj), "text/plain", statusCode);
-                return responseObj
+                return responseObj;
             }
           catch (error) {
                 // conn.rollback();
@@ -808,24 +810,24 @@ module.exports = cds.service.impl(function () {
                         "Message": Result.outputScalar.OUT_SUCCESS
                     };
 
-                    var aEmailto = null;
-                    for (var i = 0; i < aRequests.length; i++) {
-                        var oEmailData = {
-                            "ReqNo": aRequests[i].REQUEST_NO,
-                            "ReqType": aRequests[i].REQUEST_TYPE,
-                            "SupplierName": aRequests[i].DEALER_NAME1,
-                            "Admin_Email": aRequests[i].sLoginId,
-                            "Approver": aRequests[i].NEXT_APPROVER,
-                            "Assigned_To": sAssignedTo,
-                            "Buyer": aRequests[i].REQUESTER_ID
-                        };
+                    // var aEmailto = null;
+                    // for (var i = 0; i < aRequests.length; i++) {
+                    //     var oEmailData = {
+                    //         "ReqNo": aRequests[i].REQUEST_NO,
+                    //         "ReqType": aRequests[i].REQUEST_TYPE,
+                    //         "SupplierName": aRequests[i].DEALER_NAME1,
+                    //         "Admin_Email": aRequests[i].sLoginId,
+                    //         "Approver": aRequests[i].NEXT_APPROVER,
+                    //         "Assigned_To": sAssignedTo,
+                    //         "Buyer": aRequests[i].REQUESTER_ID
+                    //     };
 
-                        aEmailto = [sAssignedTo];
-                        if (aRequests[i].STATUS === 6 || (aRequests[i].NEXT_APPROVER !== aRequests[i].REQUESTER_ID)) {
-                            aEmailto.push(aRequests[i].NEXT_APPROVER);
-                        } else if (aRequests[i].REQUESTER_ID !== sAssignedTo) {
-                            aEmailto.push(aRequests[i].REQUESTER_ID);
-                        }
+                        // aEmailto = [sAssignedTo];
+                        // if (aRequests[i].STATUS === 6 || (aRequests[i].NEXT_APPROVER !== aRequests[i].REQUESTER_ID)) {
+                        //     aEmailto.push(aRequests[i].NEXT_APPROVER);
+                        // } else if (aRequests[i].REQUESTER_ID !== sAssignedTo) {
+                        //     aEmailto.push(aRequests[i].REQUESTER_ID);
+                        // }
 
                         if (isEmailNotificationEnabled) {
                             // var oEmaiContent = EMAIL_LIBRARY.getEmailData(sAction, "USER_DELEGATE", oEmailData, aRequests[i].STATUS);
@@ -841,13 +843,14 @@ module.exports = cds.service.impl(function () {
 
                     statusCode = 200;
                     return responseObj;
-                } else {
+                // }
+                //  else {
                     // responseObj = {
                     //     "Message": "Request re-assign failed!"
                     // };
                     throw {"message":"Request re-assign failed!"}
                     // statusCode = 400;
-                }
+                // }
                 // responseInfo(JSON.stringify(responseObj), "text/plain", statusCode);
                 // return responseObj;
             }

@@ -1,4 +1,4 @@
-using {DEALER_PORTAL} from '../db/MASTER_TABLES';
+using {DEALER_PORTAL,CALC_HIERARCHY_MATRIX} from '../db/MASTER_TABLES';
 
 service ideal_master_maintenance {
 
@@ -28,6 +28,9 @@ service ideal_master_maintenance {
     entity MasterIdealSapVendorNo as projection on DEALER_PORTAL.MASTER_IDEAL_SAP_DEALER_NO;
     entity MasterSapClient as projection on DEALER_PORTAL.MASTER_SAP_CLIENT;
     entity MasterSubaccount as projection on DEALER_PORTAL.MASTER_SUBACCOUNT;
+    entity MasterApprovalHierarchy as projection on DEALER_PORTAL.MASTER_APPROVAL_HIERARCHY;
+    entity CalcHierarchyMatrix as projection on CALC_HIERARCHY_MATRIX;
+
 
   type UserMasterPayload {
     ACTION         : String;
@@ -73,15 +76,28 @@ service ideal_master_maintenance {
       }
     };
 
-      //  type User_Details:{
-      //         USER_ROLE: String(50);
-      //         USER_ID: String(50);
-      //  }
+    type dyanmicApprovalPayload{
+      ACTION : String;
+      APP_TYPE : String(30);
+      USER_DETAILS : User_Details;
+      VALUE : array of{
+        HIERARCHY_ID : String(10);
+        ENTITY_CODE : String(10);
+        LEVEL : Integer;
+        ROLE_CODE : String(10);
+        TYPE : String(10);
+        ACCESS_EDIT : String(1);
+        ACCESS_APPROVE : String(1);
+        ACCESS_SENDBACK : String(1);
+        ACCESS_REJECT : String(1);
+      }
+    }
   
     //CRUD operation action
     action PostUserMaster(input : UserMasterPayload) returns String;
     //CRUD operation action   
     action PostApprovalMatrix(input : approvalMatrixPayload) returns String;
+    action PostDynamicApprovalHierarchy(input : dyanmicApprovalPayload)returns String;
     
 
 }

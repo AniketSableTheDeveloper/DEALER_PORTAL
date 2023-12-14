@@ -1,19 +1,23 @@
 context DEALER_PORTAL {
 
-    // entity MASTER_APPROVAL_HIERARCHY{
-    //     key HIERARCHY_ID : String(10);
-    //     ENTITY_CODE : String(10);
-    //     LEVEL : Integer;
-    //     ROLE_CODE : String(10);
-    //     key TYPE : String(10);
+    entity MASTER_APPROVAL_HIERARCHY{
+        key HIERARCHY_ID : String(10);
+        ENTITY_CODE : String(10);
+        LEVEL : Integer;
+        ROLE_CODE : String(10);
+        key TYPE : String(10);
+        ACCESS_EDIT : String(1);
+        ACCESS_APPROVE : String(1);
+        ACCESS_SENDBACK : String(1);
+        ACCESS_REJECT : String(1);
 
-    // }
+    }
 
-    // entity MASTER_APPROVAL_MATRIX{
-    //     key HIERARCHY_ID : String(10);
-    //     USER_IDS : String(100);
-    //     key TYPE : String(10);
-    // }
+    entity MASTER_APPROVAL_MATRIX{
+        key HIERARCHY_ID : String(10);
+        USER_IDS : String(100);
+        key TYPE : String(10);
+    }
 
     entity MASTER_USER_ROLE {
         key CODE        : String(25);
@@ -273,4 +277,19 @@ entity USERMASTER_ENTITIES {
         ENTITY_DESC  : String(100) @title: 'ENTITY_DESC: ENTITY_DESC';
         USER_ID      : String(50)  @title: 'USER_ID: USER_ID';
         USER_ROLE    : String(50)  @title: 'USER_ROLE: USER_ROLE';
+}
+
+@cds.persistence.exists 
+@cds.persistence.calcview 
+Entity CALC_HIERARCHY_MATRIX {
+key     HIERARCHY_ID: String(10)  @title: 'HIERARCHY_ID: HIERARCHY_ID' ; 
+        ENTITY_CODE: String(10)  @title: 'ENTITY_CODE: ENTITY_CODE' ; 
+        LEVEL: Integer  @title: 'LEVEL: LEVEL' ; 
+        ROLE_CODE: String(10)  @title: 'ROLE_CODE: ROLE_CODE' ; 
+        TYPE: String(10)  @title: 'TYPE: TYPE' ; 
+        ACCESS_EDIT: String(1)  @title: 'ACCESS_EDIT: ACCESS_EDIT' ; 
+        ACCESS_APPROVE: String(1)  @title: 'ACCESS_APPROVE: ACCESS_APPROVE' ; 
+        ACCESS_SENDBACK: String(1)  @title: 'ACCESS_SENDBACK: ACCESS_SENDBACK' ; 
+        ACCESS_REJECT: String(1)  @title: 'ACCESS_REJECT: ACCESS_REJECT' ; 
+        USER_IDS: String(100)  @title: 'USER_IDS: USER_IDS' ; 
 }

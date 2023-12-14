@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="CALC_HIERARCHY_MATRIX" applyPrivilegeType="NONE" dataCategory="DIMENSION" dimensionType="STANDARD" schemaVersion="3.0" hierarchyGeneration="SQL" outputViewType="Projection" cacheInvalidationPeriod="NONE" enforceSqlExecution="true">
+<descriptions defaultDescription="CALC_HIERARCHY_MATRIX.hdbcalculationview"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="DEALER_PORTAL_MASTER_APPROVAL_HIERARCHY">
+    <resourceUri>DEALER_PORTAL_MASTER_APPROVAL_HIERARCHY</resourceUri>
+  </DataSource>
+  <DataSource id="DEALER_PORTAL_MASTER_APPROVAL_MATRIX">
+    <resourceUri>DEALER_PORTAL_MASTER_APPROVAL_MATRIX</resourceUri>
+  </DataSource>
+</dataSources>
+<snapshotProcedures/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:ProjectionView" id="Projection_1">
+    <viewAttributes>
+      <viewAttribute id="HIERARCHY_ID"/>
+      <viewAttribute id="ENTITY_CODE"/>
+      <viewAttribute id="LEVEL"/>
+      <viewAttribute id="ROLE_CODE"/>
+      <viewAttribute id="TYPE"/>
+      <viewAttribute id="ACCESS_EDIT"/>
+      <viewAttribute id="ACCESS_APPROVE"/>
+      <viewAttribute id="ACCESS_SENDBACK"/>
+      <viewAttribute id="ACCESS_REJECT"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="DEALER_PORTAL_MASTER_APPROVAL_HIERARCHY"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:ProjectionView" id="Projection_2">
+    <viewAttributes>
+      <viewAttribute id="HIERARCHY_ID"/>
+      <viewAttribute id="USER_IDS"/>
+      <viewAttribute id="TYPE"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="DEALER_PORTAL_MASTER_APPROVAL_MATRIX"/>
+  </calculationView>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1" cardinality="CN_N" joinType="inner">
+    <viewAttributes>
+      <viewAttribute id="HIERARCHY_ID"/>
+      <viewAttribute id="ENTITY_CODE"/>
+      <viewAttribute id="LEVEL"/>
+      <viewAttribute id="ROLE_CODE"/>
+      <viewAttribute id="TYPE"/>
+      <viewAttribute id="ACCESS_EDIT"/>
+      <viewAttribute id="ACCESS_APPROVE"/>
+      <viewAttribute id="ACCESS_SENDBACK"/>
+      <viewAttribute id="ACCESS_REJECT"/>
+      <viewAttribute id="HIERARCHY_ID_1"/>
+      <viewAttribute id="USER_IDS"/>
+      <viewAttribute id="TYPE_1"/>
+      <viewAttribute hidden="true" id="JOIN$HIERARCHY_ID$HIERARCHY_ID"/>
+      <viewAttribute hidden="true" id="JOIN$TYPE$TYPE"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="Projection_1">
+      <mapping xsi:type="Calculation:AttributeMapping" target="HIERARCHY_ID" source="HIERARCHY_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="ENTITY_CODE" source="ENTITY_CODE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="LEVEL" source="LEVEL"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="ROLE_CODE" source="ROLE_CODE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TYPE" source="TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="ACCESS_EDIT" source="ACCESS_EDIT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="ACCESS_APPROVE" source="ACCESS_APPROVE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="ACCESS_SENDBACK" source="ACCESS_SENDBACK"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="ACCESS_REJECT" source="ACCESS_REJECT"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$HIERARCHY_ID$HIERARCHY_ID" source="HIERARCHY_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TYPE$TYPE" source="TYPE"/>
+    </input>
+    <input node="Projection_2">
+      <mapping xsi:type="Calculation:AttributeMapping" target="HIERARCHY_ID_1" source="HIERARCHY_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="USER_IDS" source="USER_IDS"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TYPE_1" source="TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$HIERARCHY_ID$HIERARCHY_ID" source="HIERARCHY_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TYPE$TYPE" source="TYPE"/>
+    </input>
+    <joinAttribute name="JOIN$HIERARCHY_ID$HIERARCHY_ID"/>
+    <joinAttribute name="JOIN$TYPE$TYPE"/>
+  </calculationView>
+</calculationViews>
+<logicalModel id="Join_1">
+  <attributes>
+    <attribute id="HIERARCHY_ID" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="HIERARCHY_ID"/>
+      <keyMapping columnObjectName="Join_1" columnName="HIERARCHY_ID"/>
+    </attribute>
+    <attribute id="ENTITY_CODE" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="ENTITY_CODE"/>
+      <keyMapping columnObjectName="Join_1" columnName="ENTITY_CODE"/>
+    </attribute>
+    <attribute id="LEVEL" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="LEVEL"/>
+      <keyMapping columnObjectName="Join_1" columnName="LEVEL"/>
+    </attribute>
+    <attribute id="ROLE_CODE" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="ROLE_CODE"/>
+      <keyMapping columnObjectName="Join_1" columnName="ROLE_CODE"/>
+    </attribute>
+    <attribute id="TYPE" order="5" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="TYPE"/>
+      <keyMapping columnObjectName="Join_1" columnName="TYPE"/>
+    </attribute>
+    <attribute id="ACCESS_EDIT" order="6" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="ACCESS_EDIT"/>
+      <keyMapping columnObjectName="Join_1" columnName="ACCESS_EDIT"/>
+    </attribute>
+    <attribute id="ACCESS_APPROVE" order="7" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="ACCESS_APPROVE"/>
+      <keyMapping columnObjectName="Join_1" columnName="ACCESS_APPROVE"/>
+    </attribute>
+    <attribute id="ACCESS_SENDBACK" order="8" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="ACCESS_SENDBACK"/>
+      <keyMapping columnObjectName="Join_1" columnName="ACCESS_SENDBACK"/>
+    </attribute>
+    <attribute id="ACCESS_REJECT" order="9" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="ACCESS_REJECT"/>
+      <keyMapping columnObjectName="Join_1" columnName="ACCESS_REJECT"/>
+    </attribute>
+    <attribute id="USER_IDS" order="10" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="USER_IDS"/>
+      <keyMapping columnObjectName="Join_1" columnName="USER_IDS"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+  
+    <shape expanded="true" modelObjectName="Projection_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="-112" y="264"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="Projection_2" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="312" y="264"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape expanded="true" modelObjectName="Join_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="100" y="187"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="Projection_1" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="136"/>
+    </shape>
+    <shape modelObjectName="Projection_2" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+      <upperLeftCorner x="320" y="30"/>
+      <rectangleSize width="136"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

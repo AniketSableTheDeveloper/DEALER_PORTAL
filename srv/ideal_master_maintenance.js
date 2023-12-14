@@ -165,4 +165,50 @@ module.exports = cds.service.impl(async function(){
     }
     catch(error  ){  throw error; }
   }
+  this.on('PostDynamicApprovalHierarchy',async (req) =>{
+
+        var oReqData = req.data.input;
+        var oUserDetails=oReqData.USER_DETAILS;
+        var sUserId=oUserDetails.USER_ID || null;
+        var sUserRole=oUserDetails.USER_ROLE || null;
+        var sAction = oReqData.ACTION;
+        var aHierarchyMatrixData = req.data.input.VALUE;
+        var vEntityCode = aHierarchyMatrixData[0].ENTITY_CODE;
+        var vType = aHierarchyMatrixData[0].TYPE;
+        var fLevel = aHierarchyMatrixData[0].LEVEL;
+
+        // if(sAction === 'CREATE'){
+        // var fLevel = await _checkEntityCodeAndTypeForLevel(aHierarchyMatrixData);
+        // var vHierarchyId = vEntityCode +'_0'+fLevel;
+        // }
+
+        if(fLevel !== null || fLevel !== '' || sAction === 'UPDATE' || sAction === 'DELETE')
+        {
+
+            // load procedure
+            const loadProc = await dbconn.loadProcedurePromisified(hdbext, null, 'DYNAMIC_MATRIX_APPROVAL')
+            // excute procedure
+            const result = await dbconn.callProcedurePromisified(loadProc,[vType, sAction, aHierarchyMatrixData,vHierarchyId,fLevel,sUserId]);
+            return result
+        }
+
+      })
+      async function _checkEntityCodeAndTypeForLevel(Data){
+
+        var aResultEntityCodeAndType = await SELECT .from `DEALER_PORTAL_MASTER_APPROVAL_HIERARCHY` .where `ENTITY_CODE=${Data[0].ENTITY_CODE} AND TYPE=${Data[0].TYPE}`;
+        var sLevel;
+
+        // if(aResultEntityCodeAndType > 0){
+
+          if(aResultEntityCodeAndType.length === 0)
+          {
+            sLevel = 1;
+          }
+          else{
+            sLevel = Number(aResultEntityCodeAndType[0].LEVEL) + 1;
+          }
+        // }
+        return sLevel;
+
+  }
 }) 

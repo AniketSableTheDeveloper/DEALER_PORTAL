@@ -1,5 +1,6 @@
 namespace DEALER_PORTAL;
-using {DEALER_PORTAL.MASTER_STATUS} from '../db/MASTER_TABLES';
+using {DEALER_PORTAL.MASTER_STATUS,DEALER_PORTAL.MASTER_ENTITY_CODE
+,DEALER_PORTAL.MASTER_REQUEST_TYPE} from '../db/MASTER_TABLES';
     
 entity IDEAL_ERROR_LOG {
  
@@ -94,7 +95,11 @@ entity REQUEST_INFO {
         COMMENT                  : String(1000);
         LEGACY_ID                : String(10);
         TO_STATUS                : Association to one DEALER_PORTAL.MASTER_STATUS
-                                       on TO_STATUS.CODE = STATUS;
+                                    on TO_STATUS.CODE = STATUS;
+        TO_ENTITY_CODE           : Association to one DEALER_PORTAL.MASTER_ENTITY_CODE
+                                    on TO_ENTITY_CODE.BUKRS = ENTITY_CODE;
+        TO_REQUEST_TYPE          : Association to one DEALER_PORTAL.MASTER_REQUEST_TYPE
+                                    on TO_REQUEST_TYPE.CODE = REQUEST_TYPE;
         // TO_ADDRESS               : Association to many DEALER_PORTAL.REGFORM_ADDRESS
         //                                on TO_ADDRESS.REQUEST_NO = REQUEST_NO;
         // TO_CONTACTS              : Association to many DEALER_PORTAL.REGFORM_CONTACTS
