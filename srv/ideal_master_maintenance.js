@@ -176,6 +176,7 @@ module.exports = cds.service.impl(async function(){
         var vEntityCode = aHierarchyMatrixData[0].ENTITY_CODE;
         var vType = aHierarchyMatrixData[0].TYPE;
         var fLevel = aHierarchyMatrixData[0].LEVEL;
+        var vRole = aHierarchyMatrixData[0].ROLE_CODE;
 
         // if(sAction === 'CREATE'){
         // var fLevel = await _checkEntityCodeAndTypeForLevel(aHierarchyMatrixData);
@@ -188,7 +189,7 @@ module.exports = cds.service.impl(async function(){
             // load procedure
             const loadProc = await dbconn.loadProcedurePromisified(hdbext, null, 'DYNAMIC_MATRIX_APPROVAL')
             // excute procedure
-            const result = await dbconn.callProcedurePromisified(loadProc,[vType, sAction, aHierarchyMatrixData,vHierarchyId,fLevel,sUserId]);
+            const result = await dbconn.callProcedurePromisified(loadProc,[vType, sAction, aHierarchyMatrixData,aHierarchyMatrixData[0].HIERARCHY_ID,fLevel,sUserId,vRole]);
             return result
         }
 
