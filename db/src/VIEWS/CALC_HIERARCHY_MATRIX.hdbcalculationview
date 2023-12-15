@@ -37,7 +37,7 @@
     <calculatedViewAttributes/>
     <input node="DEALER_PORTAL_MASTER_APPROVAL_MATRIX"/>
   </calculationView>
-  <calculationView xsi:type="Calculation:JoinView" id="Join_1" cardinality="CN_N" joinType="inner">
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1" cardinality="CN_N" joinType="leftOuter">
     <viewAttributes>
       <viewAttribute id="HIERARCHY_ID"/>
       <viewAttribute id="ENTITY_CODE"/>
