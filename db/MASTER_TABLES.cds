@@ -15,7 +15,7 @@ context DEALER_PORTAL {
 
     entity MASTER_APPROVAL_MATRIX{
         key HIERARCHY_ID : String(10);
-        USER_IDS : String(100);
+        USER_IDS : String(1000);
         key TYPE : String(10);
     }
 

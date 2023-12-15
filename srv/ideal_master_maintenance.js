@@ -166,16 +166,16 @@ module.exports = cds.service.impl(async function(){
     catch(error  ){  throw error; }
   }
   this.on('PostDynamicApprovalHierarchy',async (req) =>{
+    try{
 
         var oReqData = req.data.input;
-        var oUserDetails=oReqData.USER_DETAILS;
-        var sUserId=oUserDetails.USER_ID || null;
-        var sUserRole=oUserDetails.USER_ROLE || null;
-        var sAction = oReqData.ACTION;
-        var aHierarchyMatrixData = req.data.input.VALUE;
+        // var oUserDetails=oReqData.USER_DETAILS;
+        var sUserId=req.data.userIds || null;
+        var sAction = req.data.action;
+        var aHierarchyMatrixData = req.data.input;
         var vEntityCode = aHierarchyMatrixData[0].ENTITY_CODE;
         var vType = aHierarchyMatrixData[0].TYPE;
-        var fLevel = aHierarchyMatrixData[0].LEVEL;
+        // var fLevel = aHierarchyMatrixData[0].LEVEL;
         var vRole = aHierarchyMatrixData[0].ROLE_CODE;
 
         // if(sAction === 'CREATE'){
@@ -183,16 +183,19 @@ module.exports = cds.service.impl(async function(){
         // var vHierarchyId = vEntityCode +'_0'+fLevel;
         // }
 
-        if(fLevel !== null || fLevel !== '' || sAction === 'UPDATE' || sAction === 'DELETE')
+        if(sAction === 'CREATE' || sAction === 'UPDATE' || sAction === 'DELETE')
         {
 
             // load procedure
             const loadProc = await dbconn.loadProcedurePromisified(hdbext, null, 'DYNAMIC_MATRIX_APPROVAL')
             // excute procedure
-            const result = await dbconn.callProcedurePromisified(loadProc,[vType, sAction, aHierarchyMatrixData,aHierarchyMatrixData[0].HIERARCHY_ID,fLevel,sUserId,vRole]);
+            const result = await dbconn.callProcedurePromisified(loadProc,[vType, sAction, aHierarchyMatrixData,aHierarchyMatrixData[0].HIERARCHY_ID,sUserId,vRole]);
             return result
         }
-
+      }
+      catch (error) {
+        req.error({message:  error.message ? error.message : error });      
+      } 
       })
       async function _checkEntityCodeAndTypeForLevel(Data){
 
