@@ -63,5 +63,18 @@ const cds = require("@sap/cds");
         }
         catch (error) { throw error; }
  
-    }
+    },
+	getRegisteredId:async function(iReqNo,connection){
+        try {
+            // let connection = await cds.connect.to('db');
+            let aResult = await connection.run(
+                SELECT `REGISTERED_ID`
+                    .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
+                    .where({ REQUEST_NO: iReqNo }));
+            if (aResult.length > 0) return aResult[0].REGISTERED_ID;
+            else return null;      
+ 
+        }
+        catch (error) { throw error; }
+    },
 }

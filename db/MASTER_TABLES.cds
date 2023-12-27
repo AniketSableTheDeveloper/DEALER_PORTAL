@@ -1,3 +1,6 @@
+using { DEALER_PORTAL.MASTER_ENTITY_CODE } from '../db/MASTER_TABLES';
+
+
 context DEALER_PORTAL {
 
     entity MASTER_APPROVAL_HIERARCHY{
@@ -10,6 +13,8 @@ context DEALER_PORTAL {
         ACCESS_APPROVE : String(1);
         ACCESS_SENDBACK : String(1);
         ACCESS_REJECT : String(1);
+        TO_ENTITY_CODE : Association to one MASTER_ENTITY_CODE
+                            on TO_ENTITY_CODE.BUKRS = ENTITY_CODE;
 
     }
 
@@ -234,8 +239,8 @@ context DEALER_PORTAL {
 
     entity MASTER_IDEAL_SAP_DEALER_NO {
             // REG_NO : Integer64;
-            SAP_DEALER_CODE  : String(10);
-        key IDEAL_DEALER_CODE : Integer64;
+            SAP_DIST_CODE  : String(10);
+        key IDEAL_DIST_CODE : Integer64;
             ACCOUNT_GROUP    : String(50)
     }
 
@@ -291,5 +296,8 @@ key     HIERARCHY_ID: String(10)  @title: 'HIERARCHY_ID: HIERARCHY_ID' ;
         ACCESS_APPROVE: String(1)  @title: 'ACCESS_APPROVE: ACCESS_APPROVE' ; 
         ACCESS_SENDBACK: String(1)  @title: 'ACCESS_SENDBACK: ACCESS_SENDBACK' ; 
         ACCESS_REJECT: String(1)  @title: 'ACCESS_REJECT: ACCESS_REJECT' ; 
-        USER_IDS: String(100)  @title: 'USER_IDS: USER_IDS' ; 
+        USER_IDS: String(1000)  @title: 'USER_IDS: USER_IDS' ;
+        TO_ENTITY_CODE : Association to one DEALER_PORTAL.MASTER_ENTITY_CODE
+                            on TO_ENTITY_CODE.BUKRS = ENTITY_CODE;
+
 }

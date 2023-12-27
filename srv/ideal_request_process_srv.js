@@ -19,21 +19,12 @@ module.exports = cds.service.impl(function () {
             var aEvents = eventsData || [];
             var isEmailNotificationEnabled = false;
 
-            // var oReqData = JSON.parse(req.data.input);
-            // var sAction = oReqData.ACTION || null;
-            // var aInputData = oReqData.INPUT_DATA || null;
-            // var aEvents = oReqData.EVENTS || [];
-            // var isEmailNotificationEnabled = false;
-
             if(inputData.length === 0) throw {"message" : "inputData is missing"};
             
             var sEntityCode = aInputData[0].ENTITY_CODE || null;
 
             //intialize connection to database
             let connection = await cds.connect.to('db');
-
-            //capturing and deleting EntityDesc from InputData
-            // var sEntityDesc = aInputData[0].ENTITY_DESC || null; //commented by Siddhesh 10th Sep 23
 
             // getEntity Description against Entity Code from library
             var sEntityDesc = await lib_common.getEntityDesc(connection, sEntityCode);
@@ -52,17 +43,17 @@ module.exports = cds.service.impl(function () {
                 try{
                 //----------------------------------------------------------------------------------
                 //Check If Approver details exist against the entity code
-                var checkApprover = await lib_common.getApproverForEntity(connection, sEntityCode, 'PM', 'MATRIX_REQUEST_APPR');
-                if (checkApprover === null || (checkApprover[0].USER_ID === null || checkApprover[0].USER_ID === ""))
+                var checkApprover = await lib_common.getApproverForEntity(connection, sEntityCode, 'PM', 'MASTER_APPROVAL_HIERARCHY');
+                if (checkApprover === null || (checkApprover[0].HIERARCHY_ID === null || checkApprover[0].HIERARCHY_ID === ""))
                 throw {"message":"Approver missing in approval matrix. Please contact Admin team."};
               
                 // try {
                 // var inviteReq = aInputData[0].INVITEREQ;
                 var type = parseInt(aInputData[0].REQUEST_TYPE);
-                var dealer_No = aInputData[0].IDEAL_DEALER_CODE;
+                var dealer_No = aInputData[0].IDEAL_DIST_CODE;
 
-                if (aInputData[0].SAP_DEALER_CODE !== null) {
-                    aInputData[0].SAP_DEALER_CODE = parseInt(aInputData[0].SAP_DEALER_CODE, 10).toString();
+                if (aInputData[0].SAP_DIST_CODE !== null) {
+                    aInputData[0].SAP_DIST_CODE = parseInt(aInputData[0].SAP_DIST_CODE, 10).toString();
                 }
 
                 // var events = aInputData[0].INVITEVENTS;
@@ -78,13 +69,14 @@ module.exports = cds.service.impl(function () {
                     if (type !== 7) {
                         const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'REQUEST_PROCESS_CREATION')
                         sResponse = await dbConn.callProcedurePromisified(loadProc,
-                            [aInputData[0].ENTITY_CODE, dealer_No, aInputData, aEvents, checkApprover[0].USER_ID, checkApprover[0].APPROVER_LEVEL, checkApprover[0].USER_ROLE]
+                            [aInputData[0].ENTITY_CODE, dealer_No, aInputData, aEvents, checkApprover[0].HIERARCHY_ID, checkApprover[0].LEVEL]
                         );
+                        //In checkApprover we can get HIERARCHY_ID and the LEVEL to insert into APPROVER_LEVEL and HIERARCHY_ID column;
                     } else if (type === 7) {
                         // Quick registration
                         // var sEntityCode = aInputData[0].ENTITY_CODE;
                         var sBuyerEmail = aInputData[0].REQUESTER_ID;
-                        var sSupplierName = aInputData[0].DEALER_NAME1;
+                        var sSupplierName = aInputData[0].DIST_NAME1;
                         var sSupplierEmail = aInputData[0].REGISTERED_ID;
                         var sSupplTypeCode = aInputData[0].SUPPL_TYPE;
                         var sSupplTypeDesc = aInputData[0].SUPPL_TYPE_DESC;
@@ -100,13 +92,6 @@ module.exports = cds.service.impl(function () {
                                 iCreationType, sSupplTypeCode, sSupplTypeDesc, sBP_TypeDesc, sBP_lTypeDesc,
                                 aInputData, aEvents]
                         );
-                        //   throw JSON.stringify("Inside Quick reg handling"); 
-                        //   $.response.setBody(JSON.stringify(parseInt(inviteReq[0].CREATION_TYPE, 10)));
-
-                        // execProcedure = conn.loadProcedure('VENDOR_PORTAL', 'VENDOR_PORTAL.Procedure::VENDOR_QUICK_REGISTRATION');
-                        // Result = execProcedure(sEntityCode, sBuyerEmail, sSupplierName, sSupplierEmail,
-                        //     iRequestType, iCreationType, sSupplTypeCode, sSupplTypeDesc, sBP_TypeDesc, sBP_lTypeDesc,
-                        //     inviteReq, events);
 
                         // iVen_Content.postErrorLog(conn, Result, iREQUEST_NO, sUserID, "Supplier Request Form", "PROCEDURE",dbConn,hdbext);
                     }
@@ -115,7 +100,7 @@ module.exports = cds.service.impl(function () {
                         oEmailData = {
                             "ReqNo": sResponse.outputScalar.OUT_SUCCESS,
                             "ReqType": aInputData[0].REQUEST_TYPE,
-                            "SupplierName": aInputData[0].DEALER_NAME1,
+                            "SupplierName": aInputData[0].DIST_NAME1,
                             "EntityDesc": sEntityDesc
                         }
                         aInputData[0].REQUEST_NO = sResponse.outputScalar.OUT_SUCCESS;
@@ -159,13 +144,13 @@ module.exports = cds.service.impl(function () {
                             }
                         }
                         let Result2 = {
-                            OUT_SUCCESS: "Dealer Request Created : " + sResponse.outputScalar.OUT_SUCCESS || ""
+                            OUT_SUCCESS: "Distributor Request Created : " + sResponse.outputScalar.OUT_SUCCESS || ""
                         };
                         return Result2;
                         // iVen_Content.responseInfo(JSON.stringify(Result2), "application/json", 200);
                     } else {
                         iREQUEST_NO = 0;
-                        throw {"message":"Dealer Request Creation failed. Please contact admin."}
+                        throw {"message":"Distributor Request Creation failed. Please contact admin."}
                         // let Result2 = {
                         //     OUT_SUCCESS: "Supplier Request Creation failed. Please contact admin."
    
@@ -179,13 +164,13 @@ module.exports = cds.service.impl(function () {
                         // var Result2 = {
                         //     OUT_SUCCESS: "Supplier Email " + aInputData[0].REGISTERED_ID + " already exist."
                         // };
-                        throw {"message":"Dealer Email " + aInputData[0].REGISTERED_ID + " already exist."}
+                        throw {"message":"Distributor Email " + aInputData[0].REGISTERED_ID + " already exist."}
                     } else {
                         iREQUEST_NO = 0;
                         // var Result2 = {
                         //     OUT_SUCCESS: "Supplier " + aInputData[0].VENDOR_NAME1 + " already exist. Previous request is in process.",
                         // };
-                        throw {"message":"Dealer " + aInputData[0].DEALER_NAME1 + " already exist. Previous request is in process."}
+                        throw {"message":"Distributor " + aInputData[0].DIST_NAME1 + " already exist. Previous request is in process."}
                     }
                     // return Result2;
                     // iVen_Content.responseInfo(JSON.stringify(Result2), "application/json", 301);
@@ -215,8 +200,8 @@ module.exports = cds.service.impl(function () {
                 // var inviteReq = aInputData[0].INVITEREQ;
                 var reqNo = aInputData[0].REQUEST_NO || null;
                 var type = aInputData[0].REQUEST_TYPE || null;
-                var iDealCode = aInputData[0].IDEAL_DEALER_CODE || null;
-                var sapCode = aInputData[0].SAP_DEALER_CODE || null;
+                var iDealCode = aInputData[0].IDEAL_DIST_CODE || null;
+                var sapCode = aInputData[0].SAP_DIST_CODE || null;
                 // var events = aInputData[0].INVITEVENTS;
 
                 var sUserID = aEvents[0].USER_ID || null;
@@ -251,7 +236,7 @@ module.exports = cds.service.impl(function () {
                         oEmailData = {
                             "ReqNo": reqNo,
                             "ReqType": aInputData[0].REQUEST_TYPE,
-                            "SupplierName": aInputData[0].DEALER_NAME1,
+                            "SupplierName": aInputData[0].DIST_NAME1,
                             "EntityDesc": sEntityDesc
                         }
 
@@ -315,7 +300,7 @@ module.exports = cds.service.impl(function () {
                 try{
                 var reqNo = aInputData[0].REQUEST_NO;
                 var type = aInputData[0].REQUEST_TYPE;
-                var iDealCode = aInputData[0].IDEAL_DEALER_CODE;
+                var iDealCode = aInputData[0].IDEAL_DIST_CODE;
 
                 iREQ_NO = aEvents[0].REQUEST_NO || null;
                 sUserID = aEvents[0].USER_ID || null;
@@ -334,7 +319,7 @@ module.exports = cds.service.impl(function () {
                         oEmailData = {
                             "ReqNo": reqNo,
                             "ReqType": aInputData[0].REQUEST_TYPE,
-                            "SupplierName": aInputData[0].DEALER_NAME1 || "",
+                            "SupplierName": aInputData[0].DIST_NAME1 || "",
                             "EntityDesc": sEntityDesc || "",
                             "RejComm": aEvents[0].COMMENT || ""
                         }
@@ -355,31 +340,7 @@ module.exports = cds.service.impl(function () {
                     return Result2;
                 } else {
                     throw {"message":"Dealer Request Rejection failed. Please contact admin."}
-                    // let Result2 = {
-                    //     OUT_SUCCESS: "Supplier Request Rejection failed. Please contact admin.",
-                    //     OUT_ERROR_CODE: parseInt(sResponse.outputScalar.OUT_ERROR_CODE, 10),
-                    //     OUT_ERROR_MESSAGE: sResponse.outputScalar.OUT_ERROR_MESSAGE
-                    // };
-                    // iVen_Content.responseInfo(JSON.stringify(Result2), "application/json", parseInt(Result.OUT_ERROR_CODE, 10));
-                    // return Result2;
                 }
-
-                // } catch (e) {
-                //     conn.rollback();
-                //     Result2 = {
-                //         OUT_SUCCESS: e.message || ""
-                //     };
-
-                //     Result = {
-                //         OUT_ERROR_CODE: null,
-                //         OUT_ERROR_MESSAGE: e.message || ""
-                //     }
-                //     iVen_Content.postErrorLog(conn, Result, iREQ_NO, sUserID, "Supplier Request Approval", "XSJS",dbConn,hdbext);
-                //     iVen_Content.responseInfo(JSON.stringify(Result2), "application/json", 400);
-
-                // } finally {
-                //     conn.close();
-                // }
 
             }
             catch (error) {
@@ -406,7 +367,7 @@ module.exports = cds.service.impl(function () {
                     oEmailData = {
                         "ReqNo": aInputData[0].REQUEST_NO,
                         "ReqType": aInputData[0].REQUEST_TYPE,
-                        "SupplierName": aInputData[0].DEALER_NAME1,
+                        "SupplierName": aInputData[0].DIST_NAME1,
                         "EntityDesc": sEntityDesc
                     }
 
@@ -435,14 +396,14 @@ module.exports = cds.service.impl(function () {
             else if (sAction === "VALIDATION") { //Handle validation-----------------------------------------------------
                 // var inviteReq = aInputData[0].INVITEREQ;
                 // handling to remove zeroes before SAP vendor code from S4HANA
-                aInputData[0].SAP_DEALER_CODE = parseInt(aInputData[0].SAP_DEALER_CODE, 10).toString();
+                aInputData[0].SAP_DIST_CODE = parseInt(aInputData[0].SAP_DIST_CODE, 10).toString();
                 var validate = await checkUpdate(connection, aInputData);
 
                 if (validate === 'IN PROCESS') {
-                    sResponse = "Dealer " + aInputData[0].DEALER_NAME1 + " is in process. You can not update.";
+                    sResponse = "Dealer " + aInputData[0].DIST_NAME1 + " is in process. You can not update.";
                     throw  {"message":sResponse};
                 } else if (validate === 'NOT FOUND') {
-                    sResponse = "Dealer " + aInputData[0].DEALER_NAME1 + " not registered on iDeal Portal.";
+                    sResponse = "Dealer " + aInputData[0].DIST_NAME1 + " not registered on iDeal Portal.";
                     throw  {"message": sResponse};
                 } else {
                     sResponse = validate
@@ -455,7 +416,7 @@ module.exports = cds.service.impl(function () {
                 // var reqData = aInputData[0].INVITEREQ;
                 var validateCode = await validateSAPCode(connection, aInputData);
                 if (validateCode === false) {
-                    sResponse = "SAP dealer code : " + aInputData[0].SAP_DEALER_CODE + " already exist.";
+                    sResponse = "SAP dealer code : " + aInputData[0].SAP_DIST_CODE + " already exist.";
                     return sResponse
                 } else {
                     return validateCode;
@@ -631,7 +592,7 @@ module.exports = cds.service.impl(function () {
                 var aEventObj = await getEventObj(aInputData[0]);
                 var sUserID = aEventObj[0].USER_ID || null;
                 var sBuyerId = await getRequestCreator(connection, iRequestNo);
-                var iSAPCode = aInputData[0].SAP_DEALER_CODE; // by yogendra 
+                var iSAPCode = aInputData[0].SAP_DIST_CODE; // by yogendra 
                 var oEmaiContent = null;
 
                 // 			throw JSON.stringify(aEventObj);
@@ -815,7 +776,7 @@ module.exports = cds.service.impl(function () {
                     //     var oEmailData = {
                     //         "ReqNo": aRequests[i].REQUEST_NO,
                     //         "ReqType": aRequests[i].REQUEST_TYPE,
-                    //         "SupplierName": aRequests[i].DEALER_NAME1,
+                    //         "SupplierName": aRequests[i].DIST_NAME1,
                     //         "Admin_Email": aRequests[i].sLoginId,
                     //         "Approver": aRequests[i].NEXT_APPROVER,
                     //         "Assigned_To": sAssignedTo,
@@ -882,7 +843,7 @@ module.exports = cds.service.impl(function () {
             let aQuery1Result = await connection.run(
                 SELECT 
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
-                    .where`STATUS NOT IN (3,8) AND DEALER_NAME1 = ${data[0].DEALER_NAME1}`
+                    .where`STATUS NOT IN (3,8) AND DIST_NAME1 = ${data[0].DIST_NAME1}`
             );
             // var sQuery =
             // 	'SELECT * FROM \"VENDOR_PORTAL\".\"VENDOR_PORTAL.Table::VENDOR_INVITATION\" WHERE STATUS != ? AND STATUS != ? AND VENDOR_NAME=?';
@@ -919,12 +880,8 @@ module.exports = cds.service.impl(function () {
             let aResult = await connection.run(
                 SELECT
                     .from`${connection.entities['VIEW_REQUEST_ACTIVE_STATUS']}`
-                    .where({ SAP_DEALER_CODE: data[0].SAP_DEALER_CODE,ACTIVE: "A", STATUS: 11 })
+                    .where({ SAP_DIST_CODE: data[0].SAP_DIST_CODE,ACTIVE: "A", STATUS: 11 })
                    );
-                //   
-            // var sQuery = 'SELECT * FROM \"_SYS_BIC\".\"VENDOR_PORTAL.View/VIEW_REQUEST_ACTIVE_STATUS\"';
-            // sQuery += 'WHERE SAP_VENDOR_CODE=? AND ACTIVE=? AND STATUS=?';
-            // var aResult = con.executeQuery(sQuery, data[0].SAP_VENDOR_CODE, 'A', 11);
 
             if (aResult.length > 0) {
                 oActiveObj = {
@@ -991,11 +948,11 @@ module.exports = cds.service.impl(function () {
                 //     'SELECT "VENDOR_NAME" AS VENDOR_NAME FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
                 // var aResult = conn.executeQuery(sQuery, iRequestNo);
                 let aResult = await connection.run(
-                    SELECT`DEALER_NAME1`
+                    SELECT`DIST_NAME1`
                         .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
                         .where`REQUEST_NO=${iRequestNo}`);
                 if (aResult.length > 0) {
-                    sSupplierName = aResult[0].DEALER_NAME1;
+                    sSupplierName = aResult[0].DIST_NAME1;
                 }
             }
 
@@ -1051,11 +1008,11 @@ module.exports = cds.service.impl(function () {
                 //     'SELECT "VENDOR_NAME" AS VENDOR_NAME FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
                 // var aResult = conn.executeQuery(sQuery, iRequestNo);
                 let aResult = await connection.run(
-                    SELECT`DEALER_NAME1`
+                    SELECT`DIST_NAME1`
                         .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
                         .where`REQUEST_NO=${iRequestNo}`);
                 if (aResult.length > 0) {
-                    sSupplierName = aResult[0].DEALER_NAME1;
+                    sSupplierName = aResult[0].DIST_NAME1;
                 }
             }
 
@@ -1148,7 +1105,7 @@ module.exports = cds.service.impl(function () {
                 //     .where`active.IVEN_VENDOR_CODE=${data[0].IVEN_VENDOR_CODE} AND active.ACTIVE IS null AND request.STATUS NOT IN (3,8,11)`
                 SELECT
                 .from `${connection.entities['VIEW_REQUEST_ACTIVE_STATUS']} `
-                .where`SAP_DEALER_CODE=${data[0].SAP_DEALER_CODE} AND ACTIVE IS null AND STATUS NOT IN (3,8,11)`
+                .where`SAP_DIST_CODE=${data[0].SAP_DIST_CODE} AND ACTIVE IS null AND STATUS NOT IN (3,8,11)`
        
                 );
             // var sQuery = 'SELECT * FROM \"_SYS_BIC\".\"VENDOR_PORTAL.View/VIEW_REQUEST_ACTIVE_STATUS\"';
@@ -1164,7 +1121,7 @@ module.exports = cds.service.impl(function () {
                 //     .where`active.IVEN_VENDOR_CODE=${data[0].IVEN_VENDOR_CODE} AND active.ACTIVE = A AND request.STATUS = 11`
                     SELECT
                     .from`${connection.entities['VIEW_REQUEST_ACTIVE_STATUS']}`
-                    .where`SAP_DEALER_CODE=${data[0].SAP_DEALER_CODE} AND ACTIVE = 'A' AND STATUS = 11`
+                    .where`SAP_DIST_CODE=${data[0].SAP_DIST_CODE} AND ACTIVE = 'A' AND STATUS = 11`
           
                     );
             // var sQuery2 = 'SELECT * FROM \"_SYS_BIC\".\"VENDOR_PORTAL.View/VIEW_REQUEST_ACTIVE_STATUS\"';
@@ -1208,7 +1165,7 @@ module.exports = cds.service.impl(function () {
             let aQuery1Result = await connection.run(
                 SELECT
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
-                    .where`STATUS NOT IN (3,8) AND DEALER_NAME1 = ${data[0].DEALER_NAME1}`
+                    .where`STATUS NOT IN (3,8) AND DIST_NAME1 = ${data[0].DIST_NAME1}`
             );
             // var sQuery =
             // 	'SELECT * FROM \"VENDOR_PORTAL\".\"VENDOR_PORTAL.Table::VENDOR_INVITATION\" WHERE STATUS != ? AND STATUS != ? AND VENDOR_NAME=?';
@@ -1243,7 +1200,7 @@ module.exports = cds.service.impl(function () {
             let aResult = await connection.run(
                 SELECT
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
-                    .where`STATUS NOT IN (3,8) AND SAP_DEALER_CODE =${data[0].SAP_DEALER_CODE} `);
+                    .where`STATUS NOT IN (3,8) AND SAP_DIST_CODE =${data[0].SAP_DIST_CODE} `);
             //  var sQuery =
             //  'SELECT * FROM \"VENDOR_PORTAL\".\"VENDOR_PORTAL.Table::VENDOR_INVITATION\"
             //  WHERE STATUS != ? AND STATUS != ? AND SAP_VENDOR_CODE=?';
@@ -1307,11 +1264,11 @@ module.exports = cds.service.impl(function () {
                 //     'SELECT "VENDOR_NAME" AS VENDOR_NAME FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
                 // var aResult = conn.executeQuery(sQuery, iRequestNo);
                 let aResult = await connection.run(
-                    SELECT`DEALER_NAME1`
+                    SELECT`DIST_NAME1`
                         .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
                         .where`REQUEST_NO=${iRequestNo}`);
                 if (aResult.length > 0) {
-                    sSupplierName = aResult[0].DEALER_NAME1;
+                    sSupplierName = aResult[0].DIST_NAME1;
                 }
             }
 
@@ -1367,11 +1324,11 @@ module.exports = cds.service.impl(function () {
                 //     'SELECT "VENDOR_NAME" AS VENDOR_NAME FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
                 // var aResult = conn.executeQuery(sQuery, iRequestNo);
                 let aResult = await connection.run(
-                    SELECT`DEALER_NAME1`
+                    SELECT`DIST_NAME1`
                         .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
                         .where`REQUEST_NO=${iRequestNo}`);
                 if (aResult.length > 0) {
-                    sSupplierName = aResult[0].DEALER_NAME1;
+                    sSupplierName = aResult[0].DIST_NAME1;
                 }
             }
 
@@ -1476,7 +1433,7 @@ module.exports = cds.service.impl(function () {
             let aResult = await connection.run(
                 SELECT
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
-                    .where`STATUS NOT IN (3,8) AND SAP_DEALER_CODE =${data[0].SAP_DEALER_CODE} `);
+                    .where`STATUS NOT IN (3,8) AND SAP_DIST_CODE =${data[0].SAP_DIST_CODE} `);
             if (aResult.length !== 0) {
                 flag = false;
             }

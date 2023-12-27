@@ -55,6 +55,13 @@
       <viewAttribute hidden="true" id="JOIN$TYPE$TYPE"/>
     </viewAttributes>
     <calculatedViewAttributes/>
+    <input node="Projection_2">
+      <mapping xsi:type="Calculation:AttributeMapping" target="HIERARCHY_ID_1" source="HIERARCHY_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="USER_IDS" source="USER_IDS"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="TYPE_1" source="TYPE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$HIERARCHY_ID$HIERARCHY_ID" source="HIERARCHY_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TYPE$TYPE" source="TYPE"/>
+    </input>
     <input node="Projection_1">
       <mapping xsi:type="Calculation:AttributeMapping" target="HIERARCHY_ID" source="HIERARCHY_ID"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="ENTITY_CODE" source="ENTITY_CODE"/>
@@ -65,13 +72,6 @@
       <mapping xsi:type="Calculation:AttributeMapping" target="ACCESS_APPROVE" source="ACCESS_APPROVE"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="ACCESS_SENDBACK" source="ACCESS_SENDBACK"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="ACCESS_REJECT" source="ACCESS_REJECT"/>
-      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$HIERARCHY_ID$HIERARCHY_ID" source="HIERARCHY_ID"/>
-      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TYPE$TYPE" source="TYPE"/>
-    </input>
-    <input node="Projection_2">
-      <mapping xsi:type="Calculation:AttributeMapping" target="HIERARCHY_ID_1" source="HIERARCHY_ID"/>
-      <mapping xsi:type="Calculation:AttributeMapping" target="USER_IDS" source="USER_IDS"/>
-      <mapping xsi:type="Calculation:AttributeMapping" target="TYPE_1" source="TYPE"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$HIERARCHY_ID$HIERARCHY_ID" source="HIERARCHY_ID"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$TYPE$TYPE" source="TYPE"/>
     </input>
@@ -120,8 +120,7 @@
     <attribute id="USER_IDS" order="10" displayAttribute="false" attributeHierarchyActive="false">
       <descriptions defaultDescription="USER_IDS"/>
       <keyMapping columnObjectName="Join_1" columnName="USER_IDS"/>
-    </attribute>
-  </attributes>
+    </attribute></attributes>
   <calculatedAttributes/>
   <baseMeasures/>
   <calculatedMeasures/>
@@ -134,7 +133,7 @@
     </shape>
   
     <shape expanded="true" modelObjectName="Projection_1" modelObjectNameSpace="CalculationView">
-      <upperLeftCorner x="-112" y="264"/>
+      <upperLeftCorner x="-102" y="264"/>
       <rectangleSize height="30" width="160"/>
     </shape>
     <shape expanded="true" modelObjectName="Projection_2" modelObjectNameSpace="CalculationView">
@@ -145,14 +144,13 @@
       <upperLeftCorner x="100" y="187"/>
       <rectangleSize height="30" width="160"/>
     </shape>
-    <shape modelObjectName="Projection_1" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
-      <upperLeftCorner x="20" y="30"/>
-      <rectangleSize width="136"/>
-    </shape>
-    <shape modelObjectName="Projection_2" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput">
+    <shape modelObjectName="Projection_2" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
       <upperLeftCorner x="320" y="30"/>
       <rectangleSize width="136"/>
     </shape>
-  </shapes>
+    <shape modelObjectName="Projection_1" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="20" y="30"/>
+      <rectangleSize width="136"/>
+    </shape></shapes>
 </layout>
 </Calculation:scenario>

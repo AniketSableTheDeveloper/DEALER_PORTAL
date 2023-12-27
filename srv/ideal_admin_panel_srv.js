@@ -4,7 +4,7 @@ const dbClass = require("sap-hdbext-promisfied")
 const hdbext = require("@sap/hdbext")
 const lib_admin_panel = require('../srv/LIB/ideal_library_admin_panel');
 const lib_common = require('../srv/LIB/ideal_library');
-// const lib_email = require('../srv/LIB/ideal_library_email')
+const lib_email = require('../srv/LIB/ideal_library_email');
 // const lib_mdg = require('../srv/LIB/ideal_library_mdg')
 // const connect = require('passport/lib/framework/connect')
 
@@ -100,8 +100,8 @@ module.exports = cds.service.impl(function () {
           var aEmailCC = aInputData[0].EMAIL_CC;
           var sEmailSender = aInputData[0].EMAIL_SENDER;
           // sResponse = await lib_email.sendEmail(connection, sEmailBody, sEmailSubject, aEmailTo, aEmailCC, sEmailSender)
-        //   var sCCEmail = await lib_email.setSampleCC( [aEmailCC]);
-        //   await  lib_email.sendidealEmail(aEmailTo,sCCEmail,'html', sEmailSubject,sEmailBody)
+          var sCCEmail = await lib_email.setSampleCC( [aEmailCC]);
+          await  lib_email.sendidealEmail(aEmailTo,sCCEmail,'html', sEmailSubject,sEmailBody)
       
           return sResponse
         }catch(error){     
@@ -113,12 +113,8 @@ module.exports = cds.service.impl(function () {
           }
         //   lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
           req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
-        }
-
-        //Changes By Chandan M End 15/11/23   
+        }   
       }
-
-
     } catch (error) {
       req.error({ code: "500", message: error.message });
       // lib_common.responseInfo(req,'error','500',error,null)

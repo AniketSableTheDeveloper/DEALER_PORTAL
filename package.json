@@ -8,6 +8,8 @@
   "dependencies": {
     "@sap/cds": "^6.8.4",
     "@sap/cds-hana": "^2",
+    "@sap-cloud-sdk/core": "^1.54.2",
+    "nodemailer": "^6.9.7",
     "core-util-is": "^1.0.3",
     "@sap/hana-client": "^2.18.27",
     "@sap/hdbext": "^7.7.5",

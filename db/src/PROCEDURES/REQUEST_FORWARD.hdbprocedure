@@ -52,33 +52,25 @@ BEGIN
 	    
 	    IF :LV_INV_STATUS = 1 
     	    THEN
-    	        UPDATE "DEALER_PORTAL_REQUEST_INFO"
-                SET 
-                "NEXT_APPROVER" = :REASSIGN_TO_ID
-                WHERE "REQUEST_NO" = :LV_INV_REQUEST_NO;
+    	        -- UPDATE "DEALER_PORTAL_REQUEST_INFO"
+                -- SET 
+                -- "NEXT_APPROVER" = :REASSIGN_TO_ID
+                -- WHERE "REQUEST_NO" = :LV_INV_REQUEST_NO;
 	    
 	    ELSEIF :LV_INV_STATUS = 5 AND :LV_REQUEST_TYPE = 7
     	    THEN
-    	        UPDATE "DEALER_PORTAL_REQUEST_INFO"
-                SET 
-                "REQUESTER_ID" = :REASSIGN_TO_ID,
-                "NEXT_APPROVER" = :REASSIGN_TO_ID
-                WHERE "REQUEST_NO" = :LV_INV_REQUEST_NO;  
-    	    
-    	        -- UPDATE "DEALER_PORTAL_ONBOARDING_FORM"
-                -- SET "NEXT_APPROVER" = :REASSIGN_TO_ID
-                -- WHERE "OBR_NO" = :LV_INV_REQUEST_NO;
+    	        -- UPDATE "DEALER_PORTAL_REQUEST_INFO"
+                -- SET 
+                -- "REQUESTER_ID" = :REASSIGN_TO_ID,
+                -- "NEXT_APPROVER" = :REASSIGN_TO_ID
+                -- WHERE "REQUEST_NO" = :LV_INV_REQUEST_NO;  
                 
          ELSEIF :LV_INV_STATUS = 6 OR :LV_INV_STATUS = 9 OR :LV_INV_STATUS = 13
             THEN
-                UPDATE "DEALER_PORTAL_REQUEST_INFO"
-                SET 
-                 "NEXT_APPROVER" = REASSIGN_TO_ID
-                WHERE "REQUEST_NO" = :LV_INV_REQUEST_NO;
-            
-                -- UPDATE "DEALER_PORTAL_ONBOARDING_FORM"
-                -- SET "NEXT_APPROVER" = :REASSIGN_TO_ID
-                -- WHERE "OBR_NO" = :LV_INV_REQUEST_NO;
+                -- UPDATE "DEALER_PORTAL_REQUEST_INFO"
+                -- SET 
+                --  "NEXT_APPROVER" = REASSIGN_TO_ID
+                -- WHERE "REQUEST_NO" = :LV_INV_REQUEST_NO;
 	    
 	    END IF;
 	    

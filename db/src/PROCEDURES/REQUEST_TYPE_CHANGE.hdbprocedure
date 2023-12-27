@@ -74,14 +74,7 @@ BEGIN
             SET 
             "BP_TYPE_CODE" = :IN_SUB_TYPE,
             "BP_TYPE_DESC" = :IN_SUB_TYPE_DESC
-            WHERE "REQUEST_NO" = :IN_REQUEST_NO;
-            
-            -- UPDATE "VENDOR_PORTAL_ONBOARDING_FORM"
-            -- SET 
-            -- "BP_TYPE_CODE" = :IN_SUB_TYPE,
-            -- "BP_TYPE_DESC" = :IN_SUB_TYPE_DESC
-            -- WHERE "OBR_NO" = :IN_REQUEST_NO;
-            
+            WHERE "REQUEST_NO" = :IN_REQUEST_NO;            
             
             LV_REMARK := 'Sub Type Change';
             LV_EVENT_CODE := 21;
