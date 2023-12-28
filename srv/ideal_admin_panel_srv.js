@@ -101,7 +101,7 @@ module.exports = cds.service.impl(function () {
           var sEmailSender = aInputData[0].EMAIL_SENDER;
           // sResponse = await lib_email.sendEmail(connection, sEmailBody, sEmailSubject, aEmailTo, aEmailCC, sEmailSender)
           var sCCEmail = await lib_email.setSampleCC( [aEmailCC]);
-          await  lib_email.sendidealEmail(aEmailTo,sCCEmail,'html', sEmailSubject,sEmailBody)
+          await lib_email.sendidealEmail(aEmailTo,sCCEmail,'html', sEmailSubject,sEmailBody)
       
           return sResponse
         }catch(error){     

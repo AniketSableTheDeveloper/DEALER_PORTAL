@@ -1,9 +1,9 @@
 const cds = require('@sap/cds')
 const dbClass = require("sap-hdbext-promisfied")
 const hdbext = require("@sap/hdbext")
-const lib_common = require('./LIB/ideal_library')
-// const lib_email = require('./LIB/iven_library_email')
-// const lib_email_content = require('./LIB/iven_library_email_content')
+const lib_common = require('../srv/LIB/ideal_library')
+const lib_email = require('../srv/LIB/ideal_library_email')
+const lib_email_content = require('../srv/LIB/ideal_library_email_content')
 // const lib_ias = require('./LIB/iven_library_ias') 
 const { response } = require('express')
 
@@ -43,9 +43,9 @@ module.exports = cds.service.impl(function () {
                 try{
                 //----------------------------------------------------------------------------------
                 //Check If Approver details exist against the entity code
-                var checkApprover = await lib_common.getApproverForEntity(connection, sEntityCode, 'PM', 'MASTER_APPROVAL_HIERARCHY');
+                var checkApprover = await lib_common.getApproverForEntity(connection, sEntityCode, 'PM', 'MASTER_APPROVAL_HIERARCHY','REQ');
                 if (checkApprover === null || (checkApprover[0].HIERARCHY_ID === null || checkApprover[0].HIERARCHY_ID === ""))
-                throw {"message":"Approver missing in approval matrix. Please contact Admin team."};
+                throw {"message":"Approver missing in approval hierarchy. Please contact Admin team."};
               
                 // try {
                 // var inviteReq = aInputData[0].INVITEREQ;
@@ -127,7 +127,8 @@ module.exports = cds.service.impl(function () {
                             // iVen_Content.postErrorLog(conn, Result, iREQUEST_NO, sUserID, "Supplier Request Creation", "PROCEDURE",dbConn,hdbext);
                             if (isEmailNotificationEnabled) {
                                 //fetch Approver details
-                                var email = await lib_common.getApproverForEntity(connection, sEntityCode, 'PM', 'MATRIX_REQUEST_APPR');
+                                var email = await lib_common.getApproverForEntity(connection, sEntityCode, 'PM', 'MASTER_APPROVAL_HIERARCHY','REQ');
+                                // lib_common.getApproverForEntity(connection, sEntityCode, 'PM', 'MATRIX_REQUEST_APPR');
                                 // var sQuery =
                                 //     'SELECT USER_ID as email FROM \"VENDOR_PORTAL\".\"VENDOR_PORTAL.Table::SUPPLIER_REQUEST_MATRIX\" WHERE ENTITY_CODE = ? AND USER_ROLE = ?';
                                 // var aResult = connection.executeQuery(sQuery, inviteReq[0].ENTITY_CODE, 'PM');
@@ -208,9 +209,6 @@ module.exports = cds.service.impl(function () {
 
                 var oActiveObj = type === 5 ? await getActiveData(connection, aInputData) : null;
                 if (oActiveObj !== null && type === 5) {
-                    // execProcedure = conn.loadProcedure('VENDOR_PORTAL', 'VENDOR_PORTAL.Procedure::VENDOR_INVITE_APP_REJ');
-                    // Result = execProcedure(sAction, inviteReq[0].SUPPL_TYPE, type, inviteReq[0].REGISTERED_ID, reqNo, events, iVenCode, sapCode,
-                    //     oActiveObj.REQUEST_NO_ACTIVE, oActiveObj.REQUEST_TYPE, oActiveObj.CREATION_TYPE, 2);
 
                     const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'REQUEST_PROCESS_APPROVAL')
                     sResponse = await dbConn.callProcedurePromisified(loadProc,
@@ -247,15 +245,15 @@ module.exports = cds.service.impl(function () {
                         // EMAIL_LIBRARY._sendEmailV2(oEmaiContent1.emailBody, oEmaiContent1.subject, [aInputData[0].REGISTERED_ID], null);
 
                          // await lib_email.sendEmail(connection, oEmaiContent.emailBody, oEmaiContent.subject, [aInputData[0].REQUESTER_ID], null, null)
-                    // oEmaiContent = await lib_email_content.getEmailContent(connection, "APPROVE", "REQUEST", oEmailData, null)
-                    // var sCCEmail = await lib_email.setSampleCC(null);
-                    // await  lib_email.sendidealEmail(aInputData[0].REQUESTER_ID,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
+                    oEmaiContent = await lib_email_content.getEmailContent(connection, "APPROVE", "REQUEST", oEmailData, null)
+                    var sCCEmail = await lib_email.setSampleCC(null);
+                    await  lib_email.sendidealEmail(aInputData[0].REQUESTER_ID,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
                 
                         
                         // await lib_email.sendEmail(connection, oEmaiContent.emailBody, oEmaiContent.subject, [aInputData[0].REGISTERED_ID], null, null)
-                    // oEmaiContent = await lib_email_content.getEmailContent(connection, "INVITE", "REQUEST", oEmailData, null)
-                    // var sCCEmail = await lib_email.setSampleCC(null);
-                    // await  lib_email.sendidealEmail(aInputData[0].REGISTERED_ID,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
+                    oEmaiContent = await lib_email_content.getEmailContent(connection, "INVITE", "REQUEST", oEmailData, null)
+                    var sCCEmail = await lib_email.setSampleCC(null);
+                    await  lib_email.sendidealEmail(aInputData[0].REGISTERED_ID,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
                 
                        
                     }
@@ -264,14 +262,6 @@ module.exports = cds.service.impl(function () {
                     return Result2;
                     // iVen_Content.responseInfo(JSON.stringify(Result2), "application/json", 200);
                 } else {
-                    // let Result2 = {
-                    //     OUT_SUCCESS: "Supplier Request Approval failed. Please contact admin.",
-                    //     OUT_ERROR_CODE: parseInt(sResponse.outputScalar.OUT_ERROR_CODE, 10),
-                    //     OUT_ERROR_MESSAGE: sResponse.outputScalar.OUT_ERROR_MESSAGE
-                    // };
-                    // return Result2;
-                    // throw {"message":"Supplier Request Approval failed. Please contact admin."}
-                    // iVen_Content.responseInfo(JSON.stringify(Result2), "application/json", parseInt(Result.OUT_ERROR_CODE, 10));
                     throw {"message":sResponse.outputScalar.OUT_ERROR_MESSAGE}
                 }
                 } catch (error) {

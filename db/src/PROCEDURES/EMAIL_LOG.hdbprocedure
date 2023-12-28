@@ -37,7 +37,8 @@ BEGIN
         "BODY",
         "TYPE"
       )
-    SELECT :LV_UUID,
+    SELECT 
+    :LV_UUID,
       "STATUS",
       "STATUS_DSC",
       "LOG",
