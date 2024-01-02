@@ -1,7 +1,7 @@
 using {DEALER_PORTAL,USERMASTER_ENTITIES} from '../db/MASTER_TABLES';
 using {DEALER_PORTAL.REQUEST_INFO,
 DEALER_PORTAL.REQUEST_EVENTS_LOG,
-DEALER_PORTAL.DEALER_MASTER_S4_HANA,DEALER_PORTAL.REGFORM_ADDRESS,DEALER_PORTAL.REGFORM_FINANCIAL,
+DEALER_PORTAL.DEALER_MASTER_S4_HANA,DEALER_PORTAL.REGFORM_ADDRESS,DEALER_PORTAL.REGFORM_BANKS,
 DEALER_PORTAL.REGFORM_CONTACTS,DEALER_PORTAL.REGFORM_CUSTOMERS} from '../db/TRANSACTION_TABLES';
 
 service ideal_request_process_srv {
@@ -22,7 +22,7 @@ service ideal_request_process_srv {
     entity MasterUserEntityUsers as projection on DEALER_PORTAL.MASTER_USER_ENTITY_CODES;
     entity UserMasterEntities as projection on USERMASTER_ENTITIES;
     entity RegformAddress as projection on DEALER_PORTAL.REGFORM_ADDRESS;
-    entity RegformFinancial as projection on DEALER_PORTAL.REGFORM_FINANCIAL;
+    entity RegformBanks as projection on DEALER_PORTAL.REGFORM_BANKS;
     entity RegformContacts as projection on DEALER_PORTAL.REGFORM_CONTACTS;
     entity RegformCustomers as projection on DEALER_PORTAL.REGFORM_CUSTOMERS;
 

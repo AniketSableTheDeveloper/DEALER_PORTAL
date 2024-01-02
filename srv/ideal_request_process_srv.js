@@ -33,8 +33,7 @@ module.exports = cds.service.impl(function () {
             var sResponse = null;
 
             //Check if email notification is enabled
-            // isEmailNotificationEnabled = await lib_email.isiDealSettingEnabled(connection, "VM_EMAIL_NOTIFICATION");
-
+            isEmailNotificationEnabled = await lib_email.isiDealSettingEnabled(connection, "VM_EMAIL_NOTIFICATION");
             // get connection
             var client = await dbClass.createConnectionFromEnv();
             let dbConn = new dbClass(client);
@@ -43,7 +42,7 @@ module.exports = cds.service.impl(function () {
                 try{
                 //----------------------------------------------------------------------------------
                 //Check If Approver details exist against the entity code
-                var checkApprover = await lib_common.getApproverForEntity(connection, sEntityCode, 'PM', 'MASTER_APPROVAL_HIERARCHY','REQ');
+                var checkApprover = await lib_common.getApproverForEntity(connection, sEntityCode, 'PM', 'CALC_HIERARCHY_MATRIX','REQ',1);
                 if (checkApprover === null || (checkApprover[0].HIERARCHY_ID === null || checkApprover[0].HIERARCHY_ID === ""))
                 throw {"message":"Approver missing in approval hierarchy. Please contact Admin team."};
               
@@ -71,7 +70,6 @@ module.exports = cds.service.impl(function () {
                         sResponse = await dbConn.callProcedurePromisified(loadProc,
                             [aInputData[0].ENTITY_CODE, dealer_No, aInputData, aEvents, checkApprover[0].HIERARCHY_ID, checkApprover[0].LEVEL]
                         );
-                        //In checkApprover we can get HIERARCHY_ID and the LEVEL to insert into APPROVER_LEVEL and HIERARCHY_ID column;
                     } else if (type === 7) {
                         // Quick registration
                         // var sEntityCode = aInputData[0].ENTITY_CODE;
@@ -197,23 +195,43 @@ module.exports = cds.service.impl(function () {
             else if (sAction === "APPROVE") {  //--------------------------------------------------------------------------
              try{
                 var sQuery;
-                // try {
-                // var inviteReq = aInputData[0].INVITEREQ;
                 var reqNo = aInputData[0].REQUEST_NO || null;
                 var type = aInputData[0].REQUEST_TYPE || null;
                 var iDealCode = aInputData[0].IDEAL_DIST_CODE || null;
                 var sapCode = aInputData[0].SAP_DIST_CODE || null;
-                // var events = aInputData[0].INVITEVENTS;
+                var sLevel = aInputData[0].APPROVER_LEVEL  || null;
 
-                var sUserID = aEvents[0].USER_ID || null;
+                // var hUserRole = HIERARCHY_USERROLE;
+                // var hType = HIERARCHY_TYPE; 
 
+                var getApprover = await lib_common.getApproverForEntity(connection, sEntityCode, sUserRole, 'CALC_HIERARCHY_MATRIX','REQ',1);
+                if (getApprover === null || (getApprover[0].HIERARCHY_ID === null || getApprover[0].HIERARCHY_ID === ""))
+                throw {"message":"Approver missing in approval hierarchy. Please contact Admin team."};
+
+                var maxLevel = await lib_common.getMaxLevel(sEntityCode, sUserRole,'REQ');
+                //if approval are there
+                if(sLevel < maxLevel)
+                {
+                    sLevel = Number(sLevel) + 1;
+                    sAction = "Approve_Pending";
+                    var checkApprover = await lib_common.getApproverForEntity(connection, sEntityCode, sUserRole, 'CALC_HIERARCHY_MATRIX','REQ',sLevel);
+                    const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'REQUEST_PROCESS_APPROVAL')
+                    sResponse = await dbConn.callProcedurePromisified(loadProc,
+                        [sAction, reqNo, aInputData[0].SUPPL_TYPE, type, aInputData[0].REGISTERED_ID, iDealCode, sapCode, null,
+                            null, null, null, checkApprover[0].HIERARCHY_ID,checkApprover[0].LEVEL,aEvents]
+                    );
+
+                }
+                //final Approval
+                if(sLevel === maxLevel)
+                {
                 var oActiveObj = type === 5 ? await getActiveData(connection, aInputData) : null;
                 if (oActiveObj !== null && type === 5) {
 
                     const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'REQUEST_PROCESS_APPROVAL')
                     sResponse = await dbConn.callProcedurePromisified(loadProc,
                         [sAction, reqNo, aInputData[0].SUPPL_TYPE, type, aInputData[0].REGISTERED_ID, iDealCode, sapCode,
-                            oActiveObj.REQUEST_NO_ACTIVE, oActiveObj.REQUEST_TYPE, oActiveObj.CREATION_TYPE, 2, aEvents]
+                            oActiveObj.REQUEST_NO_ACTIVE, oActiveObj.REQUEST_TYPE, oActiveObj.CREATION_TYPE, 2, null,null,aEvents]
                     );
                     // iVen_Content.postErrorLog(conn, Result, iREQUEST_NO, sUserID, "Supplier Request Approval", "PROCEDURE",dbConn,hdbext);
                 }
@@ -221,15 +239,14 @@ module.exports = cds.service.impl(function () {
                     const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'REQUEST_PROCESS_APPROVAL')
                     sResponse = await dbConn.callProcedurePromisified(loadProc,
                         [sAction, reqNo, aInputData[0].SUPPL_TYPE, type, aInputData[0].REGISTERED_ID, iDealCode, sapCode, null,
-                            null, null, null, aEvents]
+                            null, null, null, null,null,aEvents]
                     );
-                    // execProcedure = conn.loadProcedure('VENDOR_PORTAL', 'VENDOR_PORTAL.Procedure::VENDOR_INVITE_APP_REJ');
-                    // Result = execProcedure(sAction, inviteReq[0].SUPPL_TYPE, type, inviteReq[0].REGISTERED_ID, reqNo, events, iVenCode, sapCode, null,
-                    //     null, null, null);
                     // iVen_Content.postErrorLog(conn, Result, iREQUEST_NO, sUserID, "Supplier Request Approval", "PROCEDURE",dbConn,hdbext);
                 }
+            }
+                // isEmailNotificationEnabled = "true";
                 if (sResponse.outputScalar.OUT_SUCCESS !== null) {
-                    if (isEmailNotificationEnabled) {
+                    if (isEmailNotificationEnabled && sAction !== 'Approve_Pending') {
                         // setEmailData(inviteReq, "Approve");
                         oEmailData = {
                             "ReqNo": reqNo,
@@ -238,25 +255,19 @@ module.exports = cds.service.impl(function () {
                             "EntityDesc": sEntityDesc
                         }
 
-                        // oEmaiContent = EMAIL_LIBRARY.getEmailData("APPROVE", "REQUEST", oEmailData, null);
-                        // EMAIL_LIBRARY._sendEmailV2(oEmaiContent.emailBody, oEmaiContent.subject, [aInputData[0].REQUESTER_ID], null);
-
-                        // var oEmaiContent1 = EMAIL_LIBRARY.getEmailData("INVITE", "REQUEST", oEmailData, null);
-                        // EMAIL_LIBRARY._sendEmailV2(oEmaiContent1.emailBody, oEmaiContent1.subject, [aInputData[0].REGISTERED_ID], null);
-
                          // await lib_email.sendEmail(connection, oEmaiContent.emailBody, oEmaiContent.subject, [aInputData[0].REQUESTER_ID], null, null)
                     oEmaiContent = await lib_email_content.getEmailContent(connection, "APPROVE", "REQUEST", oEmailData, null)
                     var sCCEmail = await lib_email.setSampleCC(null);
                     await  lib_email.sendidealEmail(aInputData[0].REQUESTER_ID,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
-                
                         
                         // await lib_email.sendEmail(connection, oEmaiContent.emailBody, oEmaiContent.subject, [aInputData[0].REGISTERED_ID], null, null)
                     oEmaiContent = await lib_email_content.getEmailContent(connection, "INVITE", "REQUEST", oEmailData, null)
                     var sCCEmail = await lib_email.setSampleCC(null);
-                    await  lib_email.sendidealEmail(aInputData[0].REGISTERED_ID,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
-                
-                       
+                    await  lib_email.sendidealEmail(aInputData[0].REGISTERED_ID,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)  
                     }
+                    // if (isEmailNotificationEnabled && sAction === 'Approve_Pending') {
+
+                    // }
                     let Result2 = {};
                     Result2.OUT_SUCCESS = sResponse.outputScalar.OUT_SUCCESS || "";
                     return Result2;

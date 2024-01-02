@@ -1,5 +1,5 @@
 const cds = require("@sap/cds");
-const lib_email = require("../srv/LIB/ideal_library_email");
+const lib_email = require("./ideal_library_email");
 const { Connection } = require("@sap/hana-client");
 
 // App paths from portal
@@ -199,7 +199,7 @@ module.exports = {
 
 				} else {
 
-					oEmailContent.subject = msg + "Invitation to update your company details on  " + oEmailData.EntityDesc + " Vendor Portal";
+					oEmailContent.subject = msg + "Invitation to update your company details on  " + oEmailData.EntityDesc + " Dealer Portal";
 
 					var emailBody = "Once approved, you may be invited to future procurement processes by " + oEmailData.EntityDesc +
 						". Your approved registration does not entitle you to be invited to any/all procurement processes. " + oEmailData.EntityDesc +
@@ -221,11 +221,11 @@ module.exports = {
 						sClientContactEmail +
 						"</a>" + "<br>" + "<br>" +
 						"Regards," + "<br>" +
-						"Vendor Management Team" +
+						"Dealer Management Team" +
 						"<br><br>";
 				}
 
-				Emailbody = "Dear Vendor," + "<br><br>";
+				Emailbody = "Dear Distributor," + "<br><br>";
 				oEmailContent.emailBody = "<p style=" + "font-family:Arial, Helvetica, sans-serif;font-size:11px;color:black>" + Emailbody +
 					oEmailContent.emailBody + "</p>";
 			}

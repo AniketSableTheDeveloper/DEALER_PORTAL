@@ -76,29 +76,24 @@ service ideal_master_maintenance {
       }
     };
 
-    // type dyanmicApprovalPayload{
-    //   ACTION : String;
-    //   APP_TYPE : String(30);
-    //   USER_DETAILS : User_Details;
-    //   VALUE : array of{
-    //     HIERARCHY_ID : String(10);
-    //     ENTITY_CODE : String(10);
-    //     LEVEL : Integer;
-    //     ROLE_CODE : String(10);
-    //     TYPE : String(10);
-    //     ACCESS_EDIT : String(1);
-    //     ACCESS_APPROVE : String(1);
-    //     ACCESS_SENDBACK : String(1);
-    //     ACCESS_REJECT : String(1);
-    //   }
-    // }
+    type hierarchyMatrix {
+      ACTION : String;
+      USERDETAILS : User_Details;
+      VALUE : array of {
+        HIERARCHY_ID : String(10); 
+        USER_IDS : String(1000);
+        TYPE : String(10);
+      }
+    }
+
   
     //CRUD operation action
     action PostUserMaster(input : UserMasterPayload) returns String;
     //CRUD operation action   
     action PostApprovalMatrix(input : approvalMatrixPayload) returns String;
     // action PostDynamicApprovalHierarchy(input : dyanmicApprovalPayload)returns String;
-    action PostDynamicApprovalHierarchy(action:String,userIds:String,input : many MasterApprovalHierarchy)returns String;
+    action PostDynamicApprovalHierarchy(action:String,UserDetails:User_Details,input : many MasterApprovalHierarchy)returns String;
+    action PostHierarchyMatrix(input : hierarchyMatrix)returns String;
    
 
 }

@@ -169,27 +169,19 @@ module.exports = cds.service.impl(async function(){
     try{
 
         var oReqData = req.data.input;
-        // var oUserDetails=oReqData.USER_DETAILS;
         var sUserId=req.data.userIds || null;
         var sAction = req.data.action;
         var aHierarchyMatrixData = req.data.input;
         var vEntityCode = aHierarchyMatrixData[0].ENTITY_CODE;
         var vType = aHierarchyMatrixData[0].TYPE;
-        // var fLevel = aHierarchyMatrixData[0].LEVEL;
         var vRole = aHierarchyMatrixData[0].ROLE_CODE;
-
-        // if(sAction === 'CREATE'){
-        // var fLevel = await _checkEntityCodeAndTypeForLevel(aHierarchyMatrixData);
-        // var vHierarchyId = vEntityCode +'_0'+fLevel;
-        // }
 
         if(sAction === 'CREATE' || sAction === 'UPDATE' || sAction === 'DELETE')
         {
-
             // load procedure
             const loadProc = await dbconn.loadProcedurePromisified(hdbext, null, 'DYNAMIC_MATRIX_APPROVAL')
-            // excute procedure
-            const result = await dbconn.callProcedurePromisified(loadProc,[vType, sAction, aHierarchyMatrixData,aHierarchyMatrixData[0].HIERARCHY_ID,sUserId,vRole]);
+            // execute procedure
+            const result = await dbconn.callProcedurePromisified(loadProc,[vType, sAction, aHierarchyMatrixData,aHierarchyMatrixData[0].HIERARCHY_ID,vRole]);
             return result
         }
       }
@@ -197,22 +189,28 @@ module.exports = cds.service.impl(async function(){
         req.error({message:  error.message ? error.message : error });      
       } 
       })
-      async function _checkEntityCodeAndTypeForLevel(Data){
+      this.on('PostDynamicApprovalHierarchy',async (req) =>{
+      try{
 
-        var aResultEntityCodeAndType = await SELECT .from `DEALER_PORTAL_MASTER_APPROVAL_HIERARCHY` .where `ENTITY_CODE=${Data[0].ENTITY_CODE} AND TYPE=${Data[0].TYPE}`;
-        var sLevel;
+        var oReqData = req.data.input;
+        var sAction = oReqData.ACTION;
+        var vUserDetails = oReqData.USER_DETAILS;
+        var vUserIds = oReqData.VALUE[0].USER_IDS;
+        var vHierarchyId = oReqData.VALUE[0].HIERARCHY_ID;
+        var vType = oReqData.VALUE[0].TYPE;
+  
 
-        // if(aResultEntityCodeAndType > 0){
-
-          if(aResultEntityCodeAndType.length === 0)
-          {
-            sLevel = 1;
-          }
-          else{
-            sLevel = Number(aResultEntityCodeAndType[0].LEVEL) + 1;
-          }
-        // }
-        return sLevel;
-
-  }
+        if(sAction === 'CREATE' || sAction === 'UPDATE' || sAction === 'DELETE')
+        {
+            // load procedure
+            const loadProc = await dbconn.loadProcedurePromisified(hdbext, null, 'HIERARCHY_MATRIX')
+            // execute procedure
+            const result = await dbconn.callProcedurePromisified(loadProc,[vType, sAction, vUserIds,vHierarchyId]);
+            return result
+        }
+      }
+      catch (error) {
+        req.error({message:  error.message ? error.message : error });      
+      } 
+      })
 }) 

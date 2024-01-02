@@ -7,7 +7,7 @@ service ideal_registration_form_srv {
 
     entity RequestInfo as projection on DEALER_PORTAL.REQUEST_INFO;
     entity RegformAddress as projection on DEALER_PORTAL.REGFORM_ADDRESS;
-    entity RegformFinancial as projection on DEALER_PORTAL.REGFORM_FINANCIAL;
+    entity RegformBanks as projection on DEALER_PORTAL.REGFORM_BANKS;
     entity RegformContacts as projection on DEALER_PORTAL.REGFORM_CONTACTS;
     entity RegformCustomers as projection on DEALER_PORTAL.REGFORM_CUSTOMERS;
     entity RegformBusinessHistory as projection on DEALER_PORTAL.REGFORM_BUSINESS_HISTORY;
@@ -28,7 +28,7 @@ service ideal_registration_form_srv {
 
     function GetDraftData(requestNo : Integer, entityCode : String, creationType : Integer, userId : String, userRole : String)  returns many String;
 
-    action PostRegFormData(action : String, stepNo : Integer, reqHeader : many RequestInfo, addressData : many RegformAddress, promotersData : many RegformPromoters,businessHistoryData : many RegformBusinessHistory,contactsData : many RegformContacts, financeData : many RegformFinancial, customerData : many RegformCustomers,attachmentData : many RegformAttachments, updatedFields : many String, eventsData : many RegEventsLog, userDetails : User_Details) returns many String;
+    action PostRegFormData(action : String, stepNo : Integer, reqHeader : many RequestInfo, addressData : many RegformAddress, promotersData : many RegformPromoters,businessHistoryData : many RegformBusinessHistory,contactsData : many RegformContacts, financeData : many RegformBanks, customerData : many RegformCustomers,attachmentData : many RegformAttachments, updatedFields : many String, eventsData : many RegEventsLog, userDetails : User_Details) returns many String;
     // bankData : many RegformBanks,ownersData : many RegformOwners,  prodServData : many RegFormProdServ, capacityData : many RegFormCapacity,
     // oemData : many RegFormOEM,discFieldsData : many RegFormDiscInfo,discRelativesData : many RegFormDiscRelatives, discQaCertiData : many RegFormDiscQaCertif,
     // attachmentFieldsData : many RegFormAttachFields,

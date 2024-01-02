@@ -48,18 +48,29 @@ const cds = require("@sap/cds");
 			throw error;
 		}
 	},
-	getApproverForEntity: async function (connection, sEntityCode, sRoleCode, sTableName, sType) {
+	getApproverForEntity: async function (connection, sEntityCode, sRoleCode, sTableName, sType,sLevel) {
         try {
             // let sApprover = null;
-            let sTableFullName = 'DEALER_PORTAL.' + sTableName;
+            // let sTableFullName = 'DEALER_PORTAL.' + sTableName;
             let aResult = await connection.run(
                 SELECT
-                    .from`${connection.entities[sTableFullName]}`
-                    .where({ ENTITY_CODE: sEntityCode, ROLE_CODE: sRoleCode , TYPE: sType}));
+                    .from`${connection.entities[sTableName]}`
+                    .where({ ENTITY_CODE: sEntityCode, ROLE_CODE: sRoleCode , TYPE: sType, LEVEL: sLevel}));
             if (aResult.length > 0) return aResult;
             else return null;
             // sApprover = aResult[0].USER_ID;            
  
+        }
+        catch (error) { throw error; }
+ 
+    },
+    getMaxLevel: async function (sEntityCode, sRoleCode, sType) {
+        try {
+            let aResult = await SELECT `MAX(LEVEL)` .from`CALC_HIERARCHY_MATRIX` .where`ENTITY_CODE=${sEntityCode} AND
+            ROLE_CODE=${sRoleCode} AND TYPE=${sType}`;
+            var vMaxNo = aResult[0]["MAX(LEVEL)"];
+            if (aResult.length > 0) return vMaxNo;
+            else return null;           
         }
         catch (error) { throw error; }
  
