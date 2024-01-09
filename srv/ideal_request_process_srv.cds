@@ -31,7 +31,7 @@ service ideal_request_process_srv {
     USER_ID: String(50);
   }
 
-    action RequestProcess(action : String, inputData : many RequestInfo, eventsData : many RequestEventsLog,userDetails:User_Details) returns many String;
+    action RequestProcess(action : String, appType:String, inputData : many RequestInfo, eventsData : many RequestEventsLog,userDetails:User_Details) returns many String;
     action RequestEditProcess(input : String) returns many String;
     
 

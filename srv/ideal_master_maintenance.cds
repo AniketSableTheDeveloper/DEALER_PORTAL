@@ -76,15 +76,15 @@ service ideal_master_maintenance {
       }
     };
 
-    type hierarchyMatrix {
-      ACTION : String;
-      USERDETAILS : User_Details;
-      VALUE : array of {
-        HIERARCHY_ID : String(10); 
-        USER_IDS : String(1000);
-        TYPE : String(10);
-      }
-    }
+    // type hierarchyMatrix {
+    //   ACTION : String;
+    //   USERDETAILS : User_Details;
+    //   VALUE : array of {
+    //     HIERARCHY_ID : String(10); 
+    //     USER_IDS : String(1000);
+    //     TYPE : String(10);
+    //   }
+    // }
 
   
     //CRUD operation action
@@ -92,8 +92,8 @@ service ideal_master_maintenance {
     //CRUD operation action   
     action PostApprovalMatrix(input : approvalMatrixPayload) returns String;
     // action PostDynamicApprovalHierarchy(input : dyanmicApprovalPayload)returns String;
-    action PostDynamicApprovalHierarchy(action:String,UserDetails:User_Details,input : many MasterApprovalHierarchy)returns String;
-    action PostHierarchyMatrix(input : hierarchyMatrix)returns String;
+    action PostDynamicApprovalHierarchy(action:String,UserDetails:User_Details,input : many MasterApprovalHierarchy,userIds:String)returns String;
+    // action EditHierarchyUsers(input : hierarchyMatrix)returns String;
    
 
 }

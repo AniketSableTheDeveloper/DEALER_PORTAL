@@ -46,9 +46,9 @@ BEGIN
             UPDATE "DEALER_PORTAL_REQUEST_INFO"
             SET 
             "REQUEST_TYPE" = :IN_REQUEST_TYPE_TO,
-            "CREATION_TYPE" = :IN_REQUEST_TYPE_TO,
-            "SUPPL_TYPE" = :IN_SUPPL_TYPE,
-            "SUPPL_TYPE_DESC" = :IN_SUPPL_TYPE_DESC
+            "CREATION_TYPE" = :IN_REQUEST_TYPE_TO
+            -- "SUPPL_TYPE" = :IN_SUPPL_TYPE,
+            -- "SUPPL_TYPE_DESC" = :IN_SUPPL_TYPE_DESC
             WHERE "REQUEST_NO" = :IN_REQUEST_NO;
             
             OUT_SUCCESS := 'Success';
@@ -57,9 +57,9 @@ BEGIN
         THEN
             UPDATE "DEALER_PORTAL_REQUEST_INFO"
             SET 
-            "CREATION_TYPE" = :IN_REQUEST_TYPE_TO,
-            "SUPPL_TYPE" = :IN_SUPPL_TYPE,
-            "SUPPL_TYPE_DESC" = :IN_SUPPL_TYPE_DESC
+            "CREATION_TYPE" = :IN_REQUEST_TYPE_TO
+            -- "SUPPL_TYPE" = :IN_SUPPL_TYPE,
+            -- "SUPPL_TYPE_DESC" = :IN_SUPPL_TYPE_DESC
             WHERE "REQUEST_NO" = :IN_REQUEST_NO;
             
             

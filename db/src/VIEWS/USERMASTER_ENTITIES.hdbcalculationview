@@ -60,6 +60,7 @@
       <viewAttribute id="ENTITY_DESC"/>
       <viewAttribute hidden="true" id="JOIN$USER_ID$USER_ID"/>
       <viewAttribute hidden="true" id="JOIN$EMAIL$EMAIL"/>
+      <viewAttribute hidden="true" id="JOIN$USER_ROLE$USER_ROLE"/>
     </viewAttributes>
     <calculatedViewAttributes/>
     <input node="Projection_1">
@@ -75,6 +76,7 @@
       <mapping xsi:type="Calculation:AttributeMapping" target="ACTIVE" source="ACTIVE"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$USER_ID$USER_ID" source="USER_ID"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$EMAIL$EMAIL" source="EMAIL"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$USER_ROLE$USER_ROLE" source="USER_ROLE"/>
     </input>
     <input node="Projection_2">
       <mapping xsi:type="Calculation:AttributeMapping" target="USER_ID_1" source="USER_ID"/>
@@ -84,9 +86,11 @@
       <mapping xsi:type="Calculation:AttributeMapping" target="ENTITY_DESC" source="ENTITY_DESC"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$USER_ID$USER_ID" source="USER_ID"/>
       <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$EMAIL$EMAIL" source="EMAIL"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$USER_ROLE$USER_ROLE" source="USER_ROLE"/>
     </input>
     <joinAttribute name="JOIN$USER_ID$USER_ID"/>
     <joinAttribute name="JOIN$EMAIL$EMAIL"/>
+    <joinAttribute name="JOIN$USER_ROLE$USER_ROLE"/>
   </calculationView>
 </calculationViews>
 <logicalModel id="Join_1">

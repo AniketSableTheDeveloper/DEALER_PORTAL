@@ -21,6 +21,23 @@ module.exports = cds.service.impl(async function(){
             var aEntityData = oReqData.VALUE[0].ENTITYDATA;
             var bIsDuplicateUser = null;
 
+            //SA-CM Code
+            var LV_USER_ROLE;
+            var LV_SR_NO = aUserData[0].SR_NO; 
+            var LV_USER_ID = aUserData[0].USER_ID;
+            var LV_EMAIL = aUserData[0].EMAIL;
+            if(aUserData.length === 1)
+            {
+              LV_USER_ROLE = aUserData[0].USER_ROLE;
+            }
+            else{
+              if(aUserData[0].USER_ROLE === 'DIST' || aUserData[1].USER_ROLE === 'DIST')
+              {
+                throw {"message":"Only SA and CM Role are allow"};
+              }
+              LV_USER_ROLE = aUserData[0].USER_ROLE +" And "+aUserData[1].USER_ROLE;
+            }  
+
             if (sAction === "CREATE") {
                 // Check Duplicate User
                 bIsDuplicateUser = await _checkDuplicateUser(aUserData);
@@ -30,7 +47,9 @@ module.exports = cds.service.impl(async function(){
                 const loadProc = await dbconn.loadProcedurePromisified(hdbext, null, 'MASTER_IDEAL_USERS')
                 console.log(oReqData);
                 // excute procedure
-                const result = await dbconn.callProcedurePromisified(loadProc,[sAction, aUserData, aEntityData]);
+                // const result = await dbconn.callProcedurePromisified(loadProc,[sAction, aUserData, aEntityData]);
+                //SA-CM Code
+                const result = await dbconn.callProcedurePromisified(loadProc,[sAction, LV_SR_NO, LV_USER_ID, LV_EMAIL, LV_USER_ROLE, aUserData, aEntityData]);
                 return result;
               }   
               else {
@@ -168,20 +187,18 @@ module.exports = cds.service.impl(async function(){
   this.on('PostDynamicApprovalHierarchy',async (req) =>{
     try{
 
-        var oReqData = req.data.input;
-        var sUserId=req.data.userIds || null;
         var sAction = req.data.action;
         var aHierarchyMatrixData = req.data.input;
-        var vEntityCode = aHierarchyMatrixData[0].ENTITY_CODE;
         var vType = aHierarchyMatrixData[0].TYPE;
         var vRole = aHierarchyMatrixData[0].ROLE_CODE;
+        var userIds = req.data.userIds || null;
 
-        if(sAction === 'CREATE' || sAction === 'UPDATE' || sAction === 'DELETE')
+        if(sAction === 'CREATE' || sAction === 'UPDATE' || sAction === 'DELETE' || sAction === 'EDITIDS')
         {
             // load procedure
             const loadProc = await dbconn.loadProcedurePromisified(hdbext, null, 'DYNAMIC_MATRIX_APPROVAL')
             // execute procedure
-            const result = await dbconn.callProcedurePromisified(loadProc,[vType, sAction, aHierarchyMatrixData,aHierarchyMatrixData[0].HIERARCHY_ID,vRole]);
+            const result = await dbconn.callProcedurePromisified(loadProc,[vType, sAction, aHierarchyMatrixData,aHierarchyMatrixData[0].HIERARCHY_ID,userIds,vRole]);
             return result
         }
       }
@@ -189,28 +206,28 @@ module.exports = cds.service.impl(async function(){
         req.error({message:  error.message ? error.message : error });      
       } 
       })
-      this.on('PostDynamicApprovalHierarchy',async (req) =>{
-      try{
+      // this.on('EditHierarchyUsers',async (req) =>{
+      // try{
 
-        var oReqData = req.data.input;
-        var sAction = oReqData.ACTION;
-        var vUserDetails = oReqData.USER_DETAILS;
-        var vUserIds = oReqData.VALUE[0].USER_IDS;
-        var vHierarchyId = oReqData.VALUE[0].HIERARCHY_ID;
-        var vType = oReqData.VALUE[0].TYPE;
+      //   var oReqData = req.data.input;
+      //   var sAction = oReqData.ACTION;
+      //   var vUserDetails = oReqData.USER_DETAILS;
+      //   var vUserIds = oReqData.VALUE[0].USER_IDS;
+      //   var vHierarchyId = oReqData.VALUE[0].HIERARCHY_ID;
+      //   var vType = oReqData.VALUE[0].TYPE;
   
 
-        if(sAction === 'CREATE' || sAction === 'UPDATE' || sAction === 'DELETE')
-        {
-            // load procedure
-            const loadProc = await dbconn.loadProcedurePromisified(hdbext, null, 'HIERARCHY_MATRIX')
-            // execute procedure
-            const result = await dbconn.callProcedurePromisified(loadProc,[vType, sAction, vUserIds,vHierarchyId]);
-            return result
-        }
-      }
-      catch (error) {
-        req.error({message:  error.message ? error.message : error });      
-      } 
-      })
+      //   if(sAction === 'CREATE' || sAction === 'UPDATE' || sAction === 'DELETE')
+      //   {
+      //       // load procedure
+      //       const loadProc = await dbconn.loadProcedurePromisified(hdbext, null, 'HIERARCHY_MATRIX')
+      //       // execute procedure
+      //       const result = await dbconn.callProcedurePromisified(loadProc,[vType, sAction, vUserIds,vHierarchyId]);
+      //       return result
+      //   }
+      // }
+      // catch (error) {
+      //   req.error({message:  error.message ? error.message : error });      
+      // } 
+      // })
 }) 

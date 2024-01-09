@@ -70,7 +70,7 @@ module.exports = {
 				Emailbody = "Dear Approver," + "<br><br>";
 				// var link = "Vendor_Request_Approval-Approve&/VendorInviteList/" + parseInt(oEmailData.ReqNo, 10);
 				var link =sLink_Portal_LoginAccess + "site?siteId=dfe9a08b-9dd0-4282-b092-59cf8a8da401#iven_request_approval-display?&/RouteMaster/"+ parseInt(oEmailData.ReqNo, 10);
-				oEmailContent.emailBody = req + "Request No. " + oEmailData.ReqNo + " for Vendor " + oEmailData.SupplierName +
+				oEmailContent.emailBody = req + "Request No. " + oEmailData.ReqNo + " for Distributor " + oEmailData.SupplierName +
 					" has been created and is currently pending your approval." + "<br>" + "<br>" +
 					"Please click " + "<a href=" +  link + ">" + "here" + "</a>" + " to login to " + sClientShortName + " Portal and approve." +
 					"<br>" + "<br>" +
@@ -83,12 +83,12 @@ module.exports = {
 					"</a>" + "<br>" +
 					"<br>" +
 					"Regards," + "<br>" +
-					"Vendor Management Team" +
+					"Distributor Management Team" +
 					"<br><br>";
 
 				oEmailContent.emailBody = "<p style=" + "font-family:Arial, Helvetica, sans-serif;font-size:11px;color:black>" + Emailbody + oEmailContent.emailBody + "</p>";
 				// 		subject = req + "Request created for supplier " + data[0].SupplierName;
-				oEmailContent.subject = "Vendor request created";
+				oEmailContent.subject = "Distributor request created";
 
 			} else if (sAction === "APPROVE") {
 
@@ -139,7 +139,7 @@ module.exports = {
 				
 
 				Emailbody = "Dear Approver," + "<br><br>";
-				oEmailContent.emailBody = emailStartForUpdate + req + "Request No. " + oEmailData.ReqNo + " for vendor " + oEmailData.SupplierName +
+				oEmailContent.emailBody = emailStartForUpdate + req + "Request No. " + oEmailData.ReqNo + " for distributor " + oEmailData.SupplierName +
 					" has been " + sAction.toLowerCase() + "ed." + "<br>" + "<br>" +
 					"Reason for " + sAction.toLowerCase() + "ion. :" + "<br>" +
 					oEmailData.RejComm +
@@ -150,13 +150,13 @@ module.exports = {
 					"</a>" + "<br>" +
 					"<br>" +
 					"Regards," + "<br>" +
-					"Vendor Management Team" +
+					"Distributor Management Team" +
 					"<br><br>";
 
 				oEmailContent.emailBody = "<p style=" + "font-family:Arial, Helvetica, sans-serif;font-size:11px;color:black>" + Emailbody +
 					oEmailContent.emailBody + "</p>";
 				// 		subject = req + "Request rejected for supplier " + data[0].SupplierName;
-				oEmailContent.subject = "Vendor " + req + "request " + sAction.toLowerCase() + "ed. ";
+				oEmailContent.subject = "Distributor " + req + "request " + sAction.toLowerCase() + "ed. ";
 			} else if (sAction === "INVITE" || sAction === "RE_INVITE") {
 
 				if (sAction === "RE_INVITE") {
@@ -268,10 +268,10 @@ module.exports = {
 					sRequestTypeText = "Quick ";
 				}
 				// oEmailContent.subject = "Supplier " + oEmailData.SupplierName + sRequestTypeText + sProcessTypeText + sActionTypeText + "."; 
-				oEmailContent.subject = "Vendor " + sRequestTypeText + sProcessTypeText + sActionTypeText + ".";
+				oEmailContent.subject = "Distributor " + sRequestTypeText + sProcessTypeText + sActionTypeText + ".";
 
 				oEmailContent.emailBody = greetingsTo + "<br><br>" +
-					"Request No. " + oEmailData.ReqNo + " for " + sRequestTypeText + "Vendor Registration of <span style=\"text-transform:uppercase\">" +
+					"Request No. " + oEmailData.ReqNo + " for " + sRequestTypeText + "Distributor Registration of <span style=\"text-transform:uppercase\">" +
 					oEmailData.SupplierName + "</span>";
 
 				oEmailContent.emailBody += " has been " + sActionTypeText + " and is currently pending your approval.<br>" + "<br>" +
@@ -281,7 +281,7 @@ module.exports = {
 					"<strong><a href=" + sClientContactEmail + ">" + sClientContactEmail + "</a></strong> " + "<br>" +
 					"<br>" +
 					"Regards," + "<br>" +
-					"Vendor Management Team";
+					"Distributor Management Team";
 
 			}
 			if (sAction === "SELFREG") {

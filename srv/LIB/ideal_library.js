@@ -50,14 +50,24 @@ const cds = require("@sap/cds");
 	},
 	getApproverForEntity: async function (connection, sEntityCode, sRoleCode, sTableName, sType,sLevel) {
         try {
-            // let sApprover = null;
-            // let sTableFullName = 'DEALER_PORTAL.' + sTableName;
+            if(sRoleCode === null)
+            {
+                let aResult = await connection.run(
+                SELECT
+                    .from`${connection.entities[sTableName]}`
+                    .where({ ENTITY_CODE: sEntityCode, TYPE: sType, LEVEL: sLevel}));
+            if (aResult.length > 0) return aResult;
+            else return null;
+
+            }
+            else{
             let aResult = await connection.run(
                 SELECT
                     .from`${connection.entities[sTableName]}`
                     .where({ ENTITY_CODE: sEntityCode, ROLE_CODE: sRoleCode , TYPE: sType, LEVEL: sLevel}));
             if (aResult.length > 0) return aResult;
             else return null;
+            }
             // sApprover = aResult[0].USER_ID;            
  
         }
@@ -74,6 +84,21 @@ const cds = require("@sap/cds");
         }
         catch (error) { throw error; }
  
+    },
+    getRoleForId:async function(connection,sEntityCode,sTableName,sHierarchyId,sAppType){
+
+        try {
+            let aResult = await connection.run(
+                SELECT
+                    .from`${connection.entities[sTableName]}`
+                    .where({ ENTITY_CODE: sEntityCode, TYPE: sAppType , HIERARCHY_ID: sHierarchyId}));
+            if (aResult.length > 0) return aResult;
+            else return null;
+            // sApprover = aResult[0].USER_ID;            
+ 
+        }
+        catch (error) { throw error; }
+
     },
 	getRegisteredId:async function(iReqNo,connection){
         try {

@@ -37,6 +37,7 @@ entity REGFORM_FOLDER_IDS {
 
 entity REQUEST_INFO {
     key REQUEST_NO            : Integer64;
+        MOBILE_NO             : String(30);  //added 05/01/2023
         SAP_DIST_CODE         : String(10); //SAP_DEALER_CODE
         IDEAL_DIST_CODE       : Integer64; //IDEAL_DEALER_CODE
         STATUS                : Integer;
@@ -50,8 +51,6 @@ entity REQUEST_INFO {
         APPROVER_LEVEL        : Integer;
         HIERARCHY_ID          : String(10);
         REQUESTER_ID          : String(100); // Request creator i.e. Buyer Email ID
-        SUPPL_TYPE            : String(50);
-        SUPPL_TYPE_DESC       : String(50);
         BP_TYPE_CODE          : String(4);
         BP_TYPE_DESC          : String(100);
         REQUEST_RESENT        : String(5);
@@ -116,6 +115,8 @@ entity REQUEST_INFO {
         // TRADE_LIC_NO_DATE        : Date;
         // APPROVER_ROLE            : String(50);
         // NEXT_APPROVER            : String(100);
+        // SUPPL_TYPE            : String(50);
+        // SUPPL_TYPE_DESC       : String(50);
         TO_STATUS             : Association to one DEALER_PORTAL.MASTER_STATUS
                                     on TO_STATUS.CODE = STATUS;
         TO_ENTITY_CODE        : Association to one DEALER_PORTAL.MASTER_ENTITY_CODE
