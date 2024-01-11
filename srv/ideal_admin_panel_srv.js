@@ -143,7 +143,7 @@ module.exports = cds.service.impl(function () {
 
       // Edit Forms Fields
       var sEntityCode = oReqData.CCODE || null;
-      var iType = oReqData.TYPE || null;
+      var iType = oReqData.REQ_TYPE || null;
       aData = oReqData.VALUE[0].TABLE_DATA;
 
       //Local Variable for edit forms
@@ -196,10 +196,6 @@ module.exports = cds.service.impl(function () {
               }
             }
           }
-          // if (aSuccessArray.length === iChangeCount) {
-          //   // conn.commit();
-
-          // }
           // Created Success Msg Dynamically Cause Needed Both Master Or One Master at a Time With The Help Change Flag
           successMsg = await lib_common.generateSuccessMessage(aTableDesc);
           return successMsg
@@ -238,11 +234,11 @@ module.exports = cds.service.impl(function () {
           obj = aData[i];
           if (i === 0) {
             oVisibilityObj.CCODE = sEntityCode;
-            oVisibilityObj.TYPE = iType;
+            oVisibilityObj.REQ_TYPE = iType;
             oMandatoryObj.CCODE = sEntityCode;
-            oMandatoryObj.TYPE = iType;
+            oMandatoryObj.REQ_TYPE = iType;
             oFieldDescObj.CCODE = sEntityCode;
-            oFieldDescObj.TYPE = iType;
+            oFieldDescObj.REQ_TYPE = iType;
           }
   
           oVisibilityObjTemp[obj.FIELDS.toString()] = obj.VISIBILITY;
@@ -400,17 +396,19 @@ module.exports = cds.service.impl(function () {
       var aFieldDescObj = {};
 
       var aTemplateKeys = Object.keys(columnTemplate[0]);
-      var sTempCcode = null, iTempType = null, obj = {};
+      var sTempCcode = null, iTempType = null,iTempReqType = null, obj = {};
 
       if (entityCode === "TEMPLATE") {
 
         for (var i = 0; i < aTemplateKeys.length; i++) {
           if (aTemplateKeys[i] === "CCODE") {
             sTempCcode = entityCode;
-          } else if ((aTemplateKeys[i] === "TYPE")) {
-            iTempType = 1;
+          } else if ((aTemplateKeys[i] === "REQ_TYPE")) {
+          iTempReqType = 1;
+            } else if ((aTemplateKeys[i] === "TYPE")) {
+              iTempType = '';
           } else {
-            obj["SRNO"] = i - 1;
+            obj["SRNO"] = i - 2;
             obj["FIELDS"] = aTemplateKeys[i];
             obj["VISIBILITY"] = null;
             obj["MANDATORY"] = null;
@@ -421,18 +419,20 @@ module.exports = cds.service.impl(function () {
         }
 
       } else {
-        var aVisibleFieldsData = await lib_admin_panel.getVisibleFieldsData(conn, entityCode, requestType);
-        var aMandatoryFieldsData = await lib_admin_panel.getMandatoryFieldsData(conn, entityCode, requestType);
+        var aVisibleFieldsData = await lib_admin_panel.getVisibleMandatoryFieldsData(conn, entityCode, requestType,'V');
+        var aMandatoryFieldsData = await lib_admin_panel.getVisibleMandatoryFieldsData(conn, entityCode, requestType,'M');
 
         if(aVisibleFieldsData.length !== 0 && aMandatoryFieldsData.length !== 0){
         for (var i = 0; i < aTemplateKeys.length; i++) {
           if (aTemplateKeys[i] === "CCODE") {
             sTempCcode = aVisibleFieldsData[0][aTemplateKeys[i].toString()];
+          } else if ((aTemplateKeys[i] === "REQ_TYPE")) {
+            iTempReqType = parseInt(aVisibleFieldsData[0][aTemplateKeys[i].toString()], 10);
           } else if ((aTemplateKeys[i] === "TYPE")) {
             iTempType = parseInt(aVisibleFieldsData[0][aTemplateKeys[i].toString()], 10);
           } else {
             aFieldDescObj = await lib_admin_panel.getFieldsDesc(aTemplateKeys[i], aFieldDescData);
-            obj["SRNO"] = i - 1;
+            obj["SRNO"] = i - 2;
             obj["FIELDS"] = aTemplateKeys[i];
             obj["VISIBILITY"] = aVisibleFieldsData[0][aTemplateKeys[i].toString()];
             obj["MANDATORY"] = aMandatoryFieldsData[0][aTemplateKeys[i].toString()];
@@ -446,12 +446,56 @@ module.exports = cds.service.impl(function () {
       }
       responseObj = {
         "CCODE": sTempCcode,
-        "TYPE": iTempType,
+        "REQ_TYPE": iTempReqType,
         "DATA": aVisiMandatArrFields.length > 0 ? aVisiMandatArrFields : []
       };
       req.reply(responseObj)
     } catch (error) {
       req.error({ code: "500", message: error.message });
     }
+  })
+
+  this.on('PostVisibleMandatoryFields',async req=>{    
+    //get Connection
+    var client = await dbClass.createConnectionFromEnv();
+    var dbConn = new dbClass(client);
+    try{
+      var conn = await cds.connect.to('db');
+      var {requestType,entityCode,copyEntityCode,userDetails}=req.data;
+      var sUserID=userDetails.USER_ID || null;
+      var sUserRole=userDetails.USER_ROLE || null;
+      var aMandatoryVisibleFieldsData=[];
+      var aCheckMandatoryFieldsData = await lib_admin_panel.getVisibleMandatoryFieldsData(conn, entityCode, requestType,'M');
+      var aCheckVisibleFieldsData = await lib_admin_panel.getVisibleMandatoryFieldsData(conn, entityCode, requestType,'V');
+      if(aCheckMandatoryFieldsData.length!=0 && aCheckVisibleFieldsData.length!=0){   
+        throw "Registration Form Fields Already Exists";     
+      }
+      
+      var columnTemplate = await lib_common.getTemplateColumns(conn);
+      columnTemplate[0].REQ_TYPE=requestType;
+      // aVisibleFieldsData=columnTemplate;
+      // aMandatoryFieldsData=columnTemplate;
+      aMandatoryVisibleFieldsData=columnTemplate;
+      if(copyEntityCode){
+        // aMandatoryFieldsData = await lib_admin_panel.getVisibleMandatoryFieldsData(conn, copyEntityCode, requestType,'M');
+        // aVisibleFieldsData = await lib_admin_panel.getVisibleMandatoryFieldsData(conn, copyEntityCode, requestType,'V');
+        aMandatoryVisibleFieldsData = await lib_admin_panel.getVisibleMandatoryFieldsData(conn, copyEntityCode, requestType,'VM');
+      }
+      aMandatoryVisibleFieldsData[0].CCODE=entityCode
+      aMandatoryVisibleFieldsData[1].CCODE=entityCode
+      var loadProc=await dbConn.loadProcedurePromisified(hdbext,null,"REGISTRATION_FORM_FIELDS");
+      var sResponse=await dbConn.callProcedurePromisified(loadProc,[aMandatoryVisibleFieldsData[0].CCODE,aMandatoryVisibleFieldsData[0].REQ_TYPE,aMandatoryVisibleFieldsData])   
+      req.reply(sResponse)         
+    }catch(error){
+      var sType=error.code?"Procedure":"Node Js";    
+      var iErrorCode=error.code??500;     
+      let Result = {
+          OUT_ERROR_CODE: iErrorCode,
+          OUT_ERROR_MESSAGE:  error.message ? error.message : error
+      }
+      // lib_common.postErrorLog(Result,null,sUserID,sUserRole,"System Configuration",sType,dbConn,hdbext);
+      req.error({ code:iErrorCode, message:  error.message ? error.message : error });
+    }
+
   })
 })

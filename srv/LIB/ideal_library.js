@@ -39,8 +39,8 @@ const cds = require("@sap/cds");
 
 			let aResult = await conn.run(
 				SELECT
-					.from`${conn.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_MANDATORY']}`
-					.where`CCODE = 'TEMPLATE' AND TYPE = 1`
+					.from`${conn.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG']}`
+					.where`CCODE = 'TEMPLATE' AND REQ_TYPE = 1`
 			);
 			return aResult;
 		}

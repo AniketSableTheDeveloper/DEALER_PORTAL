@@ -26,10 +26,15 @@ service ideal_registration_form_srv {
         USER_ID   : String(50);
     }
 
+    type securityPinResponse {
+    CREATED_ON    : Timestamp;
+    IS_MATCH:Boolean;
+    RESPONSE_MESSAGE:String(30);
+  }
+
     function GetDraftData(requestNo : Integer, entityCode : String, creationType : Integer, userId : String, userRole : String)  returns many String;
+    function GetSecurityPin(distributorName : String, distributorEmail : String, requesterId : String, userId : String, userRole : String)returns many String;
+    function CheckSecurityPin(distributorEmail : String,securityPin:String, userId : String, userRole : String) returns securityPinResponse;
 
     action PostRegFormData(action : String, stepNo : Integer, reqHeader : many RequestInfo, addressData : many RegformAddress, promotersData : many RegformPromoters,businessHistoryData : many RegformBusinessHistory,contactsData : many RegformContacts, financeData : many RegformBanks, customerData : many RegformCustomers,attachmentData : many RegformAttachments, updatedFields : many String, eventsData : many RegEventsLog, userDetails : User_Details) returns many String;
-    // bankData : many RegformBanks,ownersData : many RegformOwners,  prodServData : many RegFormProdServ, capacityData : many RegFormCapacity,
-    // oemData : many RegFormOEM,discFieldsData : many RegFormDiscInfo,discRelativesData : many RegFormDiscRelatives, discQaCertiData : many RegFormDiscQaCertif,
-    // attachmentFieldsData : many RegFormAttachFields,
 }

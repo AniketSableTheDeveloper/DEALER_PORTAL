@@ -270,7 +270,7 @@ context DEALER_PORTAL {
     }
 
     entity MASTER_REGFORM_FIELDS_CONFIG{
-        CCODE : String(10);
+        key CCODE : String(10);
         key REQ_TYPE : Integer;
         key TYPE : String(1);
         // Section 1 - General Section

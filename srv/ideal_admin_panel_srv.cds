@@ -20,6 +20,10 @@ service ideal_admin_panel_srv {
     entity RegformFolderIds as projection on DEALER_PORTAL.REGFORM_FOLDER_IDS;
     entity EmailConfig as projection on DEALER_PORTAL.EMAIL_CONFIG;
     
+    type User_Details:{
+    USER_ROLE: String(50);
+    USER_ID: String(50);
+  };
 
   function GetAdminPanelData(action : String, tableCode : String, requestNo : Integer) returns array of String;
   //Get Visible and Mandatory Fields
@@ -29,5 +33,7 @@ service ideal_admin_panel_srv {
   //Post Admin Panel Edits
   action   EditAdminPanelData(input : String)returns array of String;
   function TestOnPremiseConnection(sapClient : String, destFileName : String)returns array of String;
+
+  action PostVisibleMandatoryFields(requestType : Integer, entityCode : String, copyEntityCode:String, userDetails:User_Details) returns array of String;
 
 }

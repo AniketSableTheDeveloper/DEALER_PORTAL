@@ -321,35 +321,62 @@ module.exports = {
     }
   },
 
-  getVisibleFieldsData: async function (connection, iEntityCode, iType) {
+  getVisibleMandatoryFieldsData: async function (connection, iEntityCode, iType,VisibleMandatory) {
     try {
       // let connection = await cds.connect.to('db');
-      let aResult = await connection.run(
-        SELECT
-          .from`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_VISIBLE']}`
-          .where`CCODE = ${iEntityCode} AND TYPE = ${iType}`
-      );
-
+      if(VisibleMandatory === 'VM')
+      { 
+        let aResult = await connection.run(
+          SELECT
+            .from`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG']}`
+            .where`CCODE = ${iEntityCode} AND REQ_TYPE = ${iType}`
+        );
+        return aResult;
+      }
+      else if(VisibleMandatory === 'V' || VisibleMandatory === 'M'){
+        let aResult = await connection.run(
+          SELECT
+            .from`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG']}`
+            .where`CCODE = ${iEntityCode} AND REQ_TYPE = ${iType} AND TYPE = ${VisibleMandatory}`
+        );
+        return aResult;
+      }
       // var aDataObjects = this.getArrayFromResult(aResult)
-      return aResult;
     }
     catch (error) { throw error; }
   },
 
-  getMandatoryFieldsData: async function (connection, iEntityCode, iType) {
-    try {
-      // let connection = await cds.connect.to('db');
-      let aResult = await connection.run(
-        SELECT
-          .from`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_MANDATORY']}`
-          .where`CCODE = ${iEntityCode} AND TYPE = ${iType}`
-      );
+  // getVisibleFieldsData: async function (connection, iEntityCode, iType) {
+  //   try {
+  //     // let connection = await cds.connect.to('db');
+  //     var visible = "V";
+  //     let aResult = await connection.run(
+  //       SELECT
+  //         .from`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG']}`
+  //         .where`CCODE = ${iEntityCode} AND REQ_TYPE = ${iType} AND TYPE = ${visible}`
+  //     );
 
-      // var aDataObjects = this.getArrayFromResult(aResult)
-      return aResult;
-    }
-    catch (error) { throw error; }
-  },
+  //     // var aDataObjects = this.getArrayFromResult(aResult)
+  //     return aResult;
+  //   }
+  //   catch (error) { throw error; }
+  // },
+
+  // getMandatoryFieldsData: async function (connection, iEntityCode, iType) {
+  //   try {
+  //     // let connection = await cds.connect.to('db');
+  //     var vMandatory = "M";
+  //     let aResult = await connection.run(
+  //       SELECT
+  //         .from`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG']}`
+  //         .where`CCODE = ${iEntityCode} AND REQ_TYPE = ${iType} AND TYPE = ${vMandatory}`
+  //     );
+
+  //     // var aDataObjects = this.getArrayFromResult(aResult)
+  //     return aResult;
+  //   }
+  //   catch (error) { throw error; }
+  // },
   getCountryDesc: async function (connection, countryCode) {
     try {
       var sDesc = "";
@@ -556,8 +583,6 @@ module.exports = {
 
     return aUpdatedData;
   },
-
-
   updateData: async function (connection, oVisibilityObj, oMandatoryObj, oFieldDescObj) {
 
     try {
@@ -574,39 +599,33 @@ module.exports = {
       // var sQuery3 = '';
       var oFieldDescObjLV = {};
       var arrQuery3 = [];
-      // var sResults3 = '';
+      // var sResults3 = '';     
 
       for (var i = 0; i < oVisibilityObj.FIELDS.length; i++) {
         oVisibilityObjLV = oVisibilityObj.FIELDS[i];
         oMandatoryObjLV = oMandatoryObj.FIELDS[i];
         oFieldDescObjLV = oFieldDescObj.FIELDS[i];
 
-        // sQuery1 += 'UPDATE "DEALER_PORTAL_MASTER_REGFORM_FIELDS_MANDATORY" ';
-        // sQuery1 += 'SET "' + Object.keys(oMandatoryObjLV)[0] + '" = ?';
-        // sQuery1 += 'WHERE "CCODE" = ? AND "TYPE" = ?';
-
-        // sQuery2 += 'UPDATE "DEALER_PORTAL_MASTER_REGFORM_FIELDS_VISIBLE" ';
-        // sQuery2 += 'SET "' + Object.keys(oVisibilityObjLV)[0] + '" = ?';
-        // sQuery2 += 'WHERE "CCODE" = ? AND "TYPE" = ?';
-
-        // sQuery3 += 'UPDATE "DEALER_PORTAL_MASTER_REGFORM_FIELDS_ID_DESC" ';
-        // sQuery3 += 'SET "DESCRIPTION" = ?';
-        // sQuery3 += 'WHERE "FIELDS" = ?'; column = COALESCE(NULLIF(?, ''), column)
-
-
         let oSetValues1 = {};
         oSetValues1[Object.keys(oMandatoryObjLV)[0]] = oMandatoryObjLV[Object.keys(oMandatoryObjLV)[0]];
         let sResults1 = await connection.run(UPDATE
-          .entity(`${connection.entities['DEALER_PORTAL.MASTER_IDEAL_SETTINGS']}`)
+          .entity(`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG']}`)
           .set(oSetValues1)
-          .where({ CCODE: oMandatoryObj.CCODE, TYPE: oMandatoryObj.TYPE }))
+          .where({ CCODE: oMandatoryObj.CCODE, REQ_TYPE: oMandatoryObj.REQ_TYPE ,TYPE: 'M'}))
+
+        //   let oSetValues2 = {};
+        // oSetValues1[Object.keys(oMandatoryObjLV)[0]] = oMandatoryObjLV[Object.keys(oMandatoryObjLV)[0]];
+        // let sResults2 = await connection.run(UPDATE
+        //   .entity(`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG']}`)
+        //   .set({oSetValues2})
+        //   .where({ CCODE: oMandatoryObj.CCODE, REQ_TYPE: oMandatoryObj.REQ_TYPE }))
 
         let oSetValues2 = {};
         oSetValues2[Object.keys(oVisibilityObjLV)[0]] = oVisibilityObjLV[Object.keys(oVisibilityObjLV)[0]];
         let sResults2 = await connection.run(UPDATE
-          .entity(`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_VISIBLE']}`)
+          .entity(`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG']}`)
           .set(oSetValues2)
-          .where({ CCODE: oVisibilityObj.CCODE, TYPE: oVisibilityObj.TYPE }))
+          .where({ CCODE: oVisibilityObj.CCODE, REQ_TYPE: oVisibilityObj.REQ_TYPE ,TYPE: 'V'}))
 
         let oSetValues3 = {};
         oSetValues3['DESCRIPTION'] = oFieldDescObjLV[Object.keys(oFieldDescObjLV)[0]];
@@ -617,26 +636,6 @@ module.exports = {
           .set(oSetValues3)
           .where(whereClauseObj))
 
-        // let sResults1 = await connection.run(
-        //   UPDATE `${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_MANDATORY']}`
-        //     .set `${Object.keys(oMandatoryObjLV)[0]} = COALESCE(${oMandatoryObjLV[Object.keys(oMandatoryObjLV)[0]]}, '')`
-        //     .where ` "CCODE" = ${oMandatoryObj.CCODE} AND "TYPE" = ${oMandatoryObj.TYPE}`
-        // );
-
-
-        // let sResults3 = await connection.run(
-        //   UPDATE `${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_ID_DESC']}`
-        //     // .set `"DESCRIPTION" = ${oFieldDescObjLV[Object.keys(oFieldDescObjLV)[0]]}`
-        //     .set `"DESCRIPTION" = CASE WHEN ${oFieldDescObjLV[Object.keys(oFieldDescObjLV)[0]]} IS NULL 
-        //     THEN '' ELSE ${oFieldDescObjLV[Object.keys(oFieldDescObjLV)[0]]}`
-        //     .where `WHERE "FIELDS" = ${ Object.keys(oFieldDescObjLV)[0]}`
-        // );
-
-
-        // sResults1 = conn.executeUpdate(sQuery1, oMandatoryObjLV[Object.keys(oMandatoryObjLV)[0]], oMandatoryObj.CCODE, oMandatoryObj.TYPE);
-        // sResults2 = conn.executeUpdate(sQuery2, oVisibilityObjLV[Object.keys(oVisibilityObjLV)[0]], oVisibilityObj.CCODE, oVisibilityObj.TYPE);
-        // sResults3 = conn.executeUpdate(sQuery3, oFieldDescObjLV[Object.keys(oFieldDescObjLV)[0]], Object.keys(oFieldDescObjLV)[0]);
-
         arrQuery1.push(sResults1);
         arrQuery2.push(sResults2);
         arrQuery3.push(sResults3);
@@ -646,7 +645,7 @@ module.exports = {
 
       return {
         "Results1": arrQuery1 || [],
-        "Results2": arrQuery2 || [],
+        // "Results2": arrQuery2 || [],
         "sResults3": arrQuery3 || []
       };
 
@@ -656,6 +655,72 @@ module.exports = {
 
 
   },
+
+  // updateData: async function (connection, oVisibilityObj, oMandatoryObj, oFieldDescObj) {
+
+  //   try {
+  //     // var sQuery1 = '';
+  //     var oVisibilityObjLV = {};
+  //     var arrQuery1 = [];
+  //     // var sResults1 = '';
+
+  //     // var sQuery2 = '';
+  //     var oMandatoryObjLV = {};
+  //     var arrQuery2 = [];
+  //     // var sResults2 = '';
+
+  //     // var sQuery3 = '';
+  //     var oFieldDescObjLV = {};
+  //     var arrQuery3 = [];
+  //     // var sResults3 = '';
+
+  //     for (var i = 0; i < oVisibilityObj.FIELDS.length; i++) {
+  //       oVisibilityObjLV = oVisibilityObj.FIELDS[i];
+  //       oMandatoryObjLV = oMandatoryObj.FIELDS[i];
+  //       oFieldDescObjLV = oFieldDescObj.FIELDS[i];
+
+  //       let oSetValues1 = {};
+  //       oSetValues1[Object.keys(oMandatoryObjLV)[0]] = oMandatoryObjLV[Object.keys(oMandatoryObjLV)[0]];
+  //       let sResults1 = await connection.run(UPDATE
+  //         .entity(`${connection.entities['DEALER_PORTAL.MASTER_IDEAL_SETTINGS']}`)
+  //         .set(oSetValues1)
+  //         .where({ CCODE: oMandatoryObj.CCODE, TYPE: oMandatoryObj.REQ_TYPE }))
+
+  //       let oSetValues2 = {};
+  //       oSetValues2[Object.keys(oVisibilityObjLV)[0]] = oVisibilityObjLV[Object.keys(oVisibilityObjLV)[0]];
+  //       let sResults2 = await connection.run(UPDATE
+  //         .entity(`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG']}`)
+  //         .set(oSetValues2)
+  //         .where({ CCODE: oVisibilityObj.CCODE, REQ_TYPE: oVisibilityObj.REQ_TYPE }))
+
+  //       let oSetValues3 = {};
+  //       oSetValues3['DESCRIPTION'] = oFieldDescObjLV[Object.keys(oFieldDescObjLV)[0]];
+  //       let whereClauseObj = { 'FIELDS': Object.keys(oFieldDescObjLV)[0] }
+
+  //       let sResults3 = await connection.run(UPDATE
+  //         .entity(`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_ID_DESC']}`)
+  //         .set(oSetValues3)
+  //         .where(whereClauseObj))
+
+  //       arrQuery1.push(sResults1);
+  //       arrQuery2.push(sResults2);
+  //       arrQuery3.push(sResults3);
+  //     }
+
+  //     // conn.commit();
+
+  //     return {
+  //       "Results1": arrQuery1 || [],
+  //       "Results2": arrQuery2 || [],
+  //       "sResults3": arrQuery3 || []
+  //     };
+
+  //   } catch (e) {
+  //     throw e;
+  //   }
+
+
+  // },
   //Dynamic Admin Panel Logic
   funcPostAdminPanelData: async function (connection, action, sTableName, tableDesc, tableData) {
     try {
