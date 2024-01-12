@@ -74,6 +74,54 @@ const cds = require("@sap/cds");
         catch (error) { throw error; }
  
     },
+    getUpdatedFieldsDataForEdit: async function (iReqNo, aUpdatedFieldsIDs, connection) {
+        try {
+
+            var aUpdatedIdData = [];
+            var aColumnsTemplate = await this.getTemplateColumns(connection);
+            if (aUpdatedFieldsIDs.length > 0) {
+            if (aColumnsTemplate.length > 0) {
+                if (aColumnsTemplate.length !== 0) {
+                    var aColumnsTemplateObj = JSON.parse(JSON.stringify(aColumnsTemplate[0]));
+                    var aTemplateKeys = Object.keys(aColumnsTemplate[0]);
+
+                    for (var i = 0; i < aTemplateKeys.length; i++) {
+                        if (aTemplateKeys[i] === "CCODE" || aTemplateKeys[i] === "REQ_TYPE") {
+                            delete aColumnsTemplateObj[aTemplateKeys[i]];
+                        } else if (aUpdatedFieldsIDs.includes(aTemplateKeys[i])) {
+                            aColumnsTemplateObj[aTemplateKeys[i].toString()] = 'X';
+                        } else {
+                            aColumnsTemplateObj[aTemplateKeys[i].toString()] = null;
+                        }
+                    }
+                    aColumnsTemplateObj.REQ_NO = iReqNo;
+                    aUpdatedIdData.push(aColumnsTemplateObj);
+                } else {
+                    throw "TEMPLATE Data missing Mandatory Fields Table";
+                }
+                }
+            }
+            return aUpdatedIdData;
+        }
+        catch (error) {
+            throw error;
+        }
+    },
+    isiDealSettingEnabled: async function (connection, sSettingCode) {
+        try {
+            var isEnabled = false;
+            let aResult = await connection.run(
+                SELECT`SETTING`
+                    .from`${connection.entities['DEALER_PORTAL.MASTER_IDEAL_SETTINGS']}`
+                    .where({ CODE: sSettingCode, SETTING: 'X' })
+            );
+            if (aResult.length > 0)
+                isEnabled = true;
+
+            return isEnabled;
+        }
+        catch (error) { throw error; }
+    },
     getMaxLevel: async function (sEntityCode, sRoleCode, sType) {
         try {
             let aResult = await SELECT `MAX(LEVEL)` .from`CALC_HIERARCHY_MATRIX` .where`ENTITY_CODE=${sEntityCode} AND

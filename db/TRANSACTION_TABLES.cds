@@ -217,6 +217,7 @@ entity REGFORM_BUSINESS_HISTORY {
 
 entity REGFORM_CUSTOMERS {
     key REQUEST_NO    : Integer64 not null;
+    key SR_NO         : Integer;
     key CUST_NO       : Integer not null;
         CUSTOMER_NAME : String(100);
         YEAR1         : Double;
@@ -331,6 +332,21 @@ entity REGFORM_ATTACHMENTS {
         ATTACH_FOR       : String(50);
 }
 
+entity REGFORM_ATTACH_FIELDS {
+    key REQUEST_NO                 : Integer64;
+        // If UAE Company
+        IS_UAE_COMPANY             : String(5);
+        // Do you issue an Electronic Tax Invoice
+        ISSUE_ELEC_TAX_INV         : String(100);
+        // Are you a Sole Agent / Distributor / Dealer for a manufacturer / service provider
+        SOLE_DIST_MFG_SER          : String(5);
+        //SOLE_DIST_MFG_SER_TYPE : String(100);
+
+        // Passport  Representative / Authorized person
+        PASSPORT_OF_AUTH_SIGNATORY : String(5);
+        PASSPORT_REPR_AUTH_PERSON  : String(5);
+}
+
 entity REGFORM_BANKS {
 
     key REQUEST_NO          : Integer64;
@@ -371,3 +387,12 @@ entity REGFORM_BANKS {
         TO_CURRENCY         : Association to one MASTER_CURRENCY
                                   on TO_CURRENCY.WAERS = BANK_CURRENCY;
 }
+
+entity REQUEST_SECURITY_CODE {
+
+    key REGISTERED_ID : String(100);
+        SEC_CODE      : String(100);
+        CREATED_ON    : Timestamp;
+
+}
+

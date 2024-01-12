@@ -3,8 +3,280 @@ const dbClass = require("sap-hdbext-promisfied")
 const hdbext = require("@sap/hdbext")
 const lib_common = require('../srv/LIB/ideal_library')
 const lib_email = require('../srv/LIB/ideal_library_email') 
+const lib_email_content = require('../srv/LIB/ideal_library_email_content')
 
 module.exports = cds.service.impl(function () {
+
+    this.on('PostRegFormData', async (req) => {
+    //Changes By Chandan M 23/11/23 Start
+    var client = await dbClass.createConnectionFromEnv();
+    var dbConn = new dbClass(client);
+    //Changes By Chandan M 23/11/23 End
+    try {
+        var {
+            action,
+            appType,
+            stepNo,
+            reqHeader,
+            addressData,
+            contactsData,
+            bankData,
+            // financeData,
+            // ownersData,
+            // prodServData,
+            // capacityData,
+            promotersData,
+            customerData,
+            businessHistoryData,
+            // oemData,
+            // discFieldsData,
+            // discRelativesData,
+            // discQaCertiData,
+            attachmentFieldsData,
+            attachmentData,
+            updatedFields,
+            eventsData,
+            userDetails
+        } = req.data;
+
+        var sAction = action;
+        var Result = null;
+        var sType = appType;
+
+
+    //intialize connection to database
+    var connection = await cds.connect.to('db');
+    var isEmailNotificationEnabled = false;
+    var sUserIdentity=userDetails.USER_ID || null;
+    var sUserRole=userDetails.USER_ROLE || null;
+
+   //Check if email notification is enabled
+   isEmailNotificationEnabled = await lib_common.isiDealSettingEnabled(connection, "VM_EMAIL_NOTIFICATION");
+
+    if (sAction === "DRAFT" || sAction === "CREATE" || sAction === "RESEND") { 
+
+        var iReqNo = reqHeader[0].REQUEST_NO;
+        var iReqType = reqHeader[0].REQUEST_TYPE;
+        var iStep = stepNo;
+        var sLevel = reqHeader[0].APPROVER_LEVEL || 1;
+        
+        // --Section 2--
+        var aMainObj = reqHeader;
+        if (aMainObj.length > 0) {
+            reqHeader[0].REQUEST_NO = 0;
+        } else {
+            throw "Invalid Payload";
+        }
+        var sUserId = reqHeader[0].REGISTERED_ID;
+        var sEntityCode = reqHeader[0].ENTITY_CODE;
+        var sIsResend = reqHeader[0].REQUEST_RESENT;
+        var iStatus = 4; // Draft - in progress
+        var distributorName = reqHeader[0].DIST_NAME1;
+        
+
+        // iREG_NO = iReqNo || null;
+        // sUser_ID = aMainObj[0].REGISTERED_ID || null;
+
+        var aAddressObj = await getidForArr(addressData, "SR_NO") || [];
+        var aContactObj = await getidForArr(contactsData, "SR_NO") || [];
+
+        // --Section 2--
+        var aBankObj = await getidForArr(bankData, "SR_NO") || [];
+        // var aFinanceObj = await getidForArr(financeData, "SR_NO") || [];
+        // var aOwnerObj = await getidForArr(ownersData, "SR_NO") || [];
+
+        // --Section 3--
+        // var aProdServPayloadObj = await getProdServiceData(prodServData, "SR_NO") || [];
+        // var aProductObj = aProdServPayloadObj.Products || [];
+        // var aServiceObj = aProdServPayloadObj.Service || [];
+        // var aProdServbj = [...aProductObj, ...aServiceObj];
+
+        // var aCapacityObj = await getidForArr(capacityData, "SR_NO") || [];
+        var aPromoters = await getidForArr(promotersData, "SR_NO") || [];
+        var aCustomerObj = await getidForArr(customerData, "SR_NO") || [];
+        var aBusniessHistory = await getidForArr(businessHistoryData, "SR_NO") || [];
+        // var aOEMObj = await getidForArr(oemData, "SR_NO") || [];
+
+        // --Section 4--
+        // var aDiscFieldsObj = discFieldsData || [];
+        // if (aDiscFieldsObj.length > 0) {
+        //     aDiscFieldsObj[0].REQUEST_NO = 0;
+        // }
+        // var aRelativeObj = await getidForArr(discRelativesData, "SR_NO") || [];
+        // var aQaCertiObj = await getidForArr(discQaCertiData, "SR_NO") || [];
+
+        // --Section 5--
+        var aAttachFieldsObj = attachmentFieldsData || [];
+        if (aAttachFieldsObj.length > 0) {
+            aAttachFieldsObj[0].REQUEST_NO = 0;
+        }
+        var aAttachmentsObj = await getidForArr(attachmentData, "SR_NO") || [];
+
+        var aUpdatedFieldsIDs = updatedFields;
+        var aUpdatedFieldsObj = [];
+        if (aUpdatedFieldsIDs.length > 0) {
+            aUpdatedFieldsObj = await lib_common.getUpdatedFieldsDataForEdit(iReqNo, aUpdatedFieldsIDs, connection) || [];
+        }
+
+        var aEventsObj = eventsData || [];        
+
+        const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'REGFORM_DRAFT_SUBMIT');
+        sResponse = await dbConn.callProcedurePromisified(loadProc,
+            [iReqNo, iReqType, iStep, sEntityCode, sUserId, sIsResend, iStatus,null,
+                aMainObj, aAddressObj, aContactObj,
+                aBankObj,
+                aBusniessHistory,aCustomerObj,aPromoters,
+                aAttachFieldsObj, aAttachmentsObj,aUpdatedFieldsObj, aEventsObj
+            ]
+        );
+
+        Result = sResponse.outputScalar;
+        //Create response message
+        var Message =null;
+        if(Result.OUT_SUCCESS !== null){
+        if(sAction === "DRAFT")
+            Message = "Draft saved successfully";
+        else if(sAction === "CREATE")
+            Message = "Registration Form Submitted for Request: "+ iReqNo +". Your form will be forwarded to Procurement Team for verification.";
+        else if(sAction === "RESEND")
+            Message ="Form resent successfully";
+        
+            var oEmailData = {
+                "ReqNo": iReqNo,
+                "SupplierName": distributorName,
+                "To_Email": Result.OUT_EMAIL_TO // Approver
+            };
+            var checkSupplier =await fnCheckSupplier(connection, oEmailData.ReqNo);
+            if (checkSupplier === null) {
+                var dataApprover = await lib_common.getApproverForEntity(connection, sEntityCode, null, 'CALC_HIERARCHY_MATRIX',sType,sLevel) || "";
+                var sRoleCode = dataApprover[0].ROLE_CODE || null;
+                sLevel = dataApprover[0].LEVEL || 1;
+                sPmId = await lib_common.getApproverForEntity(connection, sEntityCode, sRoleCode, 'CALC_HIERARCHY_MATRIX',sType,sLevel) || "";
+                // var sPMId = await lib_common.getApproverForEntity(connection, sEntityCode, 'PM', 'MATRIX_REGISTRATION_APPR') || "";
+                if (sPMId !== "") sPMId = sPMId[0].USER_ID;
+                oEmailData.To_Email = sPMId;
+
+                if (sAction === "CREATE") {
+                    var status = 5;
+                } else if (sAction === "RESEND") {
+                    var status = 9;
+                }
+                if (isEmailNotificationEnabled && sAction !== 'DRAFT' && sPMId !== null ) {
+                    var oEmaiContent = await lib_email_content.getEmailContent(connection, "SELFREG", "REGISTER", oEmailData, status);
+                    var sCCEmail = await lib_email.setSampleCC( null);
+                    await  lib_email.sendidealEmail(sPMId,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
+                
+                }
+            } else {
+                if (isEmailNotificationEnabled && sAction !== 'DRAFT' && oEmailData.To_Email !== null) {
+                    var oEmaiContent = await lib_email_content.getEmailContent(connection,sAction, "REGISTER", oEmailData, null);
+                    var sCCEmail = await lib_email.setSampleCC( null);
+                    await  lib_email.sendidealEmail(oEmailData.To_Email,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
+                }
+            }
+            responseObj = {
+                "Draft_Success": Result.OUT_SUCCESS !== null ? 'X' : '',
+                "REQUEST_NO": Result.OUT_SUCCESS !== null ? iReqNo : 0,
+                // "Message": Result.OUT_SUCCESS !== null ? "Draft saved successfully" : "Draft saving failed!",
+                "Message":Message,
+                "ERROR_CODE": Result.OUT_ERROR_CODE,
+                "ERROR_DESC": Result.OUT_ERROR_MESSAGE
+            };
+            req.reply(responseObj);
+        } 
+        else{
+            Message = "Process Failed"
+        }
+    }
+    else {
+        throw { message: "The value for action is invalid" };
+    }
+        } catch (error) {
+            var sType=error.code?"Procedure":"Node Js";    
+            var iErrorCode=error.code??500;   
+            let Result = {
+                OUT_ERROR_CODE: iErrorCode,
+                OUT_ERROR_MESSAGE:  error.message ? error.message : error
+            }
+            // lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,"Vendor Registration Form",sType,dbConn,hdbext);       
+            req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
+        }
+    })
+    async function fnCheckSupplier(connection, requestNo) {
+        var value = 0;
+        let aResult = await connection.run(
+            SELECT
+                .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
+                .where({ REQUEST_NO: requestNo })
+        );
+        if (aResult[0].REQUESTER_ID === null && aResult[0].DIST_CODE === "SR") {
+            value = null;
+        }
+        return value;
+    }
+    async function getidForArr(array, propertyName) {
+        if (array.length > 0) {
+            if (propertyName !== "" && propertyName !== null && propertyName !== undefined) {
+                for (var i = 0; i < array.length; i++) {
+                    array[i].REQUEST_NO = 0;
+                    array[i][propertyName] = i + 1;
+                }
+            } else {
+                throw "Property Name missing for id's"
+            }
+        }
+        return array;
+    }
+    this.on('ManageCMS', async (req) => {
+        var client = await dbClass.createConnectionFromEnv();
+        var dbConn = new dbClass(client); 
+        try {
+        var { action,attachmentId, inputData,userDetails } = req.data;
+        var sUserIdentity=userDetails.USER_ID || null;
+        var sUserRole=userDetails.USER_ROLE || null;
+        var aCMSData = inputData || [];
+        var Result, responseObj;
+
+        var iReqNo=attachmentId.REQUEST_NO||null;
+
+        // get connection
+        if (aCMSData.length > 0) {
+            var client = await dbClass.createConnectionFromEnv();
+            let dbConn = new dbClass(client);
+
+            // const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'CMS_OPERATIONS');
+            // Result = await dbConn.callProcedurePromisified(loadProc,[action,attachmentId.REQUEST_NO,attachmentId.SR_NO,attachmentId.DOC_ID, aCMSData]);
+
+            if (Result.outputScalar.OUT_SUCCESS !== null) {
+                responseObj = {
+                    "Message": Result.outputScalar.OUT_SUCCESS,
+                    "DocID": Result.outputScalar.OUT_DOC_ID
+                };
+
+                req.reply(JSON.stringify(responseObj));
+            }
+            else {   
+                responseObj = {
+                    "Message": "CMS operation for " + action + " failed!",
+                    "DocId": Result.outputScalar.OUT_DOC_ID,
+                    "ERROR_CODE": parseInt(Result.outputScalar.OUT_ERROR_CODE),
+                    "ERROR_DESC": Result.outputScalar.OUT_ERROR_MESSAGE
+                };
+                throw JSON.stringify(responseObj);
+            }
+        }
+        else throw "Input data missing for action."
+        } catch (error) {
+            var sType=error.code?"Procedure":"Node Js";    
+            var iErrorCode=error.code??500;   
+            let Result = {
+                OUT_ERROR_CODE: iErrorCode,
+                OUT_ERROR_MESSAGE:  error.message ? error.message : error
+            }
+            // lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,"Vendor Registration Form",sType,dbConn,hdbext);
+            req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
+        }
+    })
 
     this.on('GetDraftData', async (req) => {
         try {
@@ -59,6 +331,212 @@ module.exports = cds.service.impl(function () {
             req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
     });
+    this.on('GetSecurityPin', async (req) => {
+        var client = await dbClass.createConnectionFromEnv();
+        var dbConn = new dbClass(client);
+        try {       
+            var { distributorName, distributorEmail, requesterId,userId,userRole } = req.data;
+            var isEmailNotificationEnabled = false;
+
+            if (distributorName === null || distributorEmail === null) {
+                throw "Invalid Payload";  
+            }
+
+            var sDistributorName = distributorName.toUpperCase().trim() || "";
+            var sDistributorEmail = distributorEmail.toLowerCase().trim() || "";
+            var sBuyerEmail = requesterId || "";
+
+            var sSecurityPin = await getRandomNumber();
+
+            var client = await dbClass.createConnectionFromEnv();
+            let dbConn = new dbClass(client);
+
+            //intialize connection to database
+            let connection = await cds.connect.to('db');
+
+            //Check if email notification is enabled
+            isEmailNotificationEnabled = await lib_common.isiDealSettingEnabled(connection, "VM_EMAIL_NOTIFICATION");
+
+            // load procedure
+            const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'REGFORM_SECURITY_PIN')
+            sResponse = await dbConn.callProcedurePromisified(loadProc, [sDistributorEmail, sSecurityPin]);
+
+
+            if (sResponse.outputScalar.OUT_SUCCESS !== null) {
+
+                var oPinEmailData = {
+                    "DistributorName": sDistributorName,
+                    "DistributorId": sDistributorEmail,
+                    "sSecurityPin": sSecurityPin,
+                    "sBuyerId": sBuyerEmail
+                };
+
+                if (isEmailNotificationEnabled) {
+                    var oEmaiContent = await lib_email_content.getEmailContent(connection, null, "SEC_PIN", oPinEmailData, null);
+                    // await lib_email.sendEmail(connection, oEmaiContent.emailBody, oEmaiContent.subject, [sSupplierEmail], [sBuyerEmail], null);
+                    var sCCEmail = await lib_email.setSampleCC( [sBuyerEmail]);
+                    await  lib_email.sendidealEmail(sDistributorEmail,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
+              
+                }
+                req.reply({ "SUCCESS": 'Yes' });
+            }
+        } catch (error) {
+            var sType=error.code?"Procedure":"Node Js";    
+            var iErrorCode=error.code??500;   
+            let Result = {
+                OUT_ERROR_CODE: iErrorCode,
+                OUT_ERROR_MESSAGE:  error.message ? error.message : error
+            }
+            // lib_common.postErrorLog(Result,null,userId,userRole,"Distributor Registration Form",sType,dbConn,hdbext);   
+            req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
+        }
+    })
+
+    this.on('CheckSecurityPin', async (req) => {
+        var client = await dbClass.createConnectionFromEnv();
+        let dbConn = new dbClass(client);
+        try {
+            var { distributorEmail,securityPin,userId,userRole} = req.data;
+            var response ={};
+
+            if (distributorEmail !== "" && distributorEmail !== null && distributorEmail !== undefined) {
+                let connection = await cds.connect.to('db');//form connection to database
+               
+                let sEmailCheck = await connection.run(SELECT
+                    .from(`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`)
+                    .where({ REGISTERED_ID: distributorEmail }));
+                if(sEmailCheck.length > 0)
+                {   
+                    let sResult = await connection.run(SELECT
+                        .from(`${connection.entities['DEALER_PORTAL.REQUEST_SECURITY_CODE']}`)
+                        .where({ REGISTERED_ID: distributorEmail }));     
+                    if (sResult.length > 0) {
+						if(securityPin === null)
+							return;
+                         //Check if user entered pin matched with generated pin
+                         if(sResult[0].SEC_CODE === securityPin)
+                         {
+                            response["CREATED_ON"]= new Date(sResult[0].CREATED_ON);
+                            response["IS_MATCH"] = true;
+                            response["RESPONSE_MESSAGE"]= "Valid Security Pin";
+                            req.reply(response);
+                         }
+                         else{
+                            response["CREATED_ON"]= new Date(sResult[0].CREATED_ON);
+                            response["IS_MATCH"] = false;
+                            response["RESPONSE_MESSAGE"]= "Invalid Security Pin entered";
+                            req.reply(response);
+                         } 
+                    }
+                    else{
+                        throw {"message": "Generate Security Pin against email id",
+                               "errorType":"Warning"};}}
+                else{
+                    throw  {"message":"Please enter Registered Email Id",
+                    "errorType":"Warning"};
+                }
+            } else throw {"message": "Distributor email id is missing for security pin check.",
+                            "errorType":"Warning"}
+
+        } catch (error) {
+           
+            var sType=error.code?"Procedure":"Node Js";    
+            var iErrorCode=error.code??500;   
+            let Result = {
+                OUT_ERROR_CODE: iErrorCode,
+                OUT_ERROR_MESSAGE:  error.message ? error.message : error
+            }
+            // if(error.errorType !== "Warning")  
+            // lib_common.postErrorLog(Result,null,userId,userRole,"Distributor Registration Form",sType,dbConn,hdbext);   
+            req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
+        }
+    });
+
+    this.on('MessengerService', async (req) => {
+        var client = await dbClass.createConnectionFromEnv();
+        let dbConn = new dbClass(client);
+        try {
+            var { action, messengerData, appType, inputData, eventsData,userDetails } = req.data;
+            var isEmailNotificationEnabled = false;
+            var sUserIdentity=userDetails.USER_ID || null;
+            var sUserRole=userDetails.USER_ROLE || null;
+
+            //intialize connection to database
+            let connection = await cds.connect.to('db');
+
+            //Check if email notification is enabled
+            isEmailNotificationEnabled = await lib_email.isiDealSettingEnabled(connection, "VM_EMAIL_NOTIFICATION");
+
+            var iReqNo = inputData[0].REQUEST_NO || null;
+            var sEntityCode = inputData[0].ENTITY_CODE || null;
+            var sSupplierEmail = inputData[0].REGISTERED_ID || null;
+            var sBuyerEmail = inputData[0].REQUESTER_ID || null;
+            var sDistributorName = inputData[0].DEALER_NAME1 || null;
+            var sLoginId = messengerData.loginId;
+            var sMailTo = messengerData.mailTo;
+            var sType = appType;
+            // var sRoleCOde = roleCode;
+            var sLevel = inputData[0].APPROVER_LEVEL || 1;
+
+            // var sAction = inputData[0].ACTION;
+            var aEventObj = await getEventObj(eventsData, action);
+            const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'MESSENGER_SERVICE')
+            Result = await dbConn.callProcedurePromisified(loadProc,
+                [iReqNo, sSupplierEmail, sMailTo, action, aEventObj]);
+
+            if (Result.outputScalar.OUT_SUCCESS === null)
+                throw "Messenger failed to send message!";
+
+            var responseObj = {
+                "Message": Result.outputScalar.OUT_SUCCESS
+            };
+
+            if (Result.outputScalar.OUT_SUCCESS !== null) {
+
+                var oEmailData = {
+                    "ReqNo": iReqNo,
+                    "SupplierName": sDistributorName,
+                    "From_Email": sLoginId,
+                    "To_Email": Result.outputScalar.OUT_EMAIL_TO,
+                    "sMessage": aEventObj[0].COMMENT
+                };
+                var sAppName; 
+                var sPmId = "";
+                if (action === "DISTRIBUTOR") {
+                    var dataApprover = await lib_common.getApproverForEntity(connection, sEntityCode, null, 'CALC_HIERARCHY_MATRIX',sType,sLevel) || "";
+                    var sRoleCode = dataApprover[0].ROLE_CODE || null;
+                    sLevel = dataApprover[0].LEVEL || 1;
+                    sPmId = await lib_common.getApproverForEntity(connection, sEntityCode, sRoleCode, 'CALC_HIERARCHY_MATRIX',sType,sLevel) || "";
+                    // sPmId = await lib_common.getApproverForEntity(connection, sEntityCode, 'PM', 'MATRIX_REGISTRATION_APPR') || "";
+                    if (sPmId !== "") sPmId = sPmId[0].USER_IDS;
+                    sAppName="Distributor Registration Form"
+                }else{
+                    sAppName=await getAppName(iReqNo);
+                } 
+                if (isEmailNotificationEnabled) {
+                    oEmaiContent = await lib_email_content.getEmailContent(connection, action, "COMMUNCATION", oEmailData, null)
+                    var sCCEmail = await lib_email.setSampleCC( [sPmId]);
+                    await  lib_email.sendidealEmail(oEmailData.To_Email,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
+                }
+                statusCode = 200;
+            } else {
+                statusCode = 400;
+            }
+            // responseInfo(JSON.stringify(responseObj), "text/plain", statusCode);
+            req.reply(responseObj);
+        } catch (error) {
+            var sType=error.code?"Procedure":"Node Js";    
+            var iErrorCode=error.code??500;   
+            let Result = {
+                OUT_ERROR_CODE: iErrorCode,
+                OUT_ERROR_MESSAGE:  error.message ? error.message : error
+            }
+            // lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,"Vendor Registration",sType,dbConn,hdbext);   
+            // lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,sAppName,sType,dbConn,hdbext);  
+            req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
+        }
+    })
+
     async function getCcodeRType(connection, requestNo, sTable) {
         try {
             var oDataObjects = null, aEntityResult = null;
@@ -127,6 +605,57 @@ module.exports = cds.service.impl(function () {
             return aResult;
         }
         catch (error) { throw error; }
+    }
+    async function getRandomNumber() {
+
+        var randomNo = JSON.stringify(Math.floor(100000 + Math.random() * 900000));
+        return randomNo;
+
+    }
+    async function getAppName(iReqNo){
+        var aReqInfo=await SELECT .from('DEALER_PORTAL_REQUEST_INFO') .where({REQUEST_NO:iReqNo});   
+        return aReqInfo[0].STATUS==1?"Distributor Request Approval":"Distributor Registration Approval";
+    }   
+    async function getEventObj(oPayloadValue, action) {
+
+        var iEventCode = null,
+            sRemark = null;
+
+        switch (action) {
+            case "DISTRIBUTOR":
+                iEventCode = 10;
+                sRemark = "Distributor sent message to Sales Associate";
+                break;
+            case "SALESASSOCIATE":
+                iEventCode = 11;
+                sRemark = "Sales Associate sent message to Distributor";
+                break;
+            case "APPROVER":
+                iEventCode = 13;
+                sRemark = "Approver sent message to Distributor";
+                break;
+        }
+
+        var eventArr = [];
+
+        if (oPayloadValue.length === 1) {
+            eventArr = [{
+                "REQUEST_NO": 0,
+                "EVENT_NO": 0,
+                "EVENT_CODE": iEventCode,
+                "USER_ID": oPayloadValue[0].USER_ID,
+                "USER_NAME": oPayloadValue[0].USER_NAME,
+                "REMARK": sRemark,
+                "COMMENT": oPayloadValue[0].COMMENT,
+                "CREATED_ON": oPayloadValue[0].CREATED_ON,
+                "EVENT_TYPE": oPayloadValue[0].EVENT_TYPE
+            }];
+
+        } else {
+            throw "Incorrect Data format for posting";
+        }
+
+        return eventArr;
     }
     async function getEventsData(connection, requestNo, sTable, sMsgType) {
         try {

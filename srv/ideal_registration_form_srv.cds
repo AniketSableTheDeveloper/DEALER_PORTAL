@@ -1,7 +1,8 @@
 using {DEALER_PORTAL} from '../db/TRANSACTION_TABLES';
 using {DEALER_PORTAL.MASTER_COUNTRY,DEALER_PORTAL.MASTER_REGION,
 DEALER_PORTAL.MASTER_CURRENCY,DEALER_PORTAL.MASTER_ENTITY_CODE,DEALER_PORTAL.MASTER_STATUS,
-DEALER_PORTAL.MASTER_REQUEST_TYPE} from '../db/MASTER_TABLES';
+DEALER_PORTAL.MASTER_REQUEST_TYPE,DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG,VIEW_REQUEST_ACTIVE_STATUS
+} from '../db/MASTER_TABLES';
 
 service ideal_registration_form_srv {
 
@@ -13,6 +14,7 @@ service ideal_registration_form_srv {
     entity RegformBusinessHistory as projection on DEALER_PORTAL.REGFORM_BUSINESS_HISTORY;
     entity RegformPromoters as projection on DEALER_PORTAL.REGFORM_PROMOTERS;
     entity RegformAttachments as projection on DEALER_PORTAL.REGFORM_ATTACHMENTS;
+    entity RegFormAttachFields as projection on DEALER_PORTAL.REGFORM_ATTACH_FIELDS;
     entity RegEventsLog as projection on DEALER_PORTAL.REQUEST_EVENTS_LOG;
     entity MasterCountry as projection on DEALER_PORTAL.MASTER_COUNTRY;
     entity MasterRegion as projection on DEALER_PORTAL.MASTER_REGION;
@@ -20,6 +22,8 @@ service ideal_registration_form_srv {
     entity MasterEntityCode as projection on DEALER_PORTAL.MASTER_ENTITY_CODE;
     entity MasterStatus as projection on DEALER_PORTAL.MASTER_STATUS;
     entity MasterRequestType as projection on DEALER_PORTAL.MASTER_REQUEST_TYPE;
+    entity MasterRegformFieldsConfig as projection on DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG;
+    entity ViewRequestActiveStatus as projection on VIEW_REQUEST_ACTIVE_STATUS;
 
     type User_Details : {
         USER_ROLE : String(50);
@@ -30,11 +34,17 @@ service ideal_registration_form_srv {
     CREATED_ON    : Timestamp;
     IS_MATCH:Boolean;
     RESPONSE_MESSAGE:String(30);
+    
   }
+  type MessengerData {
+      loginId : String;
+      mailTo  : String;
+    }
 
     function GetDraftData(requestNo : Integer, entityCode : String, creationType : Integer, userId : String, userRole : String)  returns many String;
     function GetSecurityPin(distributorName : String, distributorEmail : String, requesterId : String, userId : String, userRole : String)returns many String;
     function CheckSecurityPin(distributorEmail : String,securityPin:String, userId : String, userRole : String) returns securityPinResponse;
-
-    action PostRegFormData(action : String, stepNo : Integer, reqHeader : many RequestInfo, addressData : many RegformAddress, promotersData : many RegformPromoters,businessHistoryData : many RegformBusinessHistory,contactsData : many RegformContacts, financeData : many RegformBanks, customerData : many RegformCustomers,attachmentData : many RegformAttachments, updatedFields : many String, eventsData : many RegEventsLog, userDetails : User_Details) returns many String;
+    action MessengerService(action : String, appType : String, messengerData : MessengerData, inputData : many RequestInfo, eventsData : many RegEventsLog, userDetails : User_Details)returns many String;
+    action PostRegFormData(action : String, appType : String,stepNo : Integer, reqHeader : many RequestInfo, addressData : many RegformAddress, promotersData : many RegformPromoters,businessHistoryData : many RegformBusinessHistory,contactsData : many RegformContacts, bankData : many RegformBanks,
+    customerData : many RegformCustomers,attachmentData : many RegformAttachments,attachmentFieldsData : many RegFormAttachFields, updatedFields : many String, eventsData : many RegEventsLog, userDetails : User_Details) returns many String;
 }

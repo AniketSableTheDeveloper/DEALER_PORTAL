@@ -19,6 +19,7 @@ service ideal_admin_panel_srv {
     entity IdealErrorLog as projection on DEALER_PORTAL.IDEAL_ERROR_LOG;
     entity RegformFolderIds as projection on DEALER_PORTAL.REGFORM_FOLDER_IDS;
     entity EmailConfig as projection on DEALER_PORTAL.EMAIL_CONFIG;
+    entity MasterRegformFieldsConfig as projection on DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG;
     
     type User_Details:{
     USER_ROLE: String(50);
@@ -33,7 +34,8 @@ service ideal_admin_panel_srv {
   //Post Admin Panel Edits
   action   EditAdminPanelData(input : String)returns array of String;
   function TestOnPremiseConnection(sapClient : String, destFileName : String)returns array of String;
-
   action PostVisibleMandatoryFields(requestType : Integer, entityCode : String, copyEntityCode:String, userDetails:User_Details) returns array of String;
+  //new added
+  function GetAllVisibleMandatoryEntity(reqTypeCode:Integer, userId : String, userRole : String) returns many String;
 
 }

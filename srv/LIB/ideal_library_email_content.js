@@ -298,11 +298,11 @@ module.exports = {
 					sRequestTypeText = "updated ";
 				}
 
-				oEmailContent.subject = "Vendor " + sRequestTypeText + "self registration form " + sActionTypeText + " for " + oEmailData.SupplierName;
+				oEmailContent.subject = "Distributor " + sRequestTypeText + "self registration form " + sActionTypeText + " for " + oEmailData.SupplierName;
 
-				oEmailContent.emailBody = "Dear Vendor," + "<br><br>" +
+				oEmailContent.emailBody = "Dear Distributor," + "<br><br>" +
 					"Request No. " + oEmailData.ReqNo + " for " + sRequestTypeText +
-					"Vendor self Registration as <span style=\"text-transform:uppercase\">" +
+					"Distributor self Registration as <span style=\"text-transform:uppercase\">" +
 					oEmailData.SupplierName + "</span>";
 
 				oEmailContent.emailBody += " has been " + sActionTypeText + " and is currently pending for approval.<br>" + "<br>" +
@@ -316,7 +316,7 @@ module.exports = {
 					"<strong><a href=" + sClientContactEmail + ">" + sClientContactEmail + "</a></strong> " + "<br>" +
 					"<br>" +
 					"Regards," + "<br>" +
-					"Vendor Management Team";
+					"Distributor Management Team";
 
 			} else if (sAction === "REJECT") {
 				var sRequestTypeText = "";
@@ -572,14 +572,14 @@ module.exports = {
 			}
 
 		} else if (sAppType === "COMMUNCATION") {
-			if (sAction === "VENDOR") {
+			if (sAction === "DISTRIBUTOR") {
 
 				oEmailContent.emailBody = "Dear Approver," + "<br><br>" +
 					"There is a message from <span style=\"text-transform:uppercase\">" +
 					oEmailData.SupplierName + "</span>" +
 					" for your request  <strong>" + oEmailData.ReqNo + "</strong>.<br>" + "<br>" +
 
-					"Vendor's message:" + "<br>" +
+					"Distributor's message:" + "<br>" +
 					oEmailData.sMessage + "<br>" +
 
 					"<br>" +
@@ -587,11 +587,11 @@ module.exports = {
 					oEmailData.SupplierName + "<br>" +
 					"" + oEmailData.From_Email + "";
 
-				oEmailContent.subject = "Message from Vendor: " + oEmailData.SupplierName;
+				oEmailContent.subject = "Message from Distributor: " + oEmailData.SupplierName;
 
-			} else if (sAction === "BUYER") {
+			} else if (sAction === "SALESASSOCIATE") {
 
-				oEmailContent.emailBody = "Dear Vendor," + "<br><br>" +
+				oEmailContent.emailBody = "Dear Distributor," + "<br><br>" +
 					"There is a message from <span style=\"text-transform:uppercase\">Procurement Team</span>" +
 					" for your request  <strong>" + oEmailData.ReqNo + "</strong>.<br>" + "<br>" +
 
@@ -600,13 +600,13 @@ module.exports = {
 
 					"<br>" +
 					"Thanks!" + "<br>" +
-					"Vendor Registration Team" + "<br>" +
+					"Distributor Registration Team" + "<br>" +
 					"" + sClientShortName + "";
 
 				oEmailContent.subject = "Message from Procurement Team";
 
 			} else if (sAction === "APPROVER") {
-				oEmailContent.emailBody = "Dear Vendor," + "<br><br>" +
+				oEmailContent.emailBody = "Dear Distributor," + "<br><br>" +
 					"There is a message from <span style=\"text-transform:uppercase\">Approver</span>" +
 					" for request  <strong>" + oEmailData.ReqNo + "</strong>.<br>" + "<br>" +
 
@@ -615,7 +615,7 @@ module.exports = {
 
 					"<br>" +
 					"Thanks!" + "<br>" +
-					"Vendor Registration Team" + "<br>" +
+					"Distributor Registration Team" + "<br>" +
 					"" + sClientShortName + "";
 
 				oEmailContent.subject = "Message from Registration Approver";
@@ -817,9 +817,9 @@ module.exports = {
 
 			oEmailContent.subject = "" + sClientShortName + " Registration form login PIN.";
 
-			oEmailContent.emailBody = "Dear Vendor," + "<br><br>" +
-				"Please use the below 6-digit PIN to login to your Vendor registartion form as <span style=\"text-transform:uppercase\">" +
-				oEmailData.SupplierName + "</span> and regsitered email id <span style=\"text-transform:bold\">" + oEmailData.SupplierId +
+			oEmailContent.emailBody = "Dear Distributor," + "<br><br>" +
+				"Please use the below 6-digit PIN to login to your Distributor registartion form as <span style=\"text-transform:uppercase\">" +
+				oEmailData.DistributorName + "</span> and regsitered email id <span style=\"text-transform:bold\">" + oEmailData.DistributorId +
 				"</span><br><br>";
 
 			oEmailContent.emailBody += "Security login PIN: <strong>" + oEmailData.sSecurityPin + "</strong><br>" + "<br><br>" +
@@ -832,7 +832,7 @@ module.exports = {
 				"<strong><a href=" + sClientContactEmail + ">" + sClientContactEmail + "</a></strong> " + "<br>" +
 				"<br>" +
 				"Regards," + "<br>" +
-				"Vendor Management Team";
+				"Distributor Management Team";
 
 		} else if (sAppType === "REQ_TYPE_CHANGE") {
 

@@ -473,6 +473,7 @@ module.exports = cds.service.impl(function () {
       
       var columnTemplate = await lib_common.getTemplateColumns(conn);
       columnTemplate[0].REQ_TYPE=requestType;
+      columnTemplate[1].REQ_TYPE=requestType;
       // aVisibleFieldsData=columnTemplate;
       // aMandatoryFieldsData=columnTemplate;
       aMandatoryVisibleFieldsData=columnTemplate;
@@ -498,4 +499,52 @@ module.exports = cds.service.impl(function () {
     }
 
   })
+
+  this.on('GetAllVisibleMandatoryEntity',async req=>{   
+    var client = await dbClass.createConnectionFromEnv();
+    var dbConn = new dbClass(client);    
+    try{
+        var {reqTypeCode,userId,userRole}=req.data
+        var conn = await cds.connect.to('db');   
+        var aMandatoryCode,aVisibleCode,aMandatoryReqExist=[],aVisibleReqExist=[],
+        sResponse={
+          "AVAILABLE":{},
+          "NOT_AVAILABLE":{}
+        };     
+          aMandatoryReqExist=await SELECT .columns(['CCODE']) .from('DEALER_PORTAL_MASTER_REGFORM_FIELDS_CONFIG') .where({REQ_TYPE:reqTypeCode,CCODE:{'!=':'TEMPLATE'},TYPE:'M'});
+          aMandatoryCode = aMandatoryReqExist.map(obj => obj.CCODE);
+          if(aMandatoryCode.length==0){
+            sResponse.AVAILABLE.MANDATORY=[]
+            sResponse.NOT_AVAILABLE.MANDATORY=await SELECT .from('DEALER_PORTAL_MASTER_ENTITY_CODE')
+          }
+          else{   
+            sResponse.AVAILABLE.MANDATORY=await SELECT .from('DEALER_PORTAL_MASTER_ENTITY_CODE') .where({'BUKRS':aMandatoryCode});
+            sResponse.NOT_AVAILABLE.MANDATORY=await SELECT .from('DEALER_PORTAL_MASTER_ENTITY_CODE') .where({'BUKRS':{'NOT IN':aMandatoryCode}}); 
+          }
+          
+          aVisibleReqExist=await SELECT .columns(['CCODE']) .from('DEALER_PORTAL_MASTER_REGFORM_FIELDS_CONFIG') .where({REQ_TYPE:reqTypeCode,CCODE:{'!=':'TEMPLATE'},TYPE:'V'});
+          aVisibleCode = aVisibleReqExist.map(obj => obj.CCODE);
+
+          if(aVisibleCode.length==0){
+            sResponse.AVAILABLE.VISIBLE=[]     
+            sResponse.NOT_AVAILABLE.VISIBLE=await SELECT .from('DEALER_PORTAL_MASTER_ENTITY_CODE')
+          }
+          else{   
+            sResponse.AVAILABLE.VISIBLE=await SELECT .from('DEALER_PORTAL_MASTER_ENTITY_CODE') .where({'BUKRS':aVisibleCode});
+            sResponse.NOT_AVAILABLE.VISIBLE=await SELECT .from('DEALER_PORTAL_MASTER_ENTITY_CODE') .where({'BUKRS':{'NOT IN':aVisibleCode}}); 
+          }           
+                     
+        req.reply(sResponse)       
+
+    }catch(error){
+        var sType=error.code?"Procedure":"Node Js";    
+        var iErrorCode=error.code??500;     
+        let Result = {
+            OUT_ERROR_CODE: iErrorCode,
+            OUT_ERROR_MESSAGE:  error.message ? error.message : error   
+        }
+        // lib_common.postErrorLog(Result,null,userId,userRole,"System Configuration",sType,dbConn,hdbext);
+        req.error({ code:iErrorCode, message:  error.message ? error.message : error });
+    }
+  });
 })

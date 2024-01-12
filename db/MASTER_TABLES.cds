@@ -427,10 +427,160 @@ context DEALER_PORTAL {
         
     }
 
-    // entity MASTER_REGFORM_FIELDS{
-    //     key FIELD_ID : String(20);
-    //     DESCRIPTION : String(1000);
-    // }
+    entity MASTER_REGFORM_FIELDS_UPDATED {
+        key REQ_NO    : Int64 not null;
+          // Section 1 - General Section
+        // Group 1 - General Information
+        S1G1T1F1 : String(1);
+        S1G1T1F2 : String(1);
+        S1G1T1F3 : String(1);
+        S1G1T1F4 : String(1);
+        S1G1T1F5 : String(1);
+        S1G1T1F6 : String(1);
+        S1G1T1F7 : String(1);
+        // Section 1 - General Section
+        // Group 2 - Distributor Address
+        S1G2T1F1 : String(1);
+        S1G2T1F2 : String(1);
+        S1G2T1F3 : String(1);
+        S1G2T1F4 : String(1);
+        S1G2T1F5 : String(1);
+        S1G2T1F6 : String(1);
+        S1G2T1F7 : String(1);
+        S1G2T1F8 : String(1);
+        S1G2T1F9 : String(1);
+        S1G2T1F10 : String(1);
+        // Section 1 - General Section
+        // Group 3 - Other Office Address
+        S1G3T1F1 : String(1);
+        S1G3T1F2 : String(1);
+        S1G3T1F3 : String(1);
+        S1G3T1F4 : String(1);
+        S1G3T1F5 : String(1);
+        S1G3T1F6 : String(1);
+        S1G3T1F7 : String(1);
+        S1G3T1F8 : String(1);
+        S1G3T1F9 : String(1);
+        S1G3T1F10 : String(1);
+        // Section 1 - General Section
+        // Group 4 - Contact information
+        S1G4T1F1 : String(1);
+        S1G4T1F2 : String(1);
+        S1G4T1F3 : String(1);
+        S1G4T1F4 : String(1);
+        S1G4T1F5 : String(1);
+        S1G4T1F6 : String(1);
+        S1G4T1F7 : String(1);
+        S1G4T1F8 : String(1);
+        S1G4T1F9 : String(1);
+        // Section 1 - General Section
+        // Group 5 - Other Contact information
+        S1G5T2F1 : String(1);
+        S1G5T2F2 : String(1);
+        S1G5T2F3 : String(1);
+        S1G5T2F4 : String(1);
+        S1G5T2F5 : String(1);
+        S1G5T2F6 : String(1);
+        S1G5T2F7 : String(1);
+        S1G5T2F8 : String(1);
+        S1G5T2F9 : String(1);
+        S1G5T2F10 : String(1);
+        // Section 1 - General Section
+        // Group 6 - Additional Information
+        S1G6T1F1 : String(1);
+        S1G6T1F2 : String(1);
+        S1G6T1F3 : String(1);
+        // Section 1 - General Section
+        // Group 7 - Employee Details
+        S1G7T1F1 : String(1);
+        S1G7T1F2 : String(1);
+        S1G7T1F3 : String(1);
+        S1G7T1F4 : String(1);
+        S1G7T1F5 : String(1);
+        S1G7T1F6 : String(1);
+        S1G7T1F7 : String(1);
+        S1G7T1F8 : String(1);
+        S1G7T1F9 : String(1);
+        S1G7T1F10 : String(1);
+        // Section 2 - Financial Section
+        // Group 1 - Financial Information
+        S2G1T1F1: String(1);
+        S2G1T1F2: String(1);
+        S2G1T1F3: String(1);
+        S2G1T1F4: String(1);
+        S2G1T1F5: String(1);
+        S2G1T1F6: String(1);
+        S2G1T1F7: String(1);
+        S2G1T1F8: String(1);
+        S2G1T1F9: String(1);
+        S2G1T1F10: String(1);
+        S2G1T1F11: String(1);
+        S2G1T1F12: String(1);
+        S2G1T1F13: String(1);
+        // Section 2 - Financial Section
+        // Group 2 - Other Bank Details
+        S2G2T1F1: String(1);
+        S2G2T1F2: String(1);
+        S2G2T1F3: String(1);
+        S2G2T1F4: String(1);
+        S2G2T1F5: String(1);
+        S2G2T1F6: String(1);
+        S2G2T1F7: String(1);
+        S2G2T1F8: String(1);
+        S2G2T1F9: String(1);
+        S2G2T1F10: String(1);
+        S2G2T1F11: String(1);
+        S2G2T1F12: String(1);
+        S2G2T1F13: String(1);
+        // Section 2 - Financial Section
+        // Group 2 - Other Bank Details
+        //Type 2 - VAT Details
+        S2G2T2F1: String(1);
+        S2G2T2F2: String(1);
+        S2G2T2F3: String(1);
+        // Section 2 - Financial Section
+        // Group 2 - Other Bank Details
+        //Type 3 - ICV Details
+        S2G2T3F1: String(1);
+        // Section 3 - Operational Section
+        // Group 1 - Business History Details
+        S3G1T1F1 : String(1);
+        S3G1T1F2 : String(1);
+        S3G1T1F3 : String(1);
+        S3G1T1F4 : String(1);
+        S3G1T1F5 : String(1);
+        S3G1T1F6 : String(1);
+        // Section 3 - Operational Section
+        // Group 2 - Customer Details
+        S3G2T1F1 : String(1);
+        S3G2T1F2 : String(1);
+        S3G2T1F3 : String(1);
+        S3G2T1F4 : String(1);
+        // Section 3 - Operational Section
+        // Group 3 - Promoter/Management Details
+        S3G3T1F1 : String(1);
+        S3G3T1F2 : String(1);
+        S3G3T1F3 : String(1);
+        S3G3T1F4 : String(1);
+        S3G3T1F5 : String(1);
+        S3G3T1F6 : String(1);
+        S3G3T1F7 : String(1);
+        // Section 4 - Attachment Section
+        // Attachment 1 - Company Profile
+        S4A1F1 : String(1);
+        // Attachment 2 - Distributor Document
+        S4A2F1 : String(1);
+        // Attachment 3 - Bank Account letter issued by the Bank (In Bank's letterhead)
+        S4A3F1 : String(1);
+        // Attachment 4 - TRN Certificate (Tax Registration Number)
+        S4A4F1 : String(1);
+        // Attachment 5 - ISO Certificate
+        S4A5F1 : String(1);
+        // Attachment 6 - Other Quality certificates
+        S4A6F1 : String(1);
+        // Attachment 7 - Upload Disclosure Form
+        S4A7F1 : String(1);
+    }
     
 }
 
@@ -464,4 +614,30 @@ key     HIERARCHY_ID: String(10)  @title: 'HIERARCHY_ID: HIERARCHY_ID' ;
         TO_ENTITY_CODE : Association to one DEALER_PORTAL.MASTER_ENTITY_CODE
                             on TO_ENTITY_CODE.BUKRS = ENTITY_CODE;
 
+}
+
+@cds.persistence.exists 
+@cds.persistence.calcview 
+Entity VIEW_REQUEST_ACTIVE_STATUS {
+key     REQUEST_NO: Integer64  @title: 'REQUEST_NO: REQUEST_NO' ; 
+        SAP_DIST_CODE: String(10)  @title: 'SAP_DIST_CODE: SAP_DIST_CODE' ; 
+        IDEAL_DIST_CODE: Integer64  @title: 'IDEAL_DIST_CODE: IDEAL_DIST_CODE' ; 
+        STATUS: Integer  @title: 'STATUS: STATUS' ; 
+        REGISTERED_ID: String(100)  @title: 'REGISTERED_ID: REGISTERED_ID' ; 
+        ENTITY_CODE: String(10)  @title: 'ENTITY_CODE: ENTITY_CODE' ; 
+        REQUEST_TYPE: Integer  @title: 'REQUEST_TYPE: REQUEST_TYPE' ; 
+        CREATION_TYPE: Integer  @title: 'CREATION_TYPE: CREATION_TYPE' ; 
+        DIST_NAME1: String(100)  @title: 'DIST_NAME1: DIST_NAME1' ; 
+        REQUESTER_ID: String(100)  @title: 'REQUESTER_ID: REQUESTER_ID' ; 
+        CREATED_ON: Timestamp  @title: 'CREATED_ON: CREATED_ON' ; 
+        BP_TYPE_CODE: String(4)  @title: 'BP_TYPE_CODE: BP_TYPE_CODE' ; 
+        BP_TYPE_DESC: String(100)  @title: 'BP_TYPE_DESC: BP_TYPE_DESC' ; 
+        BUYER_ASSIGN_CHECK: String(1)  @title: 'BUYER_ASSIGN_CHECK: BUYER_ASSIGN_CHECK' ; 
+        COMMENT: String(1000)  @title: 'COMMENT: COMMENT' ; 
+        LEGACY_ID: String(10)  @title: 'LEGACY_ID: LEGACY_ID' ; 
+        DIST_CODE: String(50)  @title: 'DIST_CODE: DIST_CODE' ; 
+        NDA_TYPE: String(50)  @title: 'NDA_TYPE: NDA_TYPE' ; 
+        REMINDER_COUNT: Integer  @title: 'REMINDER_COUNT: REMINDER_COUNT' ; 
+        REQUEST_NO_1: Integer64  @title: 'REQUEST_NO_1: REQUEST_NO' ; 
+        ACTIVE: String(1)  @title: 'ACTIVE: ACTIVE' ; 
 }
