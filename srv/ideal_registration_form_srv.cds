@@ -14,7 +14,9 @@ service ideal_registration_form_srv {
     entity RegformBusinessHistory as projection on DEALER_PORTAL.REGFORM_BUSINESS_HISTORY;
     entity RegformPromoters as projection on DEALER_PORTAL.REGFORM_PROMOTERS;
     entity RegformAttachments as projection on DEALER_PORTAL.REGFORM_ATTACHMENTS;
+    entity RegFormCMS as projection on DEALER_PORTAL.REGFORM_ATTACHMENTS_CMS;
     entity RegFormAttachFields as projection on DEALER_PORTAL.REGFORM_ATTACH_FIELDS;
+    entity RegSupplierLog as projection on DEALER_PORTAL.SUPPLIER_PROFILE_LOG;
     entity RegEventsLog as projection on DEALER_PORTAL.REQUEST_EVENTS_LOG;
     entity MasterCountry as projection on DEALER_PORTAL.MASTER_COUNTRY;
     entity MasterRegion as projection on DEALER_PORTAL.MASTER_REGION;
@@ -41,10 +43,20 @@ service ideal_registration_form_srv {
       mailTo  : String;
     }
 
+    type AttachmentID {
+    REQUEST_NO : Integer64;
+    SR_NO      : Integer;
+    DOC_ID     : Integer64;
+  }
+
     function GetDraftData(requestNo : Integer, entityCode : String, creationType : Integer, userId : String, userRole : String)  returns many String;
     function GetSecurityPin(distributorName : String, distributorEmail : String, requesterId : String, userId : String, userRole : String)returns many String;
     function CheckSecurityPin(distributorEmail : String,securityPin:String, userId : String, userRole : String) returns securityPinResponse;
     action MessengerService(action : String, appType : String, messengerData : MessengerData, inputData : many RequestInfo, eventsData : many RegEventsLog, userDetails : User_Details)returns many String;
     action PostRegFormData(action : String, appType : String,stepNo : Integer, reqHeader : many RequestInfo, addressData : many RegformAddress, promotersData : many RegformPromoters,businessHistoryData : many RegformBusinessHistory,contactsData : many RegformContacts, bankData : many RegformBanks,
     customerData : many RegformCustomers,attachmentData : many RegformAttachments,attachmentFieldsData : many RegFormAttachFields, updatedFields : many String, eventsData : many RegEventsLog, userDetails : User_Details) returns many String;
+    action   ManageCMS(action : String, attachmentId : AttachmentID, inputData : many RegFormCMS, userDetails : User_Details) returns many String;
+    action   EditRegFormData(action : String, // APPROVER | VENDOR 
+    stepNo : Integer,reqHeader : many RequestInfo,addressData : many RegformAddress,contactsData : many RegformContacts,updatedFields : many String,editLog : many RegSupplierLog,userDetails : User_Details) returns many String;
+
 }

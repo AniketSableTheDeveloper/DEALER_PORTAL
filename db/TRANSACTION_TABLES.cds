@@ -347,6 +347,33 @@ entity REGFORM_ATTACH_FIELDS {
         PASSPORT_REPR_AUTH_PERSON  : String(5);
 }
 
+entity REGFORM_ATTACHMENTS_CMS {
+        // key REQUEST_NO
+        // key SR_NO            : Integer;
+    key DOC_ID        : Integer64;
+        FILE_NAME     : String(100);
+        FILE_MIMETYPE : String(100);
+        FILE_CONTENT  : LargeBinary;
+        UPLOADED_ON   : Timestamp;
+        ACTIVE_FLAG   : String(1);
+}
+
+entity SUPPLIER_PROFILE_LOG {
+
+    key SAP_DIST_CODE    : String(10);
+    key EVENT_NO           : Integer;
+        EVENT_CODE         : Integer;
+        EVENT_TYPE         : String(20);
+        USER_ID            : String(100);
+        USER_NAME          : String(100);
+        REMARK             : String(100);
+        COMMENT            : String(1000);
+        UPDATED_ON         : Timestamp;
+        UPDATED_FIELD_NAME : String(100);
+        CHANGE_VALUE       : String(5000);
+        ORG_VALUE          : String(5000);
+        REQUEST_NO         : Integer64;
+}
 entity REGFORM_BANKS {
 
     key REQUEST_NO          : Integer64;
@@ -396,3 +423,147 @@ entity REQUEST_SECURITY_CODE {
 
 }
 
+entity REQUEST_INFO_TEMP{
+    key REQUEST_NO            : Integer64;
+    key TEMP_ID          : Integer64;
+        MOBILE_NO             : String(30);  //added 05/01/2023
+        SAP_DIST_CODE         : String(10); //SAP_DEALER_CODE
+        IDEAL_DIST_CODE       : Integer64; //IDEAL_DEALER_CODE
+        STATUS                : Integer;
+        REGISTERED_ID         : String(100); // Dealer Primary Email ID
+        ENTITY_CODE           : String(10);
+        REQUEST_TYPE          : Integer;
+        CREATION_TYPE         : Integer;
+        DIST_NAME1            : String(100); //DEALER_NAME1
+        DIST_NAME2            : String(100); //DEALER_NAME2
+        DIST_CODE             : String(50); //DEALER_CODE
+        APPROVER_LEVEL        : Integer;
+        HIERARCHY_ID          : String(10);
+        REQUESTER_ID          : String(100); // Request creator i.e. Buyer Email ID
+        BP_TYPE_CODE          : String(4);
+        BP_TYPE_DESC          : String(100);
+        REQUEST_RESENT        : String(5);
+        MDG_CR_NO             : String(15);
+        LAST_ACTIVE_REQ_NO    : Integer64;
+        SECONDARY_EMAILS_ID   : String(500);
+        ESTAB_YEAR            : String(4);
+        WEBSITE               : String(100);
+        VAT_REG_NUMBER        : String(25);
+        VAT_REG_DATE          : Date;
+        VAT_CHECK             : String(1);
+        LAST_SAVED_STEP       : Integer;
+        COMPLETED_BY          : String(100);
+        COMPLETED_BY_POSITION : String(50);
+        ACK_VALIDATION        : String(5);
+        SUBMISSION_DATE       : Timestamp;
+        LAST_UPDATED_ON       : Timestamp;
+        OT_PARENT_ID          : String(10);
+        OT_FOLDER1_ID         : String(25);
+        OT_FOLDER2_ID         : String(25);
+        OT_FOLDER3_ID         : String(25);
+        OT_FOLDER4_ID         : String(25);
+        NDA_TYPE              : String(50);
+        REMINDER_COUNT        : Integer;
+        BUYER_ASSIGN_CHECK    : String(1);
+        CREATED_ON            : Timestamp;
+        COMMENT               : String(1000);
+        LEGACY_ID             : String(10);
+        //refer from ideal
+        BU_CODE               : String(50);
+        TOT_PERM_EMP          : Integer;
+        TOT_TEMP_EMP          : Integer;
+        NOE_ACC               : Integer;
+        NOE_ADM               : Integer;
+        NOE_HR                : Integer;
+        NOE_QA                : Integer;
+        NOE_MAN               : Integer;
+        NOE_SAL               : Integer;
+        NOE_SEC               : Integer;
+        NOE_ANY               : Integer;
+        SAP_DIST_NO           : String(10);
+        PROPOSAL_DATE         : Date;
+        ENTITY_NAME           : String(50);
+        BUSINESS_NATURE       : String(20);
+        TERR_HOSP_ACC         : String(100);
+        SELLING_POINT         : String(200);
+        DIST_RECOMMMEDATION   : String(200);
+        DIST_RELATION         : String(200);
+        SALES_ASSOCIATE_ID    : String(100);
+        SA_APPROVED_ON        : Timestamp;
+        SAVED_AS_DRAFT        : Integer;
+        // Fields from ideal
+        REGISTERED_ADDR       : String(10);
+        OFFICE_ADDR           : String(10);
+        SHIP_TO_ADDR          : String(10);
+        WAREHOUSE_ADDR        : String(10);
+        TO_STATUS             : Association to one DEALER_PORTAL.MASTER_STATUS
+                                    on TO_STATUS.CODE = STATUS;
+}
+
+entity REGFORM_ADDRESS_TEMP{
+
+    key REQUEST_NO       : Integer64;
+    key TEMP_ID          : Integer64;
+    key SR_NO            : Integer;
+        ADDRESS_TYPE     : String(50);
+        ADDRESS_DESC     : String(50);
+        HOUSE_NUM1       : String(10);
+        STREET1          : String(60);
+        STREET2          : String(40);
+        STREET3          : String(40);
+        STREET4          : String(40);
+        CITY             : String(100);
+        STATE            : String(100);
+        COUNTRY          : String(100);
+        POSTAL_CODE      : String(10);
+        CONTACT_NO       : String(30);
+        CONTACT_TELECODE : String(4);
+        FAX_NO           : String(10);
+        EMAIL            : String(241);
+        DISTRICT         : String(35);
+        //taken from ideal
+        ADDR_CODE        : String(10);
+
+}
+
+entity REGFORM_CONTACTS_TEMP{
+
+    key REQUEST_NO       : Integer64;
+    key TEMP_ID          : Integer64;
+    key SR_NO            : Integer;
+        NAME1            : String(35);
+        NAME2            : String(35);
+        HOUSE_NUM1       : String(10);
+        STREET1          : String(40);
+        STREET2          : String(40);
+        CITY             : String(100);
+        STATE            : String(100);
+        POSTAL_CODE      : String(10);
+        DESIGNATION      : String(50);
+        NATIONALITY      : String(30);
+        PASSPORT_NO      : String(30);
+        EMAIL            : String(241);
+        CONTACT_NO       : String(30);
+        MOBILE_NO        : String(30);
+        CONTACT_TYPE     : String(10);
+        CONTACT_TELECODE : String(4);
+        MOBILE_TELECODE  : String(4);
+        BP_ID            : String(10);
+        //taken from ideal
+        LOC_NO           : Integer not null;
+        LOC_TYPE         : String(2) not null;
+        BR_WH_NO         : Integer;
+        ADDR_CODE        : String(10);
+        CONCERN_TYPE     : String(10);
+        INFRA_DETAIL     : String(50);
+        TEMP_DETAIL      : Integer;
+        PROPERTY_TYPE    : String(10);
+        ON_LEASE         : String(1);
+        ATTACH_CODE      : Integer;
+        FILE_NAME        : String(100);
+        FILE_TYPE        : String(100);
+        FILE_MIMETYPE    : String(100);
+        FILE_CONTENT     : LargeBinary;
+        UPLOAD_DATE      : Timestamp;
+
+}

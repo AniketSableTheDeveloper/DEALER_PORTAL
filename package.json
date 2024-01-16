@@ -12,6 +12,7 @@
     "nodemailer": "^6.9.7",
     "core-util-is": "^1.0.3",
     "@sap/hana-client": "^2.18.27",
+    "@sap-cloud-sdk/http-client":"^3.4.0",
     "@sap/hdbext": "^7.7.5",
     "express": "^4.18.2",
     "hdb": "^0.19.5",
@@ -23,7 +24,41 @@
   },
   "cds": {
     "requires": {
-      "db": "hana"
+      "db": "hana",
+      "ZIDL_CUSTOMER_REG_SRV": {
+        "kind": "odata-v2",
+        "model": "srv/external/ZIDL_CUSTOMER_REG_SRV",
+        "csrf": true,
+        "csrfInBatch": true,
+        "credentials": {
+          "destination": "iDeal_S4HANA",
+          "path": "/sap/opu/odata/sap/ZIDL_CUSTOMER_REG_SRV/",
+          "forwardAuthToken": true,
+          "timeout": 100000
+        },
+        "[production]": {
+          "credentials": {
+            "destination": "iDeal_S4HANA",
+            "path": "/sap/opu/odata/sap/ZIDL_CUSTOMER_REG_SRV"
+          }
+        }
+      },
+      "ZMDG_CUSTOMER_REG_SRV": {
+        "kind": "rest",
+        "model": "srv/external/ZMDG_CUSTOMER_REG_SRV",
+        "csrf": true,
+        "csrfInBatch": true,
+        "credentials": {
+          "destination": "iDeal_S4HANA",
+          "path": "/sap/opu/odata/sap/ZMDG_CUSTOMER_REG_SRV/"
+        },
+        "[production]": {
+          "credentials": {
+            "destination": "iDeal_S4HANA",
+            "path": "/sap/opu/odata/sap/ZMDG_CUSTOMER_REG_SRV"
+          }
+        }
+      }
     },
     "hana": {
       "deploy-format": "hdbtable"

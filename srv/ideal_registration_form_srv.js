@@ -153,8 +153,8 @@ module.exports = cds.service.impl(function () {
                 sLevel = dataApprover[0].LEVEL || 1;
                 sPmId = await lib_common.getApproverForEntity(connection, sEntityCode, sRoleCode, 'CALC_HIERARCHY_MATRIX',sType,sLevel) || "";
                 // var sPMId = await lib_common.getApproverForEntity(connection, sEntityCode, 'PM', 'MATRIX_REGISTRATION_APPR') || "";
-                if (sPMId !== "") sPMId = sPMId[0].USER_ID;
-                oEmailData.To_Email = sPMId;
+                if (sPmId !== "") sPmId = sPmId[0].USER_IDS;
+                oEmailData.To_Email = sPmId;
 
                 if (sAction === "CREATE") {
                     var status = 5;
@@ -244,8 +244,8 @@ module.exports = cds.service.impl(function () {
             var client = await dbClass.createConnectionFromEnv();
             let dbConn = new dbClass(client);
 
-            // const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'CMS_OPERATIONS');
-            // Result = await dbConn.callProcedurePromisified(loadProc,[action,attachmentId.REQUEST_NO,attachmentId.SR_NO,attachmentId.DOC_ID, aCMSData]);
+            const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'CMS_OPERATIONS');
+            Result = await dbConn.callProcedurePromisified(loadProc,[action,attachmentId.REQUEST_NO,attachmentId.SR_NO,attachmentId.DOC_ID, aCMSData]);
 
             if (Result.outputScalar.OUT_SUCCESS !== null) {
                 responseObj = {
@@ -273,7 +273,7 @@ module.exports = cds.service.impl(function () {
                 OUT_ERROR_CODE: iErrorCode,
                 OUT_ERROR_MESSAGE:  error.message ? error.message : error
             }
-            // lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,"Vendor Registration Form",sType,dbConn,hdbext);
+            lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,"Distributor Registration Form",sType,dbConn,hdbext);
             req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
     })
@@ -291,7 +291,7 @@ module.exports = cds.service.impl(function () {
             var dbConn = new dbClass(client);
 
             //fetch registered id against request no
-            var registeredUser =await  lib_common.getRegisteredId(requestNo,connection);
+            var registeredUser = await lib_common.getRegisteredId(requestNo,connection);
 
             // try {
             if (entityCode === undefined || entityCode === null || entityCode === "" || creationType === undefined || creationType === null || creationType === "") {
@@ -316,9 +316,31 @@ module.exports = cds.service.impl(function () {
                     sUserID = aDraftData.MAIN[0].REGISTERED_ID || null;
                 }
 
+                var aMandatoryFieldsData = await getMandatoryVisibleFieldsData(connection, entityCode, creationType,'M');
+                var aVisibleFieldsData = await getMandatoryVisibleFieldsData(connection, entityCode, creationType,'V');
+                var aUpdatedFieldsData = await getUpdatedFieldsData(connection, requestNo);
+                var aSettings = await getObjectFromRows(await getiDealSettings(connection));
+                // Total Count of Mandatory Fields For Progress Bar
+                var obj1 = aMandatoryFieldsData[0] || {};
+                var totalCount = 0;
+                var key;
+                if (Object.keys(obj1).length) {
+                    for (key in obj1) {
+                        if (obj1[key] === "X") {
+                            totalCount = totalCount + 1;
+                        }
+                    }
+                }
                 var responseObj = {
                     "DRAFT": (aDraftData.MAIN.length || aDraftData.ADDRESS.length) > 0 ? aDraftData : [], // changes to save country from registration form 10/04/2023
-                    // "DRAFT": aDraftData.MAIN.length > 0 ? aDraftData : [],
+                    "VISIBLE": aVisibleFieldsData.length > 0 ? aVisibleFieldsData : [],
+                    "MANDATORY": aMandatoryFieldsData.length > 0 ? aMandatoryFieldsData : [],
+                    "UPDATED": aUpdatedFieldsData.length > 0 ? aUpdatedFieldsData : [],
+                    "OPENTEXT": await getOpenTextCredentials(connection),
+                    "CLIENT_INFO": await getClientDetails(connection),
+                    "TOTALCOUNT": totalCount,
+                    "SETTINGS": aSettings,
+                    "LABELS": await getLabelsForFormID(connection)
                 };
                 return responseObj;
             }
@@ -327,10 +349,42 @@ module.exports = cds.service.impl(function () {
             var iErrorCode=error.code??500;   
  
             if(error.errorType !== "Warning")
-            // lib_common.postErrorLog(Result,requestNo,userId,userRole,"Vendor Registration Form",sType,dbConn,hdbext);  //New  
+            lib_common.postErrorLog(Result,requestNo,userId,userRole,"Distributor Registration Form",sType,dbConn,hdbext);  //New  
             req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
     });
+
+    async function getClientDetails(connection) {
+        try {
+            var aDataObj = "";
+            let aResult = await connection.run(
+                SELECT`CLIENT_FULL_NAME,CLIENT_SHORT_NAME,CLIENT_COUNTRY`
+                    .from`${connection.entities['DEALER_PORTAL.MASTER_EMAIL_CONTACT_ID']}`
+                    .where({ SR_NO: 1 }));
+            if (aResult.length > 0) {
+                aDataObj = aResult[0];
+            }
+            return aDataObj;
+        }
+        catch (error) { throw error; }
+    }
+    async function getLabelsForFormID(connection) {
+        try {
+            var aDataObj = "";
+            var responseObj = []
+            let aResult = await connection.run(
+                SELECT`FIELDS,DESCRIPTION`
+                    .from`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_ID_DESC']}`
+                    .orderBy("FIELDS")
+                    );
+             const outputObject = aResult.reduce((result, item) => {
+                result[item["FIELDS"]] = item["DESCRIPTION"];
+                return result;
+              }, {});         
+             return [outputObject];
+        }
+        catch (error) { throw error; }}
+
     this.on('GetSecurityPin', async (req) => {
         var client = await dbClass.createConnectionFromEnv();
         var dbConn = new dbClass(client);
@@ -387,7 +441,7 @@ module.exports = cds.service.impl(function () {
                 OUT_ERROR_CODE: iErrorCode,
                 OUT_ERROR_MESSAGE:  error.message ? error.message : error
             }
-            // lib_common.postErrorLog(Result,null,userId,userRole,"Distributor Registration Form",sType,dbConn,hdbext);   
+            lib_common.postErrorLog(Result,null,userId,userRole,"Distributor Registration Form",sType,dbConn,hdbext);   
             req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
     })
@@ -447,7 +501,7 @@ module.exports = cds.service.impl(function () {
                 OUT_ERROR_MESSAGE:  error.message ? error.message : error
             }
             // if(error.errorType !== "Warning")  
-            // lib_common.postErrorLog(Result,null,userId,userRole,"Distributor Registration Form",sType,dbConn,hdbext);   
+            lib_common.postErrorLog(Result,null,userId,userRole,"Distributor Registration Form",sType,dbConn,hdbext);   
             req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
     });
@@ -532,10 +586,141 @@ module.exports = cds.service.impl(function () {
                 OUT_ERROR_MESSAGE:  error.message ? error.message : error
             }
             // lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,"Vendor Registration",sType,dbConn,hdbext);   
-            // lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,sAppName,sType,dbConn,hdbext);  
+            lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,sAppName,sType,dbConn,hdbext);  
             req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
     })
+
+    this.on('EditRegFormData', async (req) => {
+        var client = await dbClass.createConnectionFromEnv();
+        var dbConn = new dbClass(client);
+        try {
+            var { action, stepNo, reqHeader, addressData, contactsData, updatedFields, editLog,userDetails} = req.data;   
+            var isEmailNotificationEnabled = false;
+            // get connection
+            // var client = await dbClass.createConnectionFromEnv();
+            // let dbConn = new dbClass(client);
+            // execProcedure = conn.loadProcedure('VENDOR_PORTAL', 'VENDOR_PORTAL.Procedure::ONBOARDING_REJECT');
+
+            //intialize connection to database
+            let connection = await cds.connect.to('db');
+            //  queryResult = await connection.run(SELECT `COUNT(*)`
+            //  .from`${connection.entities['VENDOR_PORTAL.REQUEST_INFO_TEMP']}`
+            //  .where`REQUEST_NO = ${reqHeader[0].REQUEST_NO}`);
+
+            //Check if email notification is enabled
+            // isEmailNotificationEnabled = await lib_email.isiVenSettingEnabled(connection, "VM_EMAIL_NOTIFICATION");
+
+            var sUserIdentity=userDetails.USER_ID || null;
+            var sUserRole=userDetails.USER_ROLE || null;
+
+            var iReqNo = reqHeader[0].REQUEST_NO || null;
+            var sUserId = reqHeader[0].REGISTERED_ID || null;
+            var sEntityCode = reqHeader[0].ENTITY_CODE || null;
+            var sIsResend = reqHeader[0].REQUEST_RESENT || null;
+            var iStatus = reqHeader[0].STATUS || null;
+            var aAddressObj = await getidForArr(addressData, "SR_NO") || [];
+            var aContactObj = await getidForArr(contactsData, "SR_NO") || [];
+
+            // --Section 2--
+            // var aFinanceObj = getidForArr(oPayload.VALUE.FINANCE, "SR_NO") || [];
+
+            // var aCustomerObj = getidForArr(oPayload.VALUE.CUSTOMER, "SR_NO") || [];
+
+            // --Section 5--
+            // var aAttachFieldsObj = oPayload.VALUE.ATTACH_FIELDS || [];
+            // if (aAttachFieldsObj.length > 0) {
+            //     aAttachFieldsObj[0].OBR_NO = 0;
+            // }
+            // var aAttachmentsObj = getidForArr(oPayload.VALUE.ATTACHMENTS, "SR_NO") || [];
+
+            var aUpdatedFieldsIDs = updatedFields;
+            var aUpdatedFieldsObj = [];
+            if (aUpdatedFieldsIDs.length > 0) {
+                aUpdatedFieldsObj = await lib_common.getUpdatedFieldsDataForEdit(iReqNo, aUpdatedFieldsIDs, connection) || [];
+            }
+
+            var aLogsTable = await getLogsCount(connection, editLog);
+            // Result = execProcedure(iReqNo, iStep, sEntityCode, sUserId, sIsResend, iStatus,
+            //     aMainObj, aAddressObj, aContactObj,
+            //     aPaymentObj, aFinanceObj, aOwnerObj,
+            //     aProdServbj, aCapacityObj, aCustomerObj, aOEMObj,
+            //     aDiscFieldsObj, aRelativeObj, aQaCertiObj,
+            //     aAttachFieldsObj, aAttachmentsObj,
+            //     aUpdatedFieldsObj,aLogsTable);
+            if (action === 'APPROVE') {
+                const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'REGFORM_EDIT_APPROVER')
+                Result = await dbConn.callProcedurePromisified(loadProc,
+                    [iReqNo,stepNo, sUserId,null, reqHeader, aAddressObj, aContactObj, [], [], [], [],
+                        [], [], [], aUpdatedFieldsObj, aLogsTable]);
+
+                if (Result.outputScalar.OUT_SUCCESS === null) {
+
+                    let sErrorMsg = JSON.stringify({
+                        "Edit_Success": '',
+                        "REQUEST_NO": 0,
+                        "Message": "Edit saving failed!"
+
+                    })
+                    throw sErrorMsg;
+                }
+                responseObj = {
+                    "Edit_Success": 'X',
+                    "REQUEST_NO": Result.outputScalar.OUT_SUCCESS,
+                    "Message": "Edit saved successfully"
+                };
+
+                // responseInfo(JSON.stringify(responseObj), "text/plain", 200);
+                req.reply(responseObj);
+            }
+        } catch (error) {
+            var sType=error.code?"Procedure":"Node Js";    
+            var iErrorCode=error.code??500;   
+            let Result = {
+                OUT_ERROR_CODE: iErrorCode,
+                OUT_ERROR_MESSAGE:  error.message ? error.message : error
+            }
+            lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,"Distributor Registration Approval",sType,dbConn,hdbext);   
+            req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
+        }
+    })
+
+    async function getObjectFromRows(aDataObjects) {
+        try {
+            var oReturnObj = {},
+                datalength = aDataObjects.length;
+            if (datalength > 0) {
+                for (var i = 0; i < datalength; i++) {
+                    oReturnObj[aDataObjects[i].CODE.toString()] = aDataObjects[i].SETTING;
+                }
+            } return oReturnObj;
+        }
+        catch (error) { throw error; }
+    }
+
+    async function getLogsCount(conn, oPayloadValue) {
+        try {
+            var iCount = 0;
+            let aResult = await conn.run(
+                SELECT` MAX(EVENT_NO) AS COUNT`
+                    .from`${conn.entities['DEALER_PORTAL.SUPPLIER_PROFILE_LOG']}`
+                    .where`SAP_DIST_CODE =${oPayloadValue[0].SAP_DIST_CODE}`
+            );
+            if (aResult.length > 0) {
+                iCount = aResult[0].COUNT + 1;
+            } else {
+                iCount = iCount + 1;
+            }
+            for (var i = 0; i < oPayloadValue.length; i++) {
+                var no = iCount + i;
+                oPayloadValue[i].EVENT_NO = no;
+            }
+            return oPayloadValue;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
 
     async function getCcodeRType(connection, requestNo, sTable) {
         try {
@@ -571,7 +756,7 @@ module.exports = cds.service.impl(function () {
                 "ADDRESS": await getAddressWithDesc(connection, await getTableData(connection, requestNo, "REGFORM_ADDRESS") || []),
                 "CONTACTS": await getContactsWithDesc(connection, await getTableData(connection, requestNo, "REGFORM_CONTACTS") || []),
 
-                "FINANCE": await getTableData(connection, requestNo, "REGFORM_FINANCIAL") || [],
+                "FINANCE": await getTableData(connection, requestNo, "REGFORM_BANKS") || [],
 
                 "BUSINESS_HISTORY": await getTableData(connection, requestNo, "REGFORM_BUSINESS_HISTORY") || [],
                 "CUSTOMER": await getTableData(connection, requestNo, "REGFORM_CUSTOMERS") || [],
@@ -606,11 +791,36 @@ module.exports = cds.service.impl(function () {
         }
         catch (error) { throw error; }
     }
+
+    async function getOpenTextCredentials(connection) {
+        try {
+            var aDataObj = "";
+            let aResult = await connection.run(
+                SELECT`USERNAME,PASSWORD,ADD_INFO1`
+                    .from`${connection.entities['DEALER_PORTAL.MASTER_CREDENTIAL']}`
+                    .where({ TYPE: 'OPENTEXT', SR_NO: 1 }));
+            if (aResult.length > 0) {
+                aDataObj = aResult[0];
+            }
+            return aDataObj;
+        }
+        catch (error) { throw error; }
+    }
     async function getRandomNumber() {
 
         var randomNo = JSON.stringify(Math.floor(100000 + Math.random() * 900000));
         return randomNo;
 
+    }
+    async function getUpdatedFieldsData(connection, requestNo) {
+        try {
+            let aResult = await connection.run(
+                SELECT
+                    .from`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_UPDATED']}`
+                    .where({ REQ_NO: requestNo }));
+            return aResult;
+        }
+        catch (error) { throw error; }
     }
     async function getAppName(iReqNo){
         var aReqInfo=await SELECT .from('DEALER_PORTAL_REQUEST_INFO') .where({REQUEST_NO:iReqNo});   
@@ -657,6 +867,17 @@ module.exports = cds.service.impl(function () {
 
         return eventArr;
     }
+
+    async function getiDealSettings(connection) {
+        try {
+            let aResult = await connection.run(
+                SELECT`CODE,SETTING`
+                    .from`${connection.entities['DEALER_PORTAL.MASTER_IDEAL_SETTINGS']}`
+                    .where({ TYPE: 'REGFORM' }));
+            return aResult;
+        }
+        catch (error) { throw error; }
+    }
     async function getEventsData(connection, requestNo, sTable, sMsgType) {
         try {
             let aResult = await connection.run(
@@ -667,6 +888,17 @@ module.exports = cds.service.impl(function () {
         }
         catch (error) { throw error; }
     }
+    async function getMandatoryVisibleFieldsData(connection, entityCode, creationType,type) {
+        try {
+            let aResult = await connection.run(
+                SELECT
+                    .from`${connection.entities['DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG']}`
+                    .where({ CCODE: entityCode, REQ_TYPE: creationType, TYPE: type }));
+            return aResult;
+        }
+        catch (error) { throw error; }
+    }
+
     async function checkOtFolderIds(connection, aMainData) {
         try {
             var aFolderIdData = null;
