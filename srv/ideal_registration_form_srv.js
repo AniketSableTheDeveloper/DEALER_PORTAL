@@ -21,6 +21,7 @@ module.exports = cds.service.impl(function () {
             addressData,
             contactsData,
             bankData,
+            bankingDetails,
             // financeData,
             // ownersData,
             // prodServData,
@@ -82,6 +83,7 @@ module.exports = cds.service.impl(function () {
 
         // --Section 2--
         var aBankObj = await getidForArr(bankData, "SR_NO") || [];
+        var aBankingdetailsObj = await getidForArr(bankingDetails, "SR_NO") || [];
         // var aFinanceObj = await getidForArr(financeData, "SR_NO") || [];
         // var aOwnerObj = await getidForArr(ownersData, "SR_NO") || [];
 
@@ -124,7 +126,7 @@ module.exports = cds.service.impl(function () {
         sResponse = await dbConn.callProcedurePromisified(loadProc,
             [iReqNo, iReqType, iStep, sEntityCode, sUserId, sIsResend, iStatus,null,
                 aMainObj, aAddressObj, aContactObj,
-                aBankObj,
+                aBankObj,aBankingdetailsObj,
                 aBusniessHistory,aCustomerObj,aPromoters,
                 aAttachFieldsObj, aAttachmentsObj,aUpdatedFieldsObj, aEventsObj
             ]
@@ -652,7 +654,7 @@ module.exports = cds.service.impl(function () {
                 const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'REGFORM_EDIT_APPROVER')
                 Result = await dbConn.callProcedurePromisified(loadProc,
                     [iReqNo,stepNo, sUserId,null, reqHeader, aAddressObj, aContactObj, [], [], [], [],
-                        [], [], [], aUpdatedFieldsObj, aLogsTable]);
+                        [], [], [],[], aUpdatedFieldsObj, aLogsTable]);
 
                 if (Result.outputScalar.OUT_SUCCESS === null) {
 
@@ -757,6 +759,7 @@ module.exports = cds.service.impl(function () {
                 "CONTACTS": await getContactsWithDesc(connection, await getTableData(connection, requestNo, "REGFORM_CONTACTS") || []),
 
                 "FINANCE": await getTableData(connection, requestNo, "REGFORM_BANKS") || [],
+                "BANKING_DETAILS":await getTableData(connection, requestNo, "REGFORM_BANKING_DETAILS") || [],
 
                 "BUSINESS_HISTORY": await getTableData(connection, requestNo, "REGFORM_BUSINESS_HISTORY") || [],
                 "CUSTOMER": await getTableData(connection, requestNo, "REGFORM_CUSTOMERS") || [],

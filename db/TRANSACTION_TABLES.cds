@@ -57,7 +57,7 @@ entity REQUEST_INFO {
         MDG_CR_NO             : String(15);
         LAST_ACTIVE_REQ_NO    : Integer64;
         SECONDARY_EMAILS_ID   : String(500);
-        ESTAB_YEAR            : String(4);
+        ORG_ESTAB_YEAR            : String(4);
         WEBSITE               : String(100);
         VAT_REG_NUMBER        : String(25);
         VAT_REG_DATE          : Date;
@@ -102,6 +102,8 @@ entity REQUEST_INFO {
         SALES_ASSOCIATE_ID    : String(100);
         SA_APPROVED_ON        : Timestamp;
         SAVED_AS_DRAFT        : Integer;
+        LIC_NO             : String(50);
+        LIC_NO_DATE        : Date;
         // Fields from ideal
         REGISTERED_ADDR       : String(10);
         OFFICE_ADDR           : String(10);
@@ -405,16 +407,24 @@ entity REGFORM_BANKS {
         BANK_CURRENCY       : String(5);
         BANK_NO             : String(15);
         PAYMENT_TYPE        : String(10);
-        //Fields From Ideal
-        FACILTY             : String(20);
-        AMOUNT_LIMIT        : Double;
-        ASSO_SINCE          : Integer;
         TO_COUNTRY          : Association to one MASTER_COUNTRY
                                   on TO_COUNTRY.LAND1 = BANK_COUNTRY;
         TO_CURRENCY         : Association to one MASTER_CURRENCY
                                   on TO_CURRENCY.WAERS = BANK_CURRENCY;
 }
 
+entity REGFORM_BANKING_DETAILS{
+
+        key REQUEST_NO          : Integer64;
+        key SR_NO               : Integer;
+        NAME                : String(100);
+        BRANCH_NAME         : String(100);
+        //Fields From Ideal
+        FACILTY             : String(20);
+        AMOUNT_LIMIT        : Double;
+        ASSO_SINCE          : Integer;
+    
+}
 entity REQUEST_SECURITY_CODE {
 
     key REGISTERED_ID : String(100);
@@ -446,7 +456,7 @@ entity REQUEST_INFO_TEMP{
         MDG_CR_NO             : String(15);
         LAST_ACTIVE_REQ_NO    : Integer64;
         SECONDARY_EMAILS_ID   : String(500);
-        ESTAB_YEAR            : String(4);
+        ORG_ESTAB_YEAR            : String(4);
         WEBSITE               : String(100);
         VAT_REG_NUMBER        : String(25);
         VAT_REG_DATE          : Date;
@@ -468,6 +478,8 @@ entity REQUEST_INFO_TEMP{
         CREATED_ON            : Timestamp;
         COMMENT               : String(1000);
         LEGACY_ID             : String(10);
+        LIC_NO             : String(50);
+        LIC_NO_DATE        : Date;
         //refer from ideal
         BU_CODE               : String(50);
         TOT_PERM_EMP          : Integer;

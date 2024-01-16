@@ -117,16 +117,16 @@ module.exports = {
 				sSAPDistCode = (sContactBpId === "" || sContactBpId === null) ? "" : sNewSapCode;
 			}
 			oDataObj = {
-				"PartnerID": "",
+				"PartnerID": "12",
 				"Name1": aContactsDataArr[key].NAME1 || "",
-				"Name2": aContactsDataArr[key].NAME2 || "",
 				"Designation": aContactsDataArr[key].DESIGNATION || "",
+				"Name2": aContactsDataArr[key].NAME2 || "",
 				"HouseNum1": aContactsDataArr[key].HOUSE_NUM1 || "",
 				"Street": aContactsDataArr[key].STREET1 || "",
-				"City1": "",
+				"City1": "c",
 				"Country": aContactsDataArr[key].NATIONALITY || "",
 				"State": aContactsDataArr[key].STATE || "", // 12-10-2022 - Changed to accomodate separate region code & postal code from contacts section 
-				"PoBox": "",
+				"PoBox": "p",
 				"PostalCode": aContactsDataArr[key].POSTAL_CODE || "", // 12-10-2022 - Changed to accomodate separate region code & postal code from contacts section
 				"TelephoneNumber": aContactsDataArr[key].CONTACT_NO || "",
 				"Mobile": aContactsDataArr[key].MOBILE_NO || "",
@@ -157,8 +157,8 @@ module.exports = {
 					"IBAN": aBankDataArr[key].IBAN_NUMBER || "",
 					"Bankl": aBankDataArr[key].BANK_KEY || "",
 					"Bankn": sBankAccNo.substring(0, 18) || "",
-					"Bkont": "",
-					"Xezer": "",
+					"Bkont": "b",
+					"Xezer": "x",
 					"Bkref": sBankAccNo.substring(18, sBankAccNo.length <= 38 ? sBankAccNo.length : 38) || "",
 					"Koinh": aBankDataArr[key].ACCOUNT_HOLDER || "",
 					"EbppAccname": aBankDataArr[key].ACCOUNT_NAME || ""
@@ -171,58 +171,23 @@ module.exports = {
 	}
 	},
 // Get MDG Payload structure for General Data
-getGeneralDataSet:async function(iDealDistCode, sSAPDistCode, aGeneralDataArr, aAddressDataArr, sBP_Type, sExemptionReason) {
+	getGeneralDataSet:async function(iDealDistCode, sSAPDistCode, aGeneralDataArr, aAddressDataArr, sBP_Type, sExemptionReason) {
 	try{
 		var sName1 = aGeneralDataArr.DIST_NAME1 || "";
-		
 		var oPayload = {
-			// "Kunnr": sSAPDistCode,
-			// "Land1": aAddressDataArr.COUNTRY || "",
-			// "Name1":  sName1.substring(0, 40)  ||  "",
-			// "Name2": sName1.substring(40, sName1.length <= 80 ? sName1.length : 80) || "",
-			// "Ort01": aAddressDataArr.CITY || "",
-			// "Ort02": aAddressDataArr.DISTRICT || "",
-			// "Pfach": "", // PO Box
-			// "Pstlz": aAddressDataArr.POSTAL_CODE || "", // Pin Code
-			// "Regio": aAddressDataArr.STATE || "",
-			// "Sortl": await this.getSearchTerm(aGeneralDataArr.DIST_NAME1 || "") || "",
-			// "Stras": aAddressDataArr.STREET1 || "",
-			// "STR_SUPPL1": aAddressDataArr.STREET2 || "",
-			// "STR_SUPPL2": aAddressDataArr.STREET3 || "",
-			// "STR_SUPPL3": aAddressDataArr.STREET4 || "",
-			// "Anred": "Company", //Title
-			// "HouseNum": aAddressDataArr.HOUSE_NUM1 || "",
-			// "Telephone1": aAddressDataArr.CONTACT_NO || "",
-			// "Telephone2": "",
-			// "Mobile1": "",
-			// "Mobile2": "",
-			// "Fax1": aAddressDataArr.FAX_NO || "",
-			// "Fax2": "",
-			// "Email1": aAddressDataArr.EMAIL || "",
-			// "Email2": "",
-			// "Sperr": "",
-			// "Sperm": "",
-			// "Partner": "1234567890",
-			// "Type": "CRM001",
-			// "Idnumber": iDealDistCode,
-			// "BP_Type": sBP_Type, //classification
-			// "VAT_RegNo": aGeneralDataArr.VAT_REG_NUMBER || "",
-			// "BankDetailsSet": [],
-			// "ContactPersonSet": []
-
-			"REPRF":"",
-			"ZTERM":"",
-			"ZUAWA":"",
-			"AKONT":"",
+			"REPRF":"r",
+			"ZTERM":"z",
+			"ZUAWA":"z",
+			"AKONT":"a",
 			"Land1":aAddressDataArr.COUNTRY || "",
 			"Name1":sName1.substring(0, 40)  ||  "",
 			"Name2":sName1.substring(40, sName1.length <= 80 ? sName1.length : 80) || "",
 			"Ort01": aAddressDataArr.CITY || "",
 			"Ort02": aAddressDataArr.DISTRICT || "",
-			"Pfach":"",
+			"Pfach":"p",
 			"Pstlz":aAddressDataArr.POSTAL_CODE || "", 
 			"Regio": aAddressDataArr.STATE || "",
-			"Sortl":await this.getSearchTerm(aGeneralDataArr.DIST_NAME1 || "") || "",
+			"Sortl":await this.getSearchTerm(aGeneralDataArr.DIST_NAME1) || "",
 			"Stras":aAddressDataArr.STREET1 || "",
 			"STR_SUPPL1":aAddressDataArr.STREET2 || "",
 			"STR_SUPPL2":aAddressDataArr.STREET3 || "",
@@ -230,22 +195,23 @@ getGeneralDataSet:async function(iDealDistCode, sSAPDistCode, aGeneralDataArr, a
 			"Anred":"Company",
 			"HouseNum": aAddressDataArr.HOUSE_NUM1 || "",
 			"Telephone1": aAddressDataArr.CONTACT_NO || "",
-			"Telephone2":"",
-			"Mobile1":"",
-			"Mobile2":"",
+			"Telephone2":"1",
+			"Mobile1":"1",
+			"Mobile2":"1",
 			"Fax1": aAddressDataArr.FAX_NO || "",
+			"Fax2":"s",
 			"Email1": aAddressDataArr.EMAIL || "",
-			"Email2":"",
-			"Sperr":"",
-			"Sperm":"",
+			"Email2":"s",
+			"Sperr":"s",
+			"Sperm":"s",
 			"Partner": "1234567890",
-			"Type":"CRM001",
+			"Type": "CRM001",
 			"Idnumber": iDealDistCode,
-			"Scenario":"",
+			"Scenario":"C",
 			"BP_Type": sBP_Type,
 			"VAT_RegNo": aGeneralDataArr.VAT_REG_NUMBER || "",
-			"ChangeRequest":"",
-			"Kunnr": sSAPDistCode
+			"ChangeRequest":"c",
+			"Kunnr": sSAPDistCode || ""
 		};
 		return oPayload;
 	}catch(error){
@@ -285,7 +251,6 @@ getGeneralDataSet:async function(iDealDistCode, sSAPDistCode, aGeneralDataArr, a
 		} else {
 			sSearchTerm = sValue.substr(0, 10);
 		}
-	
 		return sSearchTerm;
 	},
      

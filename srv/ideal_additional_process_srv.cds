@@ -37,10 +37,13 @@ entity MasterClientInfo                as projection on DEALER_PORTAL.MASTER_EMA
   entity RegFormAttachFields             as projection on DEALER_PORTAL.REGFORM_ATTACH_FIELDS;
   entity RegFormAttachments              as projection on DEALER_PORTAL.REGFORM_ATTACHMENTS;
   entity MasterRequestType               as projection on DEALER_PORTAL.MASTER_REQUEST_TYPE;
+  entity MasterUserEntityUsers           as projection on DEALER_PORTAL.MASTER_USER_ENTITY_CODES;
+  entity MasterCurrency                  as projection on DEALER_PORTAL.MASTER_CURRENCY;
   entity MasterEntityCode                as projection on DEALER_PORTAL.MASTER_ENTITY_CODE;
   entity MasterTelecode                  as projection on DEALER_PORTAL.MASTER_TELECODE;
   entity MasterPostalcode                as projection on DEALER_PORTAL.MASTER_REGEX_POSTALCODE;
   entity MasterRegion                    as projection on DEALER_PORTAL.MASTER_REGION;
+  entity MasterUserRole                  as projection on DEALER_PORTAL.MASTER_USER_ROLE;
   entity RegformBusinessHistory          as projection on  DEALER_PORTAL.REGFORM_BUSINESS_HISTORY;
   entity RegformPromoters                as projection on DEALER_PORTAL.REGFORM_PROMOTERS;
   entity RequestActiveStatus             as projection on DEALER_PORTAL.REQUEST_ACTIVE_STATUS;
@@ -55,7 +58,7 @@ entity MasterClientInfo                as projection on DEALER_PORTAL.MASTER_EMA
   }
 
   function checkServiceAvailability(cloudSrv:Boolean,onPremiseSrv:Boolean) returns many String;
-   action S4HANA_Testing(action : String,
+  action S4HANA_Testing(action : String,
                                inputData : many RequestInfo,
                                addressData : many RegFormAddress,
                                contactsData : many RegFormContacts,

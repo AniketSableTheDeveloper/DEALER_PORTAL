@@ -9,6 +9,7 @@ service ideal_registration_form_srv {
     entity RequestInfo as projection on DEALER_PORTAL.REQUEST_INFO;
     entity RegformAddress as projection on DEALER_PORTAL.REGFORM_ADDRESS;
     entity RegformBanks as projection on DEALER_PORTAL.REGFORM_BANKS;
+    entity RegformBankingDetails as projection on DEALER_PORTAL.REGFORM_BANKING_DETAILS;
     entity RegformContacts as projection on DEALER_PORTAL.REGFORM_CONTACTS;
     entity RegformCustomers as projection on DEALER_PORTAL.REGFORM_CUSTOMERS;
     entity RegformBusinessHistory as projection on DEALER_PORTAL.REGFORM_BUSINESS_HISTORY;
@@ -53,7 +54,7 @@ service ideal_registration_form_srv {
     function GetSecurityPin(distributorName : String, distributorEmail : String, requesterId : String, userId : String, userRole : String)returns many String;
     function CheckSecurityPin(distributorEmail : String,securityPin:String, userId : String, userRole : String) returns securityPinResponse;
     action MessengerService(action : String, appType : String, messengerData : MessengerData, inputData : many RequestInfo, eventsData : many RegEventsLog, userDetails : User_Details)returns many String;
-    action PostRegFormData(action : String, appType : String,stepNo : Integer, reqHeader : many RequestInfo, addressData : many RegformAddress, promotersData : many RegformPromoters,businessHistoryData : many RegformBusinessHistory,contactsData : many RegformContacts, bankData : many RegformBanks,
+    action PostRegFormData(action : String, appType : String,stepNo : Integer, reqHeader : many RequestInfo, addressData : many RegformAddress, promotersData : many RegformPromoters,businessHistoryData : many RegformBusinessHistory,contactsData : many RegformContacts, bankData : many RegformBanks,bankingDetails : many RegformBankingDetails,
     customerData : many RegformCustomers,attachmentData : many RegformAttachments,attachmentFieldsData : many RegFormAttachFields, updatedFields : many String, eventsData : many RegEventsLog, userDetails : User_Details) returns many String;
     action   ManageCMS(action : String, attachmentId : AttachmentID, inputData : many RegFormCMS, userDetails : User_Details) returns many String;
     action   EditRegFormData(action : String, // APPROVER | VENDOR 

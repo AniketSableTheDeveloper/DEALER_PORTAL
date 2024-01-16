@@ -334,6 +334,8 @@ context DEALER_PORTAL {
         S1G6T1F1 : String(1);
         S1G6T1F2 : String(1);
         S1G6T1F3 : String(1);
+        S1G6T1F4 : String(1);
+        S1G6T1F5 : String(1);
         // Section 1 - General Section
         // Group 7 - Employee Details
         S1G7T1F1 : String(1);
@@ -489,7 +491,9 @@ context DEALER_PORTAL {
         // Group 6 - Additional Information
         S1G6T1F1 : String(1);
         S1G6T1F2 : String(1);
-        S1G6T1F3 : String(1);
+        S1G6T1F3 : String(1);   
+        S1G6T1F4 : String(1);
+        S1G6T1F5 : String(1);
         // Section 1 - General Section
         // Group 7 - Employee Details
         S1G7T1F1 : String(1);

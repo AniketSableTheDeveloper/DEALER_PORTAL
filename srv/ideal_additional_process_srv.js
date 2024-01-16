@@ -24,12 +24,10 @@ this.on('checkServiceAvailability',async(req)=>{
    
       if(onPremiseSrv){
       //   set connection to ZIDL_CUSTOMER_REG_SRV Destination
-      var iVenVendorConnection = await cds.connect.to('ZIDL_CUSTOMER_REG_SRV');
-      var onPremResponse = await iVenVendorConnection.send({
+      var iDealDistConnection = await cds.connect.to('ZIDL_CUSTOMER_REG_SRV');
+      var onPremResponse = await iDealDistConnection.send({
         method: 'GET',
-        // path: '/GetCitySet',
         path:'/BPTypeSet',
-        // path:'/',
         headers: { 'Content-Type': 'application/json' ,
         "sap-client":sapClient
       }
@@ -81,18 +79,26 @@ this.on('checkServiceAvailability',async(req)=>{
 
         if(action === 'Testing')
         {
-
         oMDGPayload =await lib_mdg.getMDGPayload(inputData,addressData,contactsData,bankData, connection);
         iDealDistCode = inputData[0].IDEAL_DIST_CODE;
 
     // ------------------------START: Direct MDG Call for testing-------------------------
         var MDGResult =await lib_mdg.PostToMDG(oMDGPayload,connection);
 
-
         iMDGStatus = MDGResult.iStatusCode;
         oMDGResponse = MDGResult.oResponse;
+
+        sChangeRequestNo =oMDGResponse.changerequestNo;
+        sSapVendorCode = parseInt(oMDGResponse.d.Lifnr, 10) || "";
+        var responseObj = {
+          "Message": "Success",
+          "MDG_status": iMDGStatus,
+          "MDG_Payload": oMDGPayload,
+          "ODataResponse": oMDGResponse,
+          "sChangeRequestNo": sChangeRequestNo,
+          "sChangeRequestNo1": sChangeRequestNo
+        };
+        return  responseObj;
         }
-
-
   })
 })
