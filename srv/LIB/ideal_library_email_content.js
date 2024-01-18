@@ -321,7 +321,7 @@ module.exports = {
 			} else if (sAction === "REJECT") {
 				var sRequestTypeText = "";
 				var req = '';
-				var sSupplierName = " for Vendor " + sRequestTypeText + " Registration as <span style=\"text-transform:uppercase\">" +
+				var sSupplierName = " for Distributor " + sRequestTypeText + " Registration as <span style=\"text-transform:uppercase\">" +
 					oEmailData.SupplierName +
 					"</span> has been rejected.<br>" + "<br>"
 				if (oEmailData.ReqType === 5) {
@@ -332,21 +332,21 @@ module.exports = {
 						"</span> has been rejected.<br>" + "<br>"
 				}
 
-				oEmailContent.subject = "Vendor " + sRequestTypeText + "registration form rejected.";
+				oEmailContent.subject = "Distributor " + sRequestTypeText + "registration form rejected.";
 
-				oEmailContent.emailBody = "Dear Vendor," + "<br><br>" +
+				oEmailContent.emailBody = "Dear Distributor," + "<br><br>" +
 
-					req + "Request No. " + oEmailData.ReqNo + sSupplierName +
+				req + "Request No. " + oEmailData.ReqNo + sSupplierName +
 
-					"Reason for rejection:" + "<br>" +
-					oEmailData.Reason + "<br>" +
+				"Reason for rejection:" + "<br>" +
+				oEmailData.Reason + "<br>" +
 
-					"<br>" +
-					"Should you have any questions, please do not hesitate to reach out to us via email at " +
-					"<strong><a href=" + sClientContactEmail + ">" + sClientContactEmail + "</a></strong> " + "<br>" +
-					"<br>" +
-					"Regards," + "<br>" +
-					"Vendor Management Team";
+				"<br>" +
+				"Should you have any questions, please do not hesitate to reach out to us via email at " +
+				"<strong><a href=" + sClientContactEmail + ">" + sClientContactEmail + "</a></strong> " + "<br>" +
+				"<br>" +
+				"Regards," + "<br>" +
+				"Distributor Management Team";
 
 			} else if (sAction === "SENDBACK") {
 
@@ -360,11 +360,11 @@ module.exports = {
 				}
 
 				// 			oEmailContent.subject = "Supplier " + sRequestTypeText + "registration form sent back  for " + oEmailData.SupplierName; 
-				oEmailContent.subject = "Vendor " + sRequestTypeText + "registration form returned.";
+				oEmailContent.subject = "Distributor " + sRequestTypeText + "registration form returned.";
 
-				oEmailContent.emailBody = "Dear Vendor," + "<br><br>" +
+				oEmailContent.emailBody = "Dear Distributor," + "<br><br>" +
 
-					req + "Request No: " + oEmailData.ReqNo + " for Vendor " + sRequestTypeText +
+					req + "Request No: " + oEmailData.ReqNo + " for Distributor " + sRequestTypeText +
 					"Registration as <span style=\"text-transform:uppercase\">" +
 					oEmailData.SupplierName +
 					"</span> has been sent back.<br><br>" +
@@ -380,7 +380,7 @@ module.exports = {
 					"<strong><a href=" + sClientContactEmail + ">" + sClientContactEmail + "</a></strong> " + "<br>" +
 					"<br>" +
 					"Regards," + "<br>" +
-					"Vendor Management Team";
+					"Distributor Management Team";
 
 			}
 		} else if (sAppType === "BUYER_NOTIFICATION") {
@@ -396,11 +396,11 @@ module.exports = {
 					req = 'update ';
 				}
 
-				oEmailContent.subject = "Vendor " + sRequestTypeText + " " + sActionTypeText;
+				oEmailContent.subject = "Distributor " + sRequestTypeText + " " + sActionTypeText;
 
 				oEmailContent.emailBody = "Dear User," + "<br><br>" +
 					"Your " + req + "Request No. " + oEmailData.ReqNo + " for" + sRequestTypeText +
-					" Vendor Registration of <span style=\"text-transform:uppercase\">" +
+					" Distributor Registration of <span style=\"text-transform:uppercase\">" +
 					oEmailData.SupplierName + "</span> has been " + sActionTypeText + " by " + oEmailData.Approver_Email + ".<br><br>" +
 
 					"You can check the details for the request on the " + sClientShortName + " portal using this " +
@@ -411,7 +411,7 @@ module.exports = {
 					"<strong><a href=" + sClientContactEmail + ">" + sClientContactEmail + "</a></strong> " + "<br>" +
 					"<br>" +
 					"Regards," + "<br>" +
-					"Vendor Management Team";
+					"Distributor Management Team";
 
 			} else if (sAction === "REJECT") {
 				var sRequestTypeText = "";
@@ -420,7 +420,7 @@ module.exports = {
 					sRequestTypeText = "updated ";
 				}
 
-				oEmailContent.subject = "Vendor " + sRequestTypeText + "registration form rejected.";
+				oEmailContent.subject = "Distributor " + sRequestTypeText + "registration form rejected.";
 
 				oEmailContent.emailBody = "Dear Buyer," + "<br><br>" +
 
@@ -439,7 +439,7 @@ module.exports = {
 					"<strong><a href=" + sClientContactEmail + ">" + sClientContactEmail + "</a></strong> " + "<br>" +
 					"<br>" +
 					"Regards," + "<br>" +
-					"Vendor Management Team";
+					"Distributor Management Team";
 
 			} else if (sAction === "SENDBACK") {
 
@@ -450,11 +450,11 @@ module.exports = {
 					sRequestTypeText = "updated ";
 				}
 
-				oEmailContent.subject = "Vendor " + sRequestTypeText + "registration form sent back.";
+				oEmailContent.subject = "Distributor " + sRequestTypeText + "registration form sent back.";
 
 				oEmailContent.emailBody = "Dear Buyer," + "<br><br>" +
 
-					"Request No. " + oEmailData.ReqNo + " for Vendor " + sRequestTypeText + "registration as <span style=\"text-transform:uppercase\">" +
+					"Request No. " + oEmailData.ReqNo + " for Distributor " + sRequestTypeText + "registration as <span style=\"text-transform:uppercase\">" +
 					oEmailData.SupplierName +
 					"</span> has been sent back during " + sRejectionLevel + " by " + oEmailData.Approver_Email + ".<br><br>" +
 
@@ -469,11 +469,11 @@ module.exports = {
 					"<strong><a href=" + sClientContactEmail + ">" + sClientContactEmail + "</a></strong> " + "<br>" +
 					"<br>" +
 					"Regards," + "<br>" +
-					"Vendor Management Team";
+					"Distributor Management Team";
 
 			} else if (sAction === "SELFREG_BUYER") {
 
-				oEmailContent.subject = "New vendor self registration request No: " + oEmailData.ReqNo + " has been assigned to you";
+				oEmailContent.subject = "New Distributor self registration request No: " + oEmailData.ReqNo + " has been assigned to you";
 				// 			oEmailContent.subject = "Self Registration Request No: " + oEmailData.ReqNo + " created for " + oEmailData.SupplierName;
 
 				oEmailContent.emailBody = "Dear Valued Recipient," + "<br><br>" +
@@ -488,7 +488,7 @@ module.exports = {
 					"<strong><a href=" + sClientContactEmail + ">" + sClientContactEmail + "</a></strong> " + "<br>" +
 					"<br>" +
 					"Regards," + "<br>" +
-					"Vendor Management Team";
+					"Distributor Management Team";
 
 			}
 

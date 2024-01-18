@@ -62,7 +62,7 @@ module.exports = cds.service.impl(async function(){
                   OUT_ERROR_CODE: iErrorCode,
                   OUT_ERROR_MESSAGE:  error.message ? error.message : error
               }
-            //   lib_common.postErrorLog(Result,null,sUserId,sUserRole,"User Master",sType,dbConn,hdbext);
+              lib_common.postErrorLog(Result,null,sUserId,sUserRole,"User Master",sType,dbconn,hdbext);
               console.error(error)         
               req.error({ code:iErrorCode, message:  error.message ? error.message : error });      
             }   
@@ -131,7 +131,7 @@ module.exports = cds.service.impl(async function(){
     //     OUT_ERROR_CODE: iErrorCode,
     //     OUT_ERROR_MESSAGE:  error.message ? error.message : error
     // }
-    // lib_common.postErrorLog(Result,null,sUserId,sUserRole,"Approval Matrix",sType,dbConn,hdbext);
+    lib_common.postErrorLog(Result,null,sUserId,sUserRole,"Approval Matrix",sType,dbconn,hdbext);
     console.error(error);        
     req.error({ code:iErrorCode, message:  error.message ? error.message : error });
   }

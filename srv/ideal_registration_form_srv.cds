@@ -59,5 +59,9 @@ service ideal_registration_form_srv {
     action   ManageCMS(action : String, attachmentId : AttachmentID, inputData : many RegFormCMS, userDetails : User_Details) returns many String;
     action   EditRegFormData(action : String, // APPROVER | VENDOR 
     stepNo : Integer,reqHeader : many RequestInfo,addressData : many RegformAddress,contactsData : many RegformContacts,updatedFields : many String,editLog : many RegSupplierLog,userDetails : User_Details) returns many String;
+    //Action for Approval
+    action RegFormDataApproval(action : String,inputData : many RequestInfo,addressData : many RegformAddress,
+    contactsData : many RegformContacts,bankData : many RegformBanks,eventsData : many RegEventsLog,
+    userDetails : User_Details)returns many String;
 
 }

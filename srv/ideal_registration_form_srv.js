@@ -4,6 +4,7 @@ const hdbext = require("@sap/hdbext")
 const lib_common = require('../srv/LIB/ideal_library')
 const lib_email = require('../srv/LIB/ideal_library_email') 
 const lib_email_content = require('../srv/LIB/ideal_library_email_content')
+const lib_mdg = require('./LIB/ideal_library_mdg')
 
 module.exports = cds.service.impl(function () {
 
@@ -200,7 +201,7 @@ module.exports = cds.service.impl(function () {
                 OUT_ERROR_CODE: iErrorCode,
                 OUT_ERROR_MESSAGE:  error.message ? error.message : error
             }
-            // lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,"Vendor Registration Form",sType,dbConn,hdbext);       
+            lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,"Distributor Registration Form",sType,dbConn,hdbext);       
             req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
     })
@@ -503,7 +504,7 @@ module.exports = cds.service.impl(function () {
                 OUT_ERROR_MESSAGE:  error.message ? error.message : error
             }
             // if(error.errorType !== "Warning")  
-            lib_common.postErrorLog(Result,null,userId,userRole,"Distributor Registration Form",sType,dbConn,hdbext);   
+            await lib_common.postErrorLog(Result,null,userId,userRole,"Distributor Registration Form",sType,dbConn,hdbext);   
             req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
         }
     });
@@ -687,6 +688,285 @@ module.exports = cds.service.impl(function () {
         }
     })
 
+    //Registration Approval Process
+    this.on('RegFormDataApproval', async (req) => {
+        try {
+            var { action, inputData,addressData,contactsData,bankData, eventsData,userDetails } = req.data;
+
+            var isEmailNotificationEnabled = false;
+            // get connection
+            var client = await dbClass.createConnectionFromEnv();
+            let dbConn = new dbClass(client);
+            var sUserIdentity=userDetails.USER_ID || null;
+            var sUserRole=userDetails.USER_ROLE || null;
+            //intialize connection to database
+            var connection = await cds.connect.to('db');
+
+            //Check if email notification is enabled
+            isEmailNotificationEnabled = await lib_email.isiDealSettingEnabled(connection, "VM_EMAIL_NOTIFICATION");
+
+            var iReqNo = inputData[0].REQUEST_NO || null;
+            var sEntityCode = inputData[0].ENTITY_CODE || null;
+            var iRequestType = inputData[0].REQUEST_TYPE || null;
+            var sDistEmail = inputData[0].REGISTERED_ID || null;
+            var sUserId = eventsData[0].USER_ID || null;
+            var iLevel = inputData[0].APPROVER_LEVEL || null;
+            var sBuyerEmail = inputData[0].REQUESTER_ID || null;
+            var sIdealNo = inputData[0].IDEAL_DIST_CODE || null;
+            var sDistName = inputData[0].DIST_NAME1 || null;
+            var sChangeRequestNo = null;
+            var iDealDistCode = inputData[0].IDEAL_DIST_CODE;
+            var sCompareValue = "A";
+
+            if (action === "REJECT" || action === "SENDBACK") { //-----------------------------------------------------------------------------
+                try{
+                var lowerCaseAction = action.toLowerCase();
+                const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'REGFORM_REJECT_SENDBACK');
+                Result = await dbConn.callProcedurePromisified(loadProc,
+                    [lowerCaseAction, iReqNo, sEntityCode, iRequestType, sDistEmail, sUserId, iLevel, eventsData]);
+                responseObj = {
+                    "Message": Result.outputScalar.OUT_SUCCESS !== null ? Result.outputScalar.OUT_SUCCESS : lowerCaseAction + " failed!"
+
+                };
+                if (Result.outputScalar.OUT_SUCCESS !== null) {
+                    var oEmailData = {
+                        "ReqNo": iReqNo,
+                        "SupplierName": sDistName,
+                        "Approver_Email": sUserId,
+                        "Approver_Level": iLevel,
+                        "To_Email": Result.OUT_EMAIL_TO,
+                        "ReqType": iRequestType,
+                        "Reason": eventsData[0].COMMENT
+                    };
+
+                    if (isEmailNotificationEnabled) {
+                        oEmaiContent = await lib_email_content.getEmailContent(connection, action, "REGISTER", oEmailData, null)
+                        var sCCEmail = await lib_email.setSampleCC( null);
+                        await  lib_email.sendidealEmail(sDistEmail,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
+
+                        oEmaiContent = await lib_email_content.getEmailContent(connection, action, "BUYER_NOTIFICATION", oEmailData, null)
+                        var sCCEmail = await lib_email.setSampleCC( null);
+                        await  lib_email.sendidealEmail(sBuyerEmail,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
+                  
+                    }
+                    statusCode = 200;
+                } else {
+                    statusCode = parseInt(Result.outputScalar.OUT_ERROR_CODE);
+                    responseObj.ERROR_CODE = parseInt(Result.outputScalar.OUT_ERROR_CODE);
+                    responseObj.ERROR_DESC = Result.outputScalar.OUT_ERROR_MESSAGE;
+                    throw responseObj;
+                }
+
+                req.reply(responseObj);
+                }catch(error){
+                    var sType=error.code?"Procedure":"Node Js";    
+                    var iErrorCode=error.code??500;   
+                    let Result = {
+                        OUT_ERROR_CODE: iErrorCode,
+                        OUT_ERROR_MESSAGE:  error.message ? error.message : error
+                    }
+                    lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,"Distributor Registration Approval",sType,dbConn,hdbext);   
+                    req.error({ code:iErrorCode, message:  error.message ? error.message : error });
+                }
+            }
+            else if (action === "APPROVE") { 
+                try{    
+                    var sSapDistCode = null;
+                    // ------------- MDG Posting Start------------------
+                    var iType = "REG";
+                    var iMaxLevelCount = await getMaxApproverCount(connection, sEntityCode, iType);
+
+                    var iDealDistCode = null;
+                    var oMDGResponse = null;
+                    var iMDGStatus = null;
+                    var oMDGPayload = null;
+                    var bMDGComparison = null;
+                    var bAttachmentComparison = null;
+                    var oActiveData = null;
+                    var CurrAttachment = null;
+                    var bNoChange = false;
+                    var oDataStatus = null;
+                    var ODataResponse = null;
+                    var sCompareValue = 'A';
+
+                    if (iLevel === iMaxLevelCount) {
+                        oMDGPayload =await lib_mdg.getMDGPayload(inputData,addressData,contactsData,bankData, connection);
+                        iDealDistCode = inputData[0].IDEAL_DIST_CODE;
+                        // sSapDistCode = parseInt(oMDGPayload.Lifnr, 10) || "";
+
+                        // ------------------------START: Direct MDG Call for testing-------------------------
+                        var MDGResult =await  lib_mdg.PostToMDG(oMDGPayload,connection);
+                        iMDGStatus = MDGResult.iStatusCode;
+                        oMDGResponse = MDGResult.oResponse;
+
+                        // sChangeRequestNo = oMDGResponse.changerequestNo.length === 12 ?  oMDGResponse.changerequestNo : null;
+                        sChangeRequestNo =oMDGResponse.changerequestNo;
+                        sSapDistCode = parseInt(oMDGResponse.d.Kunnr, 10) || "";
+
+                        //   sChangeRequestNo = oMDGResponse;
+                        // sCompareValue = "M";
+                    }
+                    // ------------- MDG Posting End------------------
+
+                    // if (iLevel < iMaxLevelCount || sChangeRequestNo !== null) {
+                    if (iLevel <= iMaxLevelCount) {
+
+                        const loadProc = await dbConn.loadProcedurePromisified(hdbext, null, 'REGFORM_APPROVAL')
+                        Result = await dbConn.callProcedurePromisified(loadProc,
+                            [iReqNo, sEntityCode, iRequestType,
+                                sDistEmail, sBuyerEmail, sUserId, iLevel, eventsData, 
+                                sChangeRequestNo, iDealDistCode, sSapDistCode, sDistName,
+                                sCompareValue]);
+                        var responseObj = {
+                            "Message": Result.outputScalar.OUT_SUCCESS !== null ? Result.outputScalar.OUT_SUCCESS : "Approval failed!",
+                            "MDG_status": iMDGStatus,
+                            "MDG_Payload": oMDGPayload,
+                            "ODataResponse": oMDGResponse,
+                            "bMDGComparison": bMDGComparison,
+                            "bAttachmentComparison": bAttachmentComparison,
+                            "CurrAttachment": CurrAttachment,
+                            "sChangeRequestNo": sChangeRequestNo,
+                            "sChangeRequestNo1": sChangeRequestNo
+                        };
+
+                        if (Result.outputScalar.OUT_SUCCESS !== null) {
+
+                            var oEmailData = {
+                                "ReqNo": iReqNo,
+                                "ReqType": iRequestType,
+                                "SupplierName": sDistName,
+                                "SupplerEmail": sDistEmail,
+                                "Approver_Email": sUserId,
+                                "Approver_Level": iLevel,
+                                "Next_Approver": Result.outputScalar.OUT_EMAIL_TO, // Proc Manager
+                                "Buyer": sBuyerEmail
+                            };
+
+                            action = Result.outputScalar.OUT_MAX_LEVEL == iLevel ? "FINAL_APPROVAL" : "APPROVE";
+
+                            if (action === "APPROVE") {
+                                // pending for approval - notification to Proc Manager
+                                if (isEmailNotificationEnabled) {
+                                    oEmaiContent = await lib_email_content.getEmailContent(connection, action, "REGISTER", oEmailData, null)
+                                    var sCCEmail = await lib_email.setSampleCC( null);
+                                    await  lib_email.sendidealEmail(oEmailData.Next_Approver,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
+                                    oEmaiContent = await lib_email_content.getEmailContent(connection, action, "BUYER_NOTIFICATION", oEmailData, null)
+                                    var sCCEmail = await lib_email.setSampleCC( null);
+                                    await  lib_email.sendidealEmail(oEmailData.Buyer,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
+                                }
+                            } else if (action === "FINAL_APPROVAL") {
+                                // Approval done - notification to Buyer & Proc Manager
+                                if (isEmailNotificationEnabled) {
+                                    oEmaiContent = await lib_email_content.getEmailContent(connection, action, "BUYER_NOTIFICATION", oEmailData, null)
+                                    var sCCEmail = await lib_email.setSampleCC( null);
+                                    var sToEmail = [oEmailData.Buyer, oEmailData.Approver_Email].toString();
+                                    await  lib_email.sendidealEmail(sToEmail,sCCEmail,'html', oEmaiContent.subject, oEmaiContent.emailBody)
+                                }
+                                //Post to IAS for Create Normal Request
+                                // if(iRequestType == 1)
+                                // await lib_ias.CreateVendorIdIAS(sSapDistCode,sDistName,null,sDistEmail);
+                            }
+                            statusCode = 200;
+                        } else {
+                            statusCode = parseInt(Result.outputScalar.OUT_ERROR_CODE);
+                            responseObj.ERROR_CODE = parseInt(Result.outputScalar.OUT_ERROR_CODE);
+                            responseObj.ERROR_DESC = Result.outputScalar.OUT_ERROR_MESSAGE;
+                            throw JSON.stringify(responseObj);
+                        }
+                        return responseObj;
+                    } else {
+                        throw "Max level reached";
+                            // responseObj = {
+                            //     "Message": "MDG posting failed!",
+                            //     "MDG_status": iMDGStatus,
+                            //     "MDG_Payload": oMDGPayload,
+                            //     "SAP_Code": sSapDistCode,
+                            //     "MDG_Response": oMDGResponse
+
+                            // }
+                            // Result = {
+                            //     "OUT_ERROR_CODE": iMDGStatus,
+                            //     "OUT_ERROR_MESSAGE": JSON.stringify(oMDGResponse)
+                            // }
+                        //     iVen_Content.postErrorLog(conn, Result, iReqNo, sUserId, "Supplier Registration Approval", "API");
+
+                        //     if (bNoChange === true) {
+                        //         responseObj.Message = "No Change Found in Data for Approval!"
+                        //     } else if (oDataStatus && oDataStatus === 400) {
+                        //         responseObj.Message = ODataResponse.oResponse;
+                        //     } else if (iMDGStatus && iMDGStatus === 500) {
+                        //         responseObj.Message = JSON.stringify(oMDGResponse);
+                        //     }
+
+                        //     iVen_Content.responseInfo(JSON.stringify(responseObj), "text/plain", 400);
+                        //     if (iRequestType !== 5) {
+                        //         // 	MDG_LIBRARY.rollbackSAPVendorCodeInSeq(conn);
+                        //     }
+                    }
+                }catch(error){
+                    var sType=error.code?"Procedure":"Node Js";    
+                    var iErrorCode=error.code??500;   
+                    let Result = {
+                        OUT_ERROR_CODE: iErrorCode,
+                        OUT_ERROR_MESSAGE:  error.message ? error.message : error
+                    }
+                    lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,"Distributor Registration Approval",sType,dbConn,hdbext);
+                    req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
+                }
+            }
+            else if (action === "DUPLICATECHECK") {
+                try{
+                    var sTradeLicense = (inputData[0].LIC_NO === null || inputData[0].LIC_NO === "") ? "" : inputData[0].LIC_NO.toUpperCase();
+                    var sVatNumber = (inputData[0].VAT_REG_NUMBER === null || inputData[0].VAT_REG_NUMBER === "") ? "" : inputData[0].VAT_REG_NUMBER.toUpperCase();
+                    var sSupplierName = (inputData[0].DIST_NAME1 === null || inputData[0].DIST_NAME1 === "") ? "" : inputData[0].DIST_NAME1.toUpperCase();
+                    var sRequestNo = (inputData[0].REQUEST_NO === null || inputData[0].REQUEST_NO === "" || inputData[0].REQUEST_NO === undefined) ? "" : parseInt(
+                        inputData[0].REQUEST_NO, 10);
+                    var responseObj = {
+                        "LIC_NO": await duplicateCheck(connection, "LIC_NO", sTradeLicense, sRequestNo),
+                        "VAT_REG_NUMBER": await duplicateCheck(connection, "VAT_REG_NUMBER", sVatNumber, sRequestNo),
+                        "DIST_NAME1": await duplicateCheck(connection, "DIST_NAME1", sSupplierName, sRequestNo)
+                    };
+                    req.reply(responseObj);
+                    // iVen_Content.responseInfo(JSON.stringify(responseObj), "text/plain", 200);
+                }catch(error){
+                    var sType=error.code?"Procedure":"Node Js";    
+                    var iErrorCode=error.code??500;   
+                    let Result = {
+                        OUT_ERROR_CODE: iErrorCode,
+                        OUT_ERROR_MESSAGE:  error.message ? error.message : error
+                    }
+                    lib_common.postErrorLog(Result,iReqNo,sUserIdentity,sUserRole,"Distrubutor Registration Approval",sType,dbConn,hdbext);           
+                    req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
+               }
+            }
+        } catch (error) {
+            req.error({ code: "500", message: error.message ? error.message : error });
+        }
+    })
+
+    async function duplicateCheck(connection, sColumnName, sColumnValue, iObrNo) {
+        try {
+            var aResult = null;
+            var whereObj = {};
+            whereObj[sColumnName] = sColumnValue;
+            if (iObrNo !== "" && sColumnValue !== "") {
+                whereObj['REQUEST_NO'] = {'!=':iObrNo}
+                aResult = await connection.run(SELECT
+                    .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
+                    .where(whereObj)
+                );
+            }
+            else {
+                aResult = await connection.run(SELECT
+                    .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
+                    .where(whereObj)
+                );
+            }
+            return aResult
+        }
+        catch (error) { throw error; }
+    }
+
     async function getObjectFromRows(aDataObjects) {
         try {
             var oReturnObj = {},
@@ -749,6 +1029,22 @@ module.exports = cds.service.impl(function () {
         }
         catch (error) { throw error; }
     }
+
+    async function getMaxApproverCount(connection, iEntityCode,iType) {
+        try {
+            var iCount = 0;
+            let aResult = await connection.run(
+                SELECT`MAX(LEVEL) AS COUNT`
+                    .from`${connection.entities['CALC_HIERARCHY_MATRIX']}`
+                    .where({ ENTITY_CODE: iEntityCode, TYPE: iType}));
+
+            if (aResult.length > 0) {
+                iCount = aResult[0].COUNT;
+            }
+            return iCount;
+        } catch (error) { throw error; }
+    }
+
     async function getDraftData(connection, requestNo) {
         try {
             var aMainData = await checkOtFolderIds(connection, await getTableData(connection, requestNo, "REQUEST_INFO")) || [];
@@ -972,6 +1268,7 @@ module.exports = cds.service.impl(function () {
                 }
             return addressWithDesc;
         }
+        return addressWithDesc;
     }
         catch (error) { throw error; }
     }

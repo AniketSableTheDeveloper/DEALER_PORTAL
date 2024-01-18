@@ -34,7 +34,6 @@ this.on('checkServiceAvailability',async(req)=>{
       })
       if( onPremResponse.length >= 0)
         response.onPremiseSrv = "Loaded"
-   
     }
     if(cloudSrv){
       var connection = await cds.connect.to('db');
@@ -43,7 +42,6 @@ this.on('checkServiceAvailability',async(req)=>{
    
         if( cloudResponse.length >= 0)
         response.cloudSrv = "Loaded"
-   
       }
    req.reply(response);  
   }

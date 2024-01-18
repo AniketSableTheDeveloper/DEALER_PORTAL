@@ -242,7 +242,7 @@ module.exports = cds.service.impl(function () {
                         OUT_ERROR_CODE: iErrorCode,
                         OUT_ERROR_MESSAGE:  error.message ? error.message : error
                     }   
-                    // lib_common.postErrorLog(Result,iREQUEST_NO,sUserIdentity,sUserRole,"Vendor Request Managment",sType,dbConn,hdbext);
+                    lib_common.postErrorLog(Result,iREQUEST_NO,sUserIdentity,sUserRole,"Distributor Request Managment",sType,dbConn,hdbext);
                     console.error(error)     
                     // return error.messsage     
                     req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
@@ -365,7 +365,7 @@ module.exports = cds.service.impl(function () {
                         OUT_ERROR_CODE: iErrorCode,
                         OUT_ERROR_MESSAGE:  error.message ? error.message : error
                     }
-                    // lib_common.postErrorLog(Result,reqNo,sUserIdentity,sUserRole,"Vendor Request Approval",sType,dbConn,hdbext);
+                    lib_common.postErrorLog(Result,reqNo,sUserIdentity,sUserRole,"Distributor Request Approval",sType,dbConn,hdbext);
                     console.error(error)     
                     // return error.messsage     
                     req.error({ code:iErrorCode, message:  error.message ? error.message : error }); 
@@ -428,7 +428,7 @@ module.exports = cds.service.impl(function () {
                     OUT_ERROR_CODE: iErrorCode,
                     OUT_ERROR_MESSAGE:  error.message ? error.message : error
                 }
-                // lib_common.postErrorLog(Result,reqNo,sUserIdentity,sUserRole,"Vendor Request Approval",sType,dbConn,hdbext);
+                lib_common.postErrorLog(Result,reqNo,sUserIdentity,sUserRole,"Distributor Request Approval",sType,dbConn,hdbext);
                 console.error(error)     
                 // return error.messsage     
                 req.error({ code:iErrorCode, message:  error.message ? error.message : error });
@@ -644,7 +644,7 @@ module.exports = cds.service.impl(function () {
                     OUT_ERROR_CODE: iErrorCode,
                     OUT_ERROR_MESSAGE:  error.message ? error.message : error
                 }
-                // lib_common.postErrorLog(Result,iRequestNo,sUserIdentity,sUserRole,"Vendor Request Edit",sType,dbConn,hdbext);
+                lib_common.postErrorLog(Result,iRequestNo,sUserIdentity,sUserRole,"Distrubutor Request Edit",sType,dbConn,hdbext);
                 console.error(error)     
                 // return error.messsage     
                 req.error({ code:iErrorCode, message:  error.message ? error.message : error });
@@ -809,7 +809,7 @@ module.exports = cds.service.impl(function () {
                     OUT_ERROR_CODE: iErrorCode,
                     OUT_ERROR_MESSAGE:  error.message ? error.message : error
                 }
-                // lib_common.postErrorLog(Result,iRequestNo,sUserIdentity,sUserRole,"Vendor Registered ID Edit",sType,dbConn,hdbext);
+                lib_common.postErrorLog(Result,iRequestNo,sUserIdentity,sUserRole,"Distributor Registered ID Edit",sType,dbConn,hdbext);
                 console.error(error)     
                 // return error.messsage     
                 req.error({ code:iErrorCode, message:  error.message ? error.message : error });
@@ -897,7 +897,7 @@ module.exports = cds.service.impl(function () {
                     OUT_ERROR_CODE: iErrorCode,
                     OUT_ERROR_MESSAGE:  error.message ? error.message : error
                 }
-                // lib_common.postErrorLog(Result,aRequests[0].REQUEST_NO,sUserIdentity,sUserRole,"Vendor Request Forwarding",sType,dbConn,hdbext);
+                lib_common.postErrorLog(Result,aRequests[0].REQUEST_NO,sUserIdentity,sUserRole,"Distributor Request Forwarding",sType,dbConn,hdbext);
                 console.error(error)     
                 // return error.messsage     
                 req.error({ code:iErrorCode, message:  error.message ? error.message : error });
@@ -919,19 +919,11 @@ module.exports = cds.service.impl(function () {
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
                     .where`STATUS NOT IN (3,8) AND DIST_NAME1 = ${data[0].DIST_NAME1}`
             );
-            // var sQuery =
-            // 	'SELECT * FROM \"VENDOR_PORTAL\".\"VENDOR_PORTAL.Table::VENDOR_INVITATION\" WHERE STATUS != ? AND STATUS != ? AND VENDOR_NAME=?';
-            // var aResult = con.executeQuery(sQuery, 3, 8, data[0].VENDOR_NAME);
-
             let aQuery2Result = await connection.run(
                 SELECT
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
                     .where`STATUS NOT IN (3,8) AND REGISTERED_ID = ${data[0].REGISTERED_ID}`
             );
-
-            // var sQuery1 =
-            // 	'SELECT * FROM \"VENDOR_PORTAL\".\"VENDOR_PORTAL.Table::VENDOR_INVITATION\" WHERE STATUS != ? AND STATUS != ? AND VEMAIL=?';
-            // var sResult = con.executeQuery(sQuery1, 3, 8, data[0].VEMAIL);
 
             var iNameCount = aQuery1Result.length;
             var iEmailCount = aQuery2Result.length;
@@ -974,9 +966,6 @@ module.exports = cds.service.impl(function () {
         try {
             var sCreatedById = "";
             if (iRequestNo !== "" || iRequestNo !== null) {
-                // var sQuery =
-                //     'SELECT "REQUESTER_ID" AS REQUESTER_ID FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
-                // var aResult = conn.executeQuery(sQuery, iRequestNo);
                 let aResult = await connection.run(
                     SELECT`REQUESTER_ID`
                         .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
@@ -1018,9 +1007,6 @@ module.exports = cds.service.impl(function () {
             var sSupplierName = "";
 
             if (iRequestNo !== "" || iRequestNo !== null) {
-                // var sQuery =
-                //     'SELECT "VENDOR_NAME" AS VENDOR_NAME FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
-                // var aResult = conn.executeQuery(sQuery, iRequestNo);
                 let aResult = await connection.run(
                     SELECT`DIST_NAME1`
                         .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
@@ -1037,9 +1023,6 @@ module.exports = cds.service.impl(function () {
     async function getCurrentRequestStatus(connection, iRequestNo) {
         try {
             var iCount = 0;
-            // var sQuery =
-            //     'SELECT "STATUS" AS STATUS FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
-            // var aResult = conn.executeQuery(sQuery, iRequestNo);
             let aResult = await connection.run(
                 SELECT`STATUS`
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
@@ -1056,9 +1039,6 @@ module.exports = cds.service.impl(function () {
             var sCreatedById = "";
 
             if (iRequestNo !== "" || iRequestNo !== null) {
-                // var sQuery =
-                //     'SELECT "REQUESTER_ID" AS REQUESTER_ID FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
-                // var aResult = conn.executeQuery(sQuery, iRequestNo);
                 let aResult = await connection.run(
                     SELECT`REQUESTER_ID`
                         .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
@@ -1067,7 +1047,6 @@ module.exports = cds.service.impl(function () {
                     sCreatedById = aResult[0].REQUESTER_ID;
                 }
             }
-
             return sCreatedById;
         }
         catch (error) { throw error; }
@@ -1078,9 +1057,6 @@ module.exports = cds.service.impl(function () {
             var sSupplierName = "";
 
             if (iRequestNo !== "" || iRequestNo !== null) {
-                // var sQuery =
-                //     'SELECT "VENDOR_NAME" AS VENDOR_NAME FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
-                // var aResult = conn.executeQuery(sQuery, iRequestNo);
                 let aResult = await connection.run(
                     SELECT`DIST_NAME1`
                         .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
@@ -1089,7 +1065,6 @@ module.exports = cds.service.impl(function () {
                     sSupplierName = aResult[0].DIST_NAME1;
                 }
             }
-
             return sSupplierName;
         }
         catch (error) { throw error; }
@@ -1097,9 +1072,6 @@ module.exports = cds.service.impl(function () {
     async function getRequestType(connection, iRequestNo) {
         try {
             var iType = 0;
-            // var sQuery =
-            //     'SELECT "REQUEST_TYPE" AS REQUEST_TYPE FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
-            // var aResult = conn.executeQuery(sQuery, iRequestNo);
             let aResult = await connection.run(
                 SELECT`REQUEST_TYPE`
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
@@ -1107,9 +1079,7 @@ module.exports = cds.service.impl(function () {
 
             if (aResult.length > 0) {
                 iType = aResult[0].REQUEST_TYPE;
-
             }
-
             return iType;
         }
         catch (error) { throw error; }
@@ -1145,16 +1115,12 @@ module.exports = cds.service.impl(function () {
             } else {
                 throw "Incorrect Data format for posting";
             }
-
             return eventArr;
         }
         catch (error) { throw error; }
     }
     async function getNextEventCount(connection, iReq_No) {
         try {
-            // var sQuery =
-            //     'SELECT COUNT(*) AS COUNT FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::REGISTERATION_EVENT_COMMENTS" WHERE REG_NO = ?';
-            // var aResult = conn.executeQuery(sQuery, iReq_No);
             let aResult = await connection.run(
                 SELECT`COUNT(*) AS COUNT`
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_EVENTS_LOG']}`
@@ -1165,42 +1131,24 @@ module.exports = cds.service.impl(function () {
         }
         catch (error) { throw error; }
     }
-
-
     //Validation while updation----------------------------------------------------------------------------------------
     async function checkUpdate(connection, data) {
         try {
 
             let aResult = await connection.run(
-                // SELECT
-                //     .from `${connection.entities['VENDOR_PORTAL.REQUEST_ACTIVE_STATUS']} as active`
-                //     .join `VENDOR_PORTAL.REQUEST_INFO as request`
-                //     .on `active.IVEN_VENDOR_CODE = request.IVEN_VENDOR_CODE`
-                //     .where`active.IVEN_VENDOR_CODE=${data[0].IVEN_VENDOR_CODE} AND active.ACTIVE IS null AND request.STATUS NOT IN (3,8,11)`
                 SELECT
                 .from `${connection.entities['VIEW_REQUEST_ACTIVE_STATUS']} `
                 .where`SAP_DIST_CODE=${data[0].SAP_DIST_CODE} AND ACTIVE IS null AND STATUS NOT IN (3,8,11)`
        
                 );
-            // var sQuery = 'SELECT * FROM \"_SYS_BIC\".\"VENDOR_PORTAL.View/VIEW_REQUEST_ACTIVE_STATUS\"';
-            // sQuery += 'WHERE SAP_VENDOR_CODE=? AND ACTIVE IS null AND STATUS != ? AND STATUS != ? AND STATUS != ?';
-            // var aResult = con.executeQuery(sQuery, data[0].SAP_VENDOR_CODE, 3, 8, 11);
             var iNonActivecount = aResult.length;
 
             let aResult1 = await connection.run(
-                // SELECT
-                //     .from`${connection.entities['VENDOR_PORTAL.REQUEST_ACTIVE_STATUS']} as active`
-                //     .join `VENDOR_PORTAL.REQUEST_INFO as request`
-                //     .on `active.IVEN_VENDOR_CODE = request.IVEN_VENDOR_CODE`
-                //     .where`active.IVEN_VENDOR_CODE=${data[0].IVEN_VENDOR_CODE} AND active.ACTIVE = A AND request.STATUS = 11`
                     SELECT
                     .from`${connection.entities['VIEW_REQUEST_ACTIVE_STATUS']}`
                     .where`SAP_DIST_CODE=${data[0].SAP_DIST_CODE} AND ACTIVE = 'A' AND STATUS = 11`
           
                     );
-            // var sQuery2 = 'SELECT * FROM \"_SYS_BIC\".\"VENDOR_PORTAL.View/VIEW_REQUEST_ACTIVE_STATUS\"';
-            // sQuery2 += 'WHERE SAP_VENDOR_CODE=? AND ACTIVE=? AND STATUS=?';
-            // var sResult = con.executeQuery(sQuery2, data[0].SAP_VENDOR_CODE, 'A', 11);
 
             var iActivecount = aResult1.length;
 
@@ -1223,8 +1171,6 @@ module.exports = cds.service.impl(function () {
                     .from`${connection.entities['DEALER_PORTAL.MASTER_IDEAL_SETTINGS']}`
                     .where({ CODE: sSettingCode, SETTING: 'X' })
             );
-            // var sQuery = 'SELECT * FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::MASTER_IVEN_SETTINGS" ';
-            //     sQuery += 'WHERE "CODE" = ?';
 
             if (aResult.length > 0)
                 isEnabled = true;
@@ -1241,19 +1187,12 @@ module.exports = cds.service.impl(function () {
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
                     .where`STATUS NOT IN (3,8) AND DIST_NAME1 = ${data[0].DIST_NAME1}`
             );
-            // var sQuery =
-            // 	'SELECT * FROM \"VENDOR_PORTAL\".\"VENDOR_PORTAL.Table::VENDOR_INVITATION\" WHERE STATUS != ? AND STATUS != ? AND VENDOR_NAME=?';
-            // var aResult = con.executeQuery(sQuery, 3, 8, data[0].VENDOR_NAME);
 
             let aQuery2Result = await connection.run(
                 SELECT
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
                     .where`STATUS NOT IN (3,8) AND REGISTERED_ID = ${data[0].REGISTERED_ID}`
             );
-
-            // var sQuery1 =
-            // 	'SELECT * FROM \"VENDOR_PORTAL\".\"VENDOR_PORTAL.Table::VENDOR_INVITATION\" WHERE STATUS != ? AND STATUS != ? AND VEMAIL=?';
-            // var sResult = con.executeQuery(sQuery1, 3, 8, data[0].VEMAIL);
 
             var iNameCount = aQuery1Result.length;
             var iEmailCount = aQuery2Result.length;
@@ -1275,10 +1214,6 @@ module.exports = cds.service.impl(function () {
                 SELECT
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
                     .where`STATUS NOT IN (3,8) AND SAP_DIST_CODE =${data[0].SAP_DIST_CODE} `);
-            //  var sQuery =
-            //  'SELECT * FROM \"VENDOR_PORTAL\".\"VENDOR_PORTAL.Table::VENDOR_INVITATION\"
-            //  WHERE STATUS != ? AND STATUS != ? AND SAP_VENDOR_CODE=?';
-            // var aResult = con.executeQuery(sQuery, 3, 8, data[0].SAP_VENDOR_CODE); 
             if (aResult.length !== 0) {
                 flag = false;
             }
@@ -1290,9 +1225,6 @@ module.exports = cds.service.impl(function () {
         try {
             var sCreatedById = "";
             if (iRequestNo !== "" || iRequestNo !== null) {
-                // var sQuery =
-                //     'SELECT "REQUESTER_ID" AS REQUESTER_ID FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
-                // var aResult = conn.executeQuery(sQuery, iRequestNo);
                 let aResult = await connection.run(
                     SELECT`REQUESTER_ID`
                         .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
@@ -1326,7 +1258,6 @@ module.exports = cds.service.impl(function () {
         } else {
             throw "Incorrect Data format for posting";
         }
-
         return eventArr;
     }
     async function getSupplierFromRequestNo(connection, iRequestNo) {
@@ -1334,9 +1265,6 @@ module.exports = cds.service.impl(function () {
             var sSupplierName = "";
 
             if (iRequestNo !== "" || iRequestNo !== null) {
-                // var sQuery =
-                //     'SELECT "VENDOR_NAME" AS VENDOR_NAME FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
-                // var aResult = conn.executeQuery(sQuery, iRequestNo);
                 let aResult = await connection.run(
                     SELECT`DIST_NAME1`
                         .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
@@ -1353,9 +1281,6 @@ module.exports = cds.service.impl(function () {
     async function getCurrentRequestStatus(connection, iRequestNo) {
         try {
             var iCount = 0;
-            // var sQuery =
-            //     'SELECT "STATUS" AS STATUS FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
-            // var aResult = conn.executeQuery(sQuery, iRequestNo);
             let aResult = await connection.run(
                 SELECT`STATUS`
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
@@ -1372,9 +1297,6 @@ module.exports = cds.service.impl(function () {
             var sCreatedById = "";
 
             if (iRequestNo !== "" || iRequestNo !== null) {
-                // var sQuery =
-                //     'SELECT "REQUESTER_ID" AS REQUESTER_ID FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
-                // var aResult = conn.executeQuery(sQuery, iRequestNo);
                 let aResult = await connection.run(
                     SELECT`REQUESTER_ID`
                         .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
@@ -1394,9 +1316,6 @@ module.exports = cds.service.impl(function () {
             var sSupplierName = "";
 
             if (iRequestNo !== "" || iRequestNo !== null) {
-                // var sQuery =
-                //     'SELECT "VENDOR_NAME" AS VENDOR_NAME FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
-                // var aResult = conn.executeQuery(sQuery, iRequestNo);
                 let aResult = await connection.run(
                     SELECT`DIST_NAME1`
                         .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
@@ -1413,9 +1332,6 @@ module.exports = cds.service.impl(function () {
     async function getRequestType(connection, iRequestNo) {
         try {
             var iType = 0;
-            // var sQuery =
-            //     'SELECT "REQUEST_TYPE" AS REQUEST_TYPE FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::VENDOR_INVITATION" WHERE REQUEST_NO = ?';
-            // var aResult = conn.executeQuery(sQuery, iRequestNo);
             let aResult = await connection.run(
                 SELECT`REQUEST_TYPE`
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_INFO']}`
@@ -1423,9 +1339,7 @@ module.exports = cds.service.impl(function () {
 
             if (aResult.length > 0) {
                 iType = aResult[0].REQUEST_TYPE;
-
             }
-
             return iType;
         }
         catch (error) { throw error; }
@@ -1454,23 +1368,17 @@ module.exports = cds.service.impl(function () {
                         "CREATED_ON": null,
                         "EVENT_TYPE": "DELG"
                     };
-
                     eventArr.push(oEventObj);
                 }
-
             } else {
                 throw "Incorrect Data format for posting";
             }
-
             return eventArr;
         }
         catch (error) { throw error; }
     }
     async function getNextEventCount(connection, iReq_No) {
         try {
-            // var sQuery =
-            //     'SELECT COUNT(*) AS COUNT FROM "VENDOR_PORTAL"."VENDOR_PORTAL.Table::REGISTERATION_EVENT_COMMENTS" WHERE REG_NO = ?';
-            // var aResult = conn.executeQuery(sQuery, iReq_No);
             let aResult = await connection.run(
                 SELECT`COUNT(*) AS COUNT`
                     .from`${connection.entities['DEALER_PORTAL.REQUEST_EVENTS_LOG']}`
@@ -1494,8 +1402,6 @@ module.exports = cds.service.impl(function () {
            aEvents[0].EVENT_NO = iCount;
             let aResult = await connection.run(
                 INSERT (aEvents) .into (connection.entities['DEALER_PORTAL.REQUEST_EVENTS_LOG']));
-          
-
           
         }
         catch (error) { throw error; }

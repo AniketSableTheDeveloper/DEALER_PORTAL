@@ -253,7 +253,99 @@ module.exports = {
 		}
 		return sSearchTerm;
 	},
-     
+
+	getActiveDataPayload:async function(conn, iDealNo) {
+		try{
+		var sReqNo=iDealNo;
+		var aActiveData=await this.getActiveData(conn, sReqNo); 
+		var oMDGPayload =await this.getMDGPayload(aActiveData.MAIN,aActiveData.ADDRESS,aActiveData.CONTACTS,aActiveData.BANK, conn);
+		return oMDGPayload;
+	}catch(error){
+		throw error;
+	}
+	},
+	getActiveData:async function(conn, iReqNo) {
+		try{
+		var oDataObj = {
+				"MAIN":await this.getTableData(conn, iReqNo, "REQUEST_INFO") || [],
+				"ADDRESS": await this.getAddressWithDesc(conn,await this.getTableData(conn, iReqNo, "REGFORM_ADDRESS") || []),
+				"CONTACTS": await this.getTableData(conn, iReqNo, "REGFORM_CONTACTS") || [],
+				"BANK": await this.getPaymentsWithDesc(conn, await this.getTableData(conn, iReqNo, "REGFORM_BANKS") || [])
+		};
+		return oDataObj;
+	}catch(error){
+		throw error;
+	}
+},
+getTableData:async function(conn, iRegNo, sTable) {
+	try{
+	let aResult = await conn.run(
+        SELECT
+          .from`${conn.entities['DEALER_PORTAL.' + sTable]}`
+		  .where `REQUEST_NO=${iRegNo}`
+      );
+	return aResult;
+}catch(error){
+	throw error;
+}	
+},
+getAddressWithDesc:async function(conn, addressArr) {
+	try{
+    var addressWithDesc = [];
+    if (addressArr.length > 0) {
+        var dataObj = {};
+		for(var i=0;i<addressArr.length;i++)
+		{
+			dataObj = JSON.parse(JSON.stringify(addressArr[i]));
+			if (dataObj.COUNTRY !== "" || dataObj.COUNTRY !== null) {
+				dataObj.COUNTRY_DESC = await lib_admin.getCountryDesc(conn, dataObj.COUNTRY) || "";
+			}
+			if (dataObj.STATE !== "" || dataObj.STATE !== null) {
+				dataObj.REGION_DESC =await this.getRegionDesc(conn, dataObj.COUNTRY, dataObj.STATE) || "";
+			}
+			addressWithDesc.push(dataObj);
+		}
+	}
+	return addressWithDesc;
+}catch(error){
+	throw error;
+}
+},
+getRegionDesc:async function(conn, countryCode, regionCode) {
+	try{
+    var sDesc = "";
+	let aResult = await conn.run(
+        SELECT `BEZEI AS DESC`
+          .from`${conn.entities['DEALER_PORTAL.MASTER_REGION']}`
+		  .where `LAND1=${countryCode} AND BLAND=${regionCode}`
+      );
+    if(aResult.length > 0){
+        sDesc = aResult[0].DESC;
+    }
+	return sDesc;
+}catch(error){
+	throw error;
+}
+},
+getPaymentsWithDesc:function(conn, paymentArr) {
+	try{
+    var paymentWithDesc = [];
+    if (paymentArr.length > 0) {
+        var dataObj = {};
+		paymentWithDesc = Object.keys(paymentArr).map(function(key) {
+		    dataObj = JSON.parse(JSON.stringify(paymentArr[key]));
+			if (dataObj.BANK_COUNTRY !== "" || dataObj.BANK_COUNTRY !== null) {
+				dataObj.COUNTRY_DESC = lib_admin.getCountryDesc(conn, dataObj.BANK_COUNTRY) || "";
+			}
+			return dataObj;
+		});
+	}
+	return paymentWithDesc;
+}catch(error){
+	throw error;
+}
+},
+
 // Used to post data to MDG and get Change Request No. as response
 PostToMDG:async function(oSapPayload,conn) {
 	try{

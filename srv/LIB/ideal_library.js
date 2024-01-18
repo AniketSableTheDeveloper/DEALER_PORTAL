@@ -134,6 +134,13 @@ const cds = require("@sap/cds");
         aArray.push(oObject)
         return aArray;
     },
+    createLogID: function () {   
+        var oDate = new Date();
+        var sMonth = '00' + String(oDate.getMonth() + 1);
+        var sLogID = 'LOG' + oDate.getFullYear() + (sMonth).slice(-2) + ('00' + oDate.getDate()).slice(-2) + ('00' + oDate.getHours()).slice(-2) +
+            ('00' + oDate.getMinutes()).slice(-2) + ('00' + oDate.getSeconds()).slice(-2) + ('000' + oDate.getMilliseconds()).slice(-3);
+        return sLogID;
+    },
     isiDealSettingEnabled: async function (connection, sSettingCode) {
         try {
             var isEnabled = false;
