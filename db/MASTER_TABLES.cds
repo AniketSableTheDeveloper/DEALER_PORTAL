@@ -223,6 +223,11 @@ context DEALER_PORTAL {
             CREATED_ON : Timestamp;
     }
 
+    entity MASTER_ADDRESS_TYPE{
+        key CODE : String(10);
+            DESC : String(30);
+    }
+
     entity MASTER_EMAIL_CONTACT_ID {
 
         key SR_NO             : Integer;
@@ -282,6 +287,7 @@ context DEALER_PORTAL {
         S1G1T1F5 : String(1);
         S1G1T1F6 : String(1);
         S1G1T1F7 : String(1);
+        S1G1T1F8 : String(1);
         // Section 1 - General Section
         // Group 2 - Distributor Address
         S1G2T1F1 : String(1);
@@ -294,6 +300,7 @@ context DEALER_PORTAL {
         S1G2T1F8 : String(1);
         S1G2T1F9 : String(1);
         S1G2T1F10 : String(1);
+        S1G2T1F11 : String(1);
         // Section 1 - General Section
         // Group 3 - Other Office Address
         S1G3T1F1 : String(1);
@@ -306,6 +313,7 @@ context DEALER_PORTAL {
         S1G3T1F8 : String(1);
         S1G3T1F9 : String(1);
         S1G3T1F10 : String(1);
+        S1G3T1F11 : String(1);
         // Section 1 - General Section
         // Group 4 - Contact information
         S1G4T1F1 : String(1);
@@ -317,6 +325,7 @@ context DEALER_PORTAL {
         S1G4T1F7 : String(1);
         S1G4T1F8 : String(1);
         S1G4T1F9 : String(1);
+        S1G4T1F10 : String(1);
         // Section 1 - General Section
         // Group 5 - Other Contact information
         S1G5T2F1 : String(1);
@@ -329,6 +338,7 @@ context DEALER_PORTAL {
         S1G5T2F8 : String(1);
         S1G5T2F9 : String(1);
         S1G5T2F10 : String(1);
+        S1G5T2F11 : String(1);
         // Section 1 - General Section
         // Group 6 - Additional Information
         S1G6T1F1 : String(1);
@@ -336,6 +346,7 @@ context DEALER_PORTAL {
         S1G6T1F3 : String(1);
         S1G6T1F4 : String(1);
         S1G6T1F5 : String(1);
+        S1G6T1F6 : String(1);
         // Section 1 - General Section
         // Group 7 - Employee Details
         S1G7T1F1 : String(1);
@@ -348,6 +359,7 @@ context DEALER_PORTAL {
         S1G7T1F8 : String(1);
         S1G7T1F9 : String(1);
         S1G7T1F10 : String(1);
+        S1G7T1F11 : String(1);
         // Section 2 - Financial Section
         // Group 1 - Financial Information
         S2G1T1F1: String(1);
@@ -360,9 +372,10 @@ context DEALER_PORTAL {
         S2G1T1F8: String(1);
         S2G1T1F9: String(1);
         S2G1T1F10: String(1);
-        S2G1T1F11: String(1);
-        S2G1T1F12: String(1);
-        S2G1T1F13: String(1);
+        // S2G1T1F11: String(1);
+        // S2G1T1F12: String(1);
+        // S2G1T1F13: String(1);
+        S2G1T1F14: String(1);
         // Section 2 - Financial Section
         // Group 2 - Other Bank Details
         S2G2T1F1: String(1);
@@ -375,19 +388,31 @@ context DEALER_PORTAL {
         S2G2T1F8: String(1);
         S2G2T1F9: String(1);
         S2G2T1F10: String(1);
-        S2G2T1F11: String(1);
-        S2G2T1F12: String(1);
-        S2G2T1F13: String(1);
+        // S2G2T1F11: String(1);
+        // S2G2T1F12: String(1);
+        // S2G2T1F13: String(1);
+        S2G2T1F14: String(1);
         // Section 2 - Financial Section
         // Group 2 - Other Bank Details
         //Type 2 - VAT Details
         S2G2T2F1: String(1);
         S2G2T2F2: String(1);
         S2G2T2F3: String(1);
+        S2G2T2F4: String(1);
         // Section 2 - Financial Section
         // Group 2 - Other Bank Details
         //Type 3 - ICV Details
         S2G2T3F1: String(1);
+        S2G2T3F2: String(1);
+        //Section 3 - Financial Section
+        // Group 3 - Banking Details
+        //Type 1 - Banking Details
+        S2G3T1F1 : String(1);
+        S2G3T1F2 : String(1);
+        S2G3T1F3 : String(1);
+        S2G3T1F4 : String(1);
+        S2G3T1F5 : String(1);
+        S2G3T1F6 : String(1);
         // Section 3 - Operational Section
         // Group 1 - Business History Details
         S3G1T1F1 : String(1);
@@ -396,12 +421,14 @@ context DEALER_PORTAL {
         S3G1T1F4 : String(1);
         S3G1T1F5 : String(1);
         S3G1T1F6 : String(1);
+        S3G1T1F7 : String(1);
         // Section 3 - Operational Section
         // Group 2 - Customer Details
         S3G2T1F1 : String(1);
         S3G2T1F2 : String(1);
         S3G2T1F3 : String(1);
         S3G2T1F4 : String(1);
+        S3G2T1F5 : String(1);
         // Section 3 - Operational Section
         // Group 3 - Promoter/Management Details
         S3G3T1F1 : String(1);
@@ -411,6 +438,7 @@ context DEALER_PORTAL {
         S3G3T1F5 : String(1);
         S3G3T1F6 : String(1);
         S3G3T1F7 : String(1);
+        S3G3T1F8 : String(1);
         // Section 4 - Attachment Section
         // Attachment 1 - Company Profile
         S4A1F1 : String(1);
@@ -426,6 +454,7 @@ context DEALER_PORTAL {
         S4A6F1 : String(1);
         // Attachment 7 - Upload Disclosure Form
         S4A7F1 : String(1);
+        S4A8F1 : String(1);
         
     }
 
@@ -440,6 +469,7 @@ context DEALER_PORTAL {
         S1G1T1F5 : String(1);
         S1G1T1F6 : String(1);
         S1G1T1F7 : String(1);
+        S1G1T1F8 : String(1);
         // Section 1 - General Section
         // Group 2 - Distributor Address
         S1G2T1F1 : String(1);
@@ -452,6 +482,7 @@ context DEALER_PORTAL {
         S1G2T1F8 : String(1);
         S1G2T1F9 : String(1);
         S1G2T1F10 : String(1);
+        S1G2T1F11 : String(1);
         // Section 1 - General Section
         // Group 3 - Other Office Address
         S1G3T1F1 : String(1);
@@ -464,6 +495,7 @@ context DEALER_PORTAL {
         S1G3T1F8 : String(1);
         S1G3T1F9 : String(1);
         S1G3T1F10 : String(1);
+        S1G3T1F11 : String(1);
         // Section 1 - General Section
         // Group 4 - Contact information
         S1G4T1F1 : String(1);
@@ -475,6 +507,7 @@ context DEALER_PORTAL {
         S1G4T1F7 : String(1);
         S1G4T1F8 : String(1);
         S1G4T1F9 : String(1);
+        S1G4T1F10 : String(1);
         // Section 1 - General Section
         // Group 5 - Other Contact information
         S1G5T2F1 : String(1);
@@ -487,6 +520,7 @@ context DEALER_PORTAL {
         S1G5T2F8 : String(1);
         S1G5T2F9 : String(1);
         S1G5T2F10 : String(1);
+        S1G5T2F11 : String(1);
         // Section 1 - General Section
         // Group 6 - Additional Information
         S1G6T1F1 : String(1);
@@ -494,6 +528,7 @@ context DEALER_PORTAL {
         S1G6T1F3 : String(1);   
         S1G6T1F4 : String(1);
         S1G6T1F5 : String(1);
+        S1G6T1F6 : String(1);
         // Section 1 - General Section
         // Group 7 - Employee Details
         S1G7T1F1 : String(1);
@@ -506,6 +541,7 @@ context DEALER_PORTAL {
         S1G7T1F8 : String(1);
         S1G7T1F9 : String(1);
         S1G7T1F10 : String(1);
+        S1G7T1F11 : String(1);
         // Section 2 - Financial Section
         // Group 1 - Financial Information
         S2G1T1F1: String(1);
@@ -518,9 +554,10 @@ context DEALER_PORTAL {
         S2G1T1F8: String(1);
         S2G1T1F9: String(1);
         S2G1T1F10: String(1);
-        S2G1T1F11: String(1);
-        S2G1T1F12: String(1);
-        S2G1T1F13: String(1);
+        // S2G1T1F11: String(1);
+        // S2G1T1F12: String(1);
+        // S2G1T1F13: String(1);
+        S2G1T1F14: String(1);
         // Section 2 - Financial Section
         // Group 2 - Other Bank Details
         S2G2T1F1: String(1);
@@ -533,19 +570,31 @@ context DEALER_PORTAL {
         S2G2T1F8: String(1);
         S2G2T1F9: String(1);
         S2G2T1F10: String(1);
-        S2G2T1F11: String(1);
-        S2G2T1F12: String(1);
-        S2G2T1F13: String(1);
+        // S2G2T1F11: String(1);
+        // S2G2T1F12: String(1);
+        // S2G2T1F13: String(1);
+        S2G2T1F14: String(1);
         // Section 2 - Financial Section
         // Group 2 - Other Bank Details
         //Type 2 - VAT Details
         S2G2T2F1: String(1);
         S2G2T2F2: String(1);
         S2G2T2F3: String(1);
+        S2G2T2F4: String(1);
         // Section 2 - Financial Section
         // Group 2 - Other Bank Details
         //Type 3 - ICV Details
         S2G2T3F1: String(1);
+        S2G2T3F2: String(1);
+        //Section 3 - Financial Section
+        // Group 3 - Banking Details
+        //Type 1 - Banking Details
+        S2G3T1F1 : String(1);
+        S2G3T1F2 : String(1);
+        S2G3T1F3 : String(1);
+        S2G3T1F4 : String(1);
+        S2G3T1F5 : String(1);
+        S2G3T1F6 : String(1);
         // Section 3 - Operational Section
         // Group 1 - Business History Details
         S3G1T1F1 : String(1);
@@ -554,12 +603,14 @@ context DEALER_PORTAL {
         S3G1T1F4 : String(1);
         S3G1T1F5 : String(1);
         S3G1T1F6 : String(1);
+        S3G1T1F7 : String(1);
         // Section 3 - Operational Section
         // Group 2 - Customer Details
         S3G2T1F1 : String(1);
         S3G2T1F2 : String(1);
         S3G2T1F3 : String(1);
         S3G2T1F4 : String(1);
+        S3G2T1F5 : String(1);
         // Section 3 - Operational Section
         // Group 3 - Promoter/Management Details
         S3G3T1F1 : String(1);
@@ -569,6 +620,7 @@ context DEALER_PORTAL {
         S3G3T1F5 : String(1);
         S3G3T1F6 : String(1);
         S3G3T1F7 : String(1);
+        S3G3T1F8 : String(1);
         // Section 4 - Attachment Section
         // Attachment 1 - Company Profile
         S4A1F1 : String(1);
@@ -584,6 +636,7 @@ context DEALER_PORTAL {
         S4A6F1 : String(1);
         // Attachment 7 - Upload Disclosure Form
         S4A7F1 : String(1);
+        S4A8F1 : String(1);
     }
     
 }

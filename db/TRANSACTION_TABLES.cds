@@ -6,7 +6,10 @@ using {
     DEALER_PORTAL.MASTER_REQUEST_TYPE,
     DEALER_PORTAL.MASTER_COUNTRY,
     DEALER_PORTAL.MASTER_REGION,
-    DEALER_PORTAL.MASTER_CURRENCY
+    DEALER_PORTAL.MASTER_CURRENCY,
+    DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG,
+    DEALER_PORTAL.MASTER_REGFORM_FIELDS_UPDATED,
+    DEALER_PORTAL.MASTER_ADDRESS_TYPE
 } from '../db/MASTER_TABLES';
 
 entity IDEAL_ERROR_LOG {
@@ -36,79 +39,79 @@ entity REGFORM_FOLDER_IDS {
 }
 
 entity REQUEST_INFO {
-    key REQUEST_NO            : Integer64;
-        MOBILE_NO             : String(30);  //added 05/01/2023
-        SAP_DIST_CODE         : String(10); //SAP_DEALER_CODE
-        IDEAL_DIST_CODE       : Integer64; //IDEAL_DEALER_CODE
-        STATUS                : Integer;
-        REGISTERED_ID         : String(100); // Dealer Primary Email ID
-        ENTITY_CODE           : String(10);
-        REQUEST_TYPE          : Integer;
-        CREATION_TYPE         : Integer;
-        DIST_NAME1            : String(100); //DEALER_NAME1
-        DIST_NAME2            : String(100); //DEALER_NAME2
-        DIST_CODE             : String(50); //DEALER_CODE
-        APPROVER_LEVEL        : Integer;
-        HIERARCHY_ID          : String(10);
-        REQUESTER_ID          : String(100); // Request creator i.e. Buyer Email ID
-        BP_TYPE_CODE          : String(4);
-        BP_TYPE_DESC          : String(100);
-        REQUEST_RESENT        : String(5);
-        MDG_CR_NO             : String(15);
-        LAST_ACTIVE_REQ_NO    : Integer64;
-        SECONDARY_EMAILS_ID   : String(500);
-        ORG_ESTAB_YEAR            : String(4);
-        WEBSITE               : String(100);
-        VAT_REG_NUMBER        : String(25);
-        VAT_REG_DATE          : Date;
-        VAT_CHECK             : String(1);
-        LAST_SAVED_STEP       : Integer;
-        COMPLETED_BY          : String(100);
-        COMPLETED_BY_POSITION : String(50);
-        ACK_VALIDATION        : String(5);
-        SUBMISSION_DATE       : Timestamp;
-        LAST_UPDATED_ON       : Timestamp;
-        OT_PARENT_ID          : String(10);
-        OT_FOLDER1_ID         : String(25);
-        OT_FOLDER2_ID         : String(25);
-        OT_FOLDER3_ID         : String(25);
-        OT_FOLDER4_ID         : String(25);
-        NDA_TYPE              : String(50);
-        REMINDER_COUNT        : Integer;
-        BUYER_ASSIGN_CHECK    : String(1);
-        CREATED_ON            : Timestamp;
-        COMMENT               : String(1000);
-        LEGACY_ID             : String(10);
+    key REQUEST_NO               : Integer64;
+        MOBILE_NO                : String(30); //added 05/01/2023
+        SAP_DIST_CODE            : String(10); //SAP_DEALER_CODE
+        IDEAL_DIST_CODE          : Integer64; //IDEAL_DEALER_CODE
+        STATUS                   : Integer;
+        REGISTERED_ID            : String(100); // Dealer Primary Email ID
+        ENTITY_CODE              : String(10);
+        REQUEST_TYPE             : Integer;
+        CREATION_TYPE            : Integer;
+        DIST_NAME1               : String(100); //DEALER_NAME1
+        DIST_NAME2               : String(100); //DEALER_NAME2
+        DIST_CODE                : String(50); //DEALER_CODE
+        APPROVER_LEVEL           : Integer;
+        HIERARCHY_ID             : String(10);
+        REQUESTER_ID             : String(100); // Request creator i.e. Buyer Email ID
+        BP_TYPE_CODE             : String(4);
+        BP_TYPE_DESC             : String(100);
+        REQUEST_RESENT           : String(5);
+        MDG_CR_NO                : String(15);
+        LAST_ACTIVE_REQ_NO       : Integer64;
+        SECONDARY_EMAILS_ID      : String(500);
+        ORG_ESTAB_YEAR           : String(4);
+        WEBSITE                  : String(100);
+        VAT_REG_NUMBER           : String(25);
+        VAT_REG_DATE             : Date;
+        VAT_CHECK                : String(1);
+        LAST_SAVED_STEP          : Integer;
+        COMPLETED_BY             : String(100);
+        COMPLETED_BY_POSITION    : String(50);
+        ACK_VALIDATION           : String(5);
+        SUBMISSION_DATE          : Timestamp;
+        LAST_UPDATED_ON          : Timestamp;
+        OT_PARENT_ID             : String(10);
+        OT_FOLDER1_ID            : String(25);
+        OT_FOLDER2_ID            : String(25);
+        OT_FOLDER3_ID            : String(25);
+        OT_FOLDER4_ID            : String(25);
+        NDA_TYPE                 : String(50);
+        REMINDER_COUNT           : Integer;
+        BUYER_ASSIGN_CHECK       : String(1);
+        CREATED_ON               : Timestamp;
+        COMMENT                  : String(1000);
+        LEGACY_ID                : String(10);
         //refer from ideal
-        BU_CODE               : String(50);
-        TOT_PERM_EMP          : Integer;
-        TOT_TEMP_EMP          : Integer;
-        NOE_ACC               : Integer;
-        NOE_ADM               : Integer;
-        NOE_HR                : Integer;
-        NOE_QA                : Integer;
-        NOE_MAN               : Integer;
-        NOE_SAL               : Integer;
-        NOE_SEC               : Integer;
-        NOE_ANY               : Integer;
-        SAP_DIST_NO           : String(10);
-        PROPOSAL_DATE         : Date;
-        ENTITY_NAME           : String(50);
-        BUSINESS_NATURE       : String(20);
-        TERR_HOSP_ACC         : String(100);
-        SELLING_POINT         : String(200);
-        DIST_RECOMMMEDATION   : String(200);
-        DIST_RELATION         : String(200);
-        SALES_ASSOCIATE_ID    : String(100);
-        SA_APPROVED_ON        : Timestamp;
-        SAVED_AS_DRAFT        : Integer;
-        LIC_NO             : String(50);
-        LIC_NO_DATE        : Date;
+        BU_CODE                  : String(50);
+        TOT_PERM_EMP             : Integer;
+        TOT_TEMP_EMP             : Integer;
+        NOE_ACC                  : Integer;
+        NOE_ADM                  : Integer;
+        NOE_HR                   : Integer;
+        NOE_QA                   : Integer;
+        NOE_MAN                  : Integer;
+        NOE_SAL                  : Integer;
+        NOE_SEC                  : Integer;
+        NOE_ANY                  : Integer;
+        SAP_DIST_NO              : String(10);
+        PROPOSAL_DATE            : Date;
+        ENTITY_NAME              : String(50);
+        BUSINESS_NATURE          : String(20);
+        TERR_HOSP_ACC            : String(100);
+        SELLING_POINT            : String(200);
+        DIST_RECOMMMEDATION      : String(200);
+        DIST_RELATION            : String(200);
+        SALES_ASSOCIATE_ID       : String(100);
+        SA_APPROVED_ON           : Timestamp;
+        SAVED_AS_DRAFT           : Integer;
+        LIC_NO                   : String(50);
+        LIC_NO_DATE              : Date;
         // Fields from ideal
-        REGISTERED_ADDR       : String(10);
-        OFFICE_ADDR           : String(10);
-        SHIP_TO_ADDR          : String(10);
-        WAREHOUSE_ADDR        : String(10);
+        REGISTERED_ADDR          : String(10);
+        OFFICE_ADDR              : String(10);
+        SHIP_TO_ADDR             : String(10);
+        WAREHOUSE_ADDR           : String(10);
         //commented fields from iven
         // SUPPL_CATEGORY           : String(5000);
         // SUPPL_CATEGORY_DESC      : String(5000);
@@ -119,29 +122,48 @@ entity REQUEST_INFO {
         // NEXT_APPROVER            : String(100);
         // SUPPL_TYPE            : String(50);
         // SUPPL_TYPE_DESC       : String(50);
-        TO_STATUS             : Association to one DEALER_PORTAL.MASTER_STATUS
-                                    on TO_STATUS.CODE = STATUS;
-        TO_ENTITY_CODE        : Association to one DEALER_PORTAL.MASTER_ENTITY_CODE
-                                    on TO_ENTITY_CODE.BUKRS = ENTITY_CODE;
-        TO_REQUEST_TYPE       : Association to one DEALER_PORTAL.MASTER_REQUEST_TYPE
-                                    on TO_REQUEST_TYPE.CODE = REQUEST_TYPE;
-        TO_ADDRESS            : Association to many DEALER_PORTAL.REGFORM_ADDRESS
-                                    on TO_ADDRESS.REQUEST_NO = REQUEST_NO;
-        TO_CONTACTS           : Association to many DEALER_PORTAL.REGFORM_CONTACTS
-                                    on TO_CONTACTS.REQUEST_NO = REQUEST_NO;
-        TO_BANKS              : Association to many DEALER_PORTAL.REGFORM_BANKS
-                                    on TO_BANKS.REQUEST_NO = REQUEST_NO;
+        TO_STATUS                : Association to one DEALER_PORTAL.MASTER_STATUS
+                                       on TO_STATUS.CODE = STATUS;
+        TO_ENTITY_CODE           : Association to one DEALER_PORTAL.MASTER_ENTITY_CODE
+                                       on TO_ENTITY_CODE.BUKRS = ENTITY_CODE;
+        TO_REQUEST_TYPE          : Association to one DEALER_PORTAL.MASTER_REQUEST_TYPE
+                                       on TO_REQUEST_TYPE.CODE = REQUEST_TYPE;
+        TO_ADDRESS               : Association to many DEALER_PORTAL.REGFORM_ADDRESS
+                                       on TO_ADDRESS.REQUEST_NO = REQUEST_NO;
+        TO_CONTACTS              : Association to many DEALER_PORTAL.REGFORM_CONTACTS
+                                       on TO_CONTACTS.REQUEST_NO = REQUEST_NO;
+        TO_BANKS                 : Association to many DEALER_PORTAL.REGFORM_BANKS
+                                       on TO_BANKS.REQUEST_NO = REQUEST_NO;
         // TO_OWNERS                : Association to many DEALER_PORTAL.REGFORM_OWNERS
         //                                on TO_OWNERS.REQUEST_NO = REQUEST_NO;
         // TO_PRODUCT_SERVICES      : Association to many DEALER_PORTAL.REGFORM_PRODUCT_SERVICE
         //                                on TO_PRODUCT_SERVICES.REQUEST_NO = REQUEST_NO;
         // TO_CAPACITY              : Association to many DEALER_PORTAL.REGFORM_CAPACITY
         //                                on TO_CAPACITY.REQUEST_NO = REQUEST_NO;
-        TO_CUSTOMERS          : Association to many DEALER_PORTAL.REGFORM_CUSTOMERS
-                                    on TO_CUSTOMERS.REQUEST_NO = REQUEST_NO;
-        // TO_OEM                   : Association to many DEALER_PORTAL.REGFORM_OEM
-        //                                on TO_OEM.REQUEST_NO = REQUEST_NO;
-        // TO_MANDATORY_FIELDS      : Association to one
+        TO_CUSTOMERS             : Association to many DEALER_PORTAL.REGFORM_CUSTOMERS
+                                       on TO_CUSTOMERS.REQUEST_NO = REQUEST_NO;
+        TO_PROMOTERS             : Association to many DEALER_PORTAL.REGFORM_PROMOTERS
+                                       on TO_PROMOTERS.REQUEST_NO = REQUEST_NO;
+        TO_BUSINESS_HISTORY      : Association to many DEALER_PORTAL.REGFORM_BUSINESS_HISTORY
+                                       on TO_BUSINESS_HISTORY.REQUEST_NO = REQUEST_NO;
+        TO_BANKING_DETAILS       : Association to many DEALER_PORTAL.REGFORM_BANKING_DETAILS
+                                       on TO_BANKING_DETAILS.REQUEST_NO = REQUEST_NO;
+        TO_ATTACH_FIELDS         : Association to many DEALER_PORTAL.REGFORM_ATTACH_FIELDS
+                                       on TO_ATTACH_FIELDS.REQUEST_NO = REQUEST_NO;
+        TO_ATTACHMENTS           : Association to many DEALER_PORTAL.REGFORM_ATTACHMENTS
+                                       on TO_ATTACHMENTS.REQUEST_NO = REQUEST_NO;
+        TO_MANDATORY_FIELDS      : Association to one DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG
+                                       on  TO_MANDATORY_FIELDS.CCODE    = ENTITY_CODE
+                                       and TO_MANDATORY_FIELDS.REQ_TYPE = CREATION_TYPE
+                                       and TO_MANDATORY_FIELDS.TYPE     = 'M';
+        TO_VISIBLE_FIELDS        : Association to one DEALER_PORTAL.MASTER_REGFORM_FIELDS_CONFIG
+                                       on  TO_VISIBLE_FIELDS.CCODE    = ENTITY_CODE
+                                       and TO_VISIBLE_FIELDS.REQ_TYPE = CREATION_TYPE
+                                       and TO_VISIBLE_FIELDS.TYPE     = 'V';
+        TO_UPDATED_FIELDS        : Association to one DEALER_PORTAL.MASTER_REGFORM_FIELDS_UPDATED
+                                       on TO_UPDATED_FIELDS.REQ_NO = REQUEST_NO;
+        TO_REQUEST_ACTIVE_STATUS : Association to one DEALER_PORTAL.REQUEST_ACTIVE_STATUS
+                                       on TO_REQUEST_ACTIVE_STATUS.REQUEST_NO = REQUEST_NO;
 }
 
 entity REQUEST_EVENTS_LOG {
@@ -266,6 +288,8 @@ entity REGFORM_ADDRESS {
         TO_REGION        : Association to one MASTER_REGION
                                on  TO_REGION.LAND1 = COUNTRY
                                and TO_REGION.BLAND = STATE;
+        TO_ADDR_TYPE     : Association to one MASTER_ADDRESS_TYPE
+                               on TO_ADDR_TYPE.CODE = ADDRESS_TYPE;
 }
 
 entity REGFORM_CONTACTS {
@@ -362,7 +386,7 @@ entity REGFORM_ATTACHMENTS_CMS {
 
 entity SUPPLIER_PROFILE_LOG {
 
-    key SAP_DIST_CODE    : String(10);
+    key SAP_DIST_CODE      : String(10);
     key EVENT_NO           : Integer;
         EVENT_CODE         : Integer;
         EVENT_TYPE         : String(20);
@@ -376,6 +400,7 @@ entity SUPPLIER_PROFILE_LOG {
         ORG_VALUE          : String(5000);
         REQUEST_NO         : Integer64;
 }
+
 entity REGFORM_BANKS {
 
     key REQUEST_NO          : Integer64;
@@ -413,18 +438,19 @@ entity REGFORM_BANKS {
                                   on TO_CURRENCY.WAERS = BANK_CURRENCY;
 }
 
-entity REGFORM_BANKING_DETAILS{
+entity REGFORM_BANKING_DETAILS {
 
-        key REQUEST_NO          : Integer64;
-        key SR_NO               : Integer;
-        NAME                : String(100);
-        BRANCH_NAME         : String(100);
+    key REQUEST_NO   : Integer64;
+    key SR_NO        : Integer;
+        NAME         : String(100);
+        BRANCH_NAME  : String(100);
         //Fields From Ideal
-        FACILTY             : String(20);
-        AMOUNT_LIMIT        : Double;
-        ASSO_SINCE          : Integer;
-    
+        FACILTY      : String(20);
+        AMOUNT_LIMIT : Double;
+        ASSO_SINCE   : Integer;
+
 }
+
 entity REQUEST_SECURITY_CODE {
 
     key REGISTERED_ID : String(100);
@@ -433,10 +459,10 @@ entity REQUEST_SECURITY_CODE {
 
 }
 
-entity REQUEST_INFO_TEMP{
+entity REQUEST_INFO_TEMP {
     key REQUEST_NO            : Integer64;
-    key TEMP_ID          : Integer64;
-        MOBILE_NO             : String(30);  //added 05/01/2023
+    key TEMP_ID               : Integer64;
+        MOBILE_NO             : String(30); //added 05/01/2023
         SAP_DIST_CODE         : String(10); //SAP_DEALER_CODE
         IDEAL_DIST_CODE       : Integer64; //IDEAL_DEALER_CODE
         STATUS                : Integer;
@@ -456,7 +482,7 @@ entity REQUEST_INFO_TEMP{
         MDG_CR_NO             : String(15);
         LAST_ACTIVE_REQ_NO    : Integer64;
         SECONDARY_EMAILS_ID   : String(500);
-        ORG_ESTAB_YEAR            : String(4);
+        ORG_ESTAB_YEAR        : String(4);
         WEBSITE               : String(100);
         VAT_REG_NUMBER        : String(25);
         VAT_REG_DATE          : Date;
@@ -478,8 +504,8 @@ entity REQUEST_INFO_TEMP{
         CREATED_ON            : Timestamp;
         COMMENT               : String(1000);
         LEGACY_ID             : String(10);
-        LIC_NO             : String(50);
-        LIC_NO_DATE        : Date;
+        LIC_NO                : String(50);
+        LIC_NO_DATE           : Date;
         //refer from ideal
         BU_CODE               : String(50);
         TOT_PERM_EMP          : Integer;
@@ -512,7 +538,7 @@ entity REQUEST_INFO_TEMP{
                                     on TO_STATUS.CODE = STATUS;
 }
 
-entity REGFORM_ADDRESS_TEMP{
+entity REGFORM_ADDRESS_TEMP {
 
     key REQUEST_NO       : Integer64;
     key TEMP_ID          : Integer64;
@@ -538,7 +564,7 @@ entity REGFORM_ADDRESS_TEMP{
 
 }
 
-entity REGFORM_CONTACTS_TEMP{
+entity REGFORM_CONTACTS_TEMP {
 
     key REQUEST_NO       : Integer64;
     key TEMP_ID          : Integer64;

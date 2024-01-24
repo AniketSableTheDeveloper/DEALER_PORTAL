@@ -12,6 +12,7 @@ using {
   DEALER_PORTAL.REGFORM_PROMOTERS,
   DEALER_PORTAL.REGFORM_ATTACH_FIELDS,
   DEALER_PORTAL.REGFORM_ATTACHMENTS,
+  DEALER_PORTAL.REGFORM_BANKING_DETAILS
 
 } from '../db/TRANSACTION_TABLES';
 
@@ -51,6 +52,8 @@ entity MasterClientInfo                as projection on DEALER_PORTAL.MASTER_EMA
   entity MasteriVenAttachments           as projection on DEALER_PORTAL.MASTER_IDEAL_ATTACHMENTS;
   entity EmailActionlog                   as projection on DEALER_PORTAL.IDEAL_EMAIL_LOG;
   entity EmailConfig                  as projection on DEALER_PORTAL.EMAIL_CONFIG;
+  entity MasterAddressType         as projection on DEALER_PORTAL.MASTER_ADDRESS_TYPE;
+  entity RegformBankingDetails as projection on DEALER_PORTAL.REGFORM_BANKING_DETAILS;
 
   type User_Details:{
     USER_ROLE: String(50);
