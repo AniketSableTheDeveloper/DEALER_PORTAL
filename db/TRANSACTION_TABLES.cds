@@ -19,6 +19,7 @@ entity demo{
 
 entity demo2{
     ID : Integer;
+    NAME:String(30);
 }
 
 entity IDEAL_ERROR_LOG {
