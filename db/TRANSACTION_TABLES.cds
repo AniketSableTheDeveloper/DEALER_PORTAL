@@ -12,6 +12,11 @@ using {
     DEALER_PORTAL.MASTER_ADDRESS_TYPE
 } from '../db/MASTER_TABLES';
 
+
+entity demo{
+    ID : Integer;
+}
+
 entity IDEAL_ERROR_LOG {
 
     key LOG_ID           : String(50);
