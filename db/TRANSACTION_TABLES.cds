@@ -17,6 +17,10 @@ entity demo{
     ID : Integer;
 }
 
+entity demo2{
+    ID : Integer;
+}
+
 entity IDEAL_ERROR_LOG {
 
     key LOG_ID           : String(50);
